@@ -145,6 +145,8 @@ Install draw.io desktop if missing:
 - To force straight vertical connections, pin entry/exit points explicitly on edges:
   `exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0`
 - Always center-align a child node under its parent (same center x) to avoid diagonal routing
+- **Event bus pattern**: place Kafka/bus nodes in the **center of the service row**, not below — services on either side can reach it with short horizontal arrows (`exitX=1` left side, `exitX=0` right side), eliminating all line crossings
+- Horizontal connections (`exitX=1` or `exitX=0`) never cross vertical nodes in the same row; use them for peer-to-peer and publish connections
 
 ## Export
 
