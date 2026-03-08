@@ -20,6 +20,10 @@ Claude Code skill for generating Draw.io diagrams and exporting to PNG/SVG/PDF l
 - **Data**: ER diagrams, data flow diagrams (DFD)
 - **Other**: org charts, mind maps, wireframes
 
+## How it works
+
+![Workflow](assets/workflow.png)
+
 ## Dependencies
 
 | Tool | Purpose |
