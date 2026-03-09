@@ -1,8 +1,26 @@
-# drawio-skill
+# drawio-skill (Archived)
 
-Claude Code skill for generating Draw.io diagrams and exporting to PNG/SVG/PDF locally.
+> **This project has been archived.** Claude Code can already generate draw.io XML natively — a dedicated skill adds little value. See [Alternative](#alternative) below for a simpler approach.
 
 [中文文档](README_CN.md)
+
+## Alternative
+
+Instead of installing this skill, add these lines to your `CLAUDE.md` (global or project-level):
+
+```markdown
+## Draw.io
+- Export: `/Applications/draw.io.app/Contents/MacOS/draw.io -x -f png -s 2 input.drawio`
+- Default style: rounded=1, spacing=15, edge routing orthogonal
+```
+
+That's it. Claude Code already knows draw.io XML syntax, layout principles, and diagram design — no skill needed.
+
+---
+
+*Original README below for reference.*
+
+---
 
 ## What it does
 
