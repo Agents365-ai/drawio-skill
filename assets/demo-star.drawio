@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="26.0.0">
+  <diagram name="Page-1">
+    <mxGraphModel>
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Hub: Kafka -->
+        <mxCell id="2" value="Kafka" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="320" y="270" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Satellite: User Service (top) -->
+        <mxCell id="3" value="User Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="40" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Satellite: Order Service (top-right) -->
+        <mxCell id="4" value="Order Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="600" y="150" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Satellite: Payment Service (bottom-right) -->
+        <mxCell id="5" value="Payment Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="600" y="390" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Satellite: Inventory Service (bottom) -->
+        <mxCell id="6" value="Inventory Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="500" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Satellite: Notification Service (bottom-left) -->
+        <mxCell id="7" value="Notification Svc" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="40" y="390" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Satellite: Analytics Service (top-left) -->
+        <mxCell id="8" value="Analytics Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="150" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Edges: each satellite ↔ Kafka hub -->
+
+        <!-- User Service → Kafka (top down) -->
+        <mxCell id="20" value="events" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Order Service → Kafka (right to left) -->
+        <mxCell id="21" value="orders" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="4" target="2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Payment Service → Kafka (right to left) -->
+        <mxCell id="22" value="payments" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="5" target="2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Inventory Service → Kafka (bottom up) -->
+        <mxCell id="23" value="stock" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="6" target="2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Notification Service → Kafka (left to right) -->
+        <mxCell id="24" value="alerts" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="7" target="2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Analytics Service → Kafka (left to right) -->
+        <mxCell id="25" value="metrics" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="8" target="2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

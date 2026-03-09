@@ -94,12 +94,36 @@ Claude 会自动生成 `.drawio` 文件并导出为 PNG。
 
 ![微服务架构图](assets/microservices-example.png)
 
+## 拓扑示例
+
+本 skill 支持多种图表拓扑，线条路由清晰 —— 不会穿越无关的形状。
+
+### 星形拓扑（7 个节点）
+
+中央消息代理 + 6 个微服务辐射排列。连线从不同方向进入 Kafka，零交叉。
+
+![星形拓扑](assets/demo-star-cn.png)
+
+### 分层流程（10 个节点，4 层）
+
+电商架构，含 2 条交叉连线：订单→商品（同层水平）和 认证→Redis（对角线，经路由走廊绕行）。所有线条路由清晰。
+
+![分层流程](assets/demo-layered-cn.png)
+
+### 环形 / 循环（8 个节点）
+
+CI/CD 流水线，包含闭合回路和 2 个分支。线条沿矩形外围流动，不穿越内部区域。
+
+![环形循环](assets/demo-ring-cn.png)
+
 ## 文件说明
 
-- `SKILL.md` — Claude Code 加载的 skill 指令文件
+- `SKILL.md` — **唯一必需的文件**，Claude Code 加载的 skill 指令。
 - `README.md` — 英文说明
 - `README_CN.md` — 本文件（中文）
-- `assets/` — 示例图表
+- `assets/` — 示例图表和工作流图片
+
+> **提示：** 仅 `SKILL.md` 是 skill 运行所必需的。`assets/`、`README.md` 和 `README_CN.md` 仅为文档用途，可以安全删除以节省空间。
 
 ## 开源协议
 

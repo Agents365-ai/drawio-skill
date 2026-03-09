@@ -93,12 +93,36 @@ Claude will generate the `.drawio` XML file and export it to PNG automatically.
 
 ![Microservices Architecture](assets/microservices-example.png)
 
+## Topology demos
+
+The skill handles various diagram topologies with clean edge routing — no lines crossing through shapes.
+
+### Star topology (7 nodes)
+
+Central message broker with 6 microservices radiating outward. Edges enter Kafka from different sides, zero crossings.
+
+![Star topology](assets/demo-star.png)
+
+### Layered flow (10 nodes, 4 tiers)
+
+E-commerce architecture with 2 cross-connections: Order→Product (same-tier horizontal) and Auth→Redis (diagonal via routing corridor). All edges route cleanly.
+
+![Layered flow](assets/demo-layered.png)
+
+### Ring / cycle (8 nodes)
+
+CI/CD pipeline with a closed loop and 2 spur branches. Edges flow along the perimeter without crossing the interior.
+
+![Ring cycle](assets/demo-ring.png)
+
 ## Files
 
-- `SKILL.md` — skill instructions loaded by Claude Code
-- `README.md` — this file (English)
+- `SKILL.md` — **the only required file**. This is what Claude Code loads as the skill instructions.
+- `README.md` — this file (English documentation)
 - `README_CN.md` — Chinese documentation
-- `assets/` — example diagrams
+- `assets/` — example diagrams and workflow images
+
+> **Note:** Only `SKILL.md` is needed for the skill to work. The `assets/`, `README.md`, and `README_CN.md` files are documentation only and can be safely deleted to save space.
 
 ## License
 
