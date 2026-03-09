@@ -66,6 +66,8 @@ After exporting the draft PNG, read the image and check for these issues before 
 | Clipped labels | Text cut off at shape boundaries | Increase shape width/height to fit label |
 | Missing connections | Arrows that don't visually connect to shapes | Verify `source`/`target` ids match existing cells |
 | Off-canvas shapes | Shapes at negative coordinates or far from the main group | Move to positive coordinates near the cluster |
+| Edge-shape overlap | An edge/arrow visually crosses through an unrelated shape | Add waypoints (`<Array as="points">`) to route around the shape, or increase spacing between shapes |
+| Stacked edges | Multiple edges overlap each other on the same path | Distribute entry/exit points across the shape perimeter (use different exitX/entryX values) |
 
 - Max **2 self-check rounds** — if issues remain after 2 fixes, show the user anyway
 - Re-export after each fix and re-read the new PNG
@@ -161,16 +163,45 @@ Once the user approves:
 ### Connector (edge)
 
 ```xml
-<!-- Directed arrow between shapes -->
-<mxCell id="10" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="2" target="3">
+<!-- Directed arrow — always include rounded, orthogonalLoop, jettySize for clean routing -->
+<mxCell id="10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="2" target="3">
   <mxGeometry relative="1" as="geometry" />
 </mxCell>
 
-<!-- Arrow with label -->
-<mxCell id="11" value="HTTP/REST" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="2" target="4">
+<!-- Arrow with label + explicit entry/exit points to control direction -->
+<mxCell id="11" value="HTTP/REST" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="2" target="4">
   <mxGeometry relative="1" as="geometry" />
 </mxCell>
+
+<!-- Arrow with waypoints — use when edge must route around other shapes -->
+<mxCell id="12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="3" target="5">
+  <mxGeometry relative="1" as="geometry">
+    <Array as="points">
+      <mxPoint x="500" y="50" />
+    </Array>
+  </mxGeometry>
+</mxCell>
 ```
+
+**Edge style rules:**
+- **Always** include `rounded=1;orthogonalLoop=1;jettySize=auto` — these enable smart routing that avoids overlaps
+- Pin `exitX/exitY/entryX/entryY` on every edge when a node has 2+ connections — distributes lines across the shape perimeter
+- Add `<Array as="points">` waypoints when an edge must detour around an intermediate shape
+
+### Distributing connections on a shape
+
+When multiple edges connect to the same shape, assign different entry/exit points to prevent stacking:
+
+| Position | exitX/entryX | exitY/entryY | Use when |
+|----------|-------------|-------------|----------|
+| Top center | 0.5 | 0 | connecting to node above |
+| Top-left | 0.25 | 0 | 2nd connection from top |
+| Top-right | 0.75 | 0 | 3rd connection from top |
+| Right center | 1 | 0.5 | connecting to node on right |
+| Bottom center | 0.5 | 1 | connecting to node below |
+| Left center | 0 | 0.5 | connecting to node on left |
+
+**Rule:** if a shape has N connections on one side, space them evenly (e.g., 3 connections on bottom → exitX = 0.25, 0.5, 0.75)
 
 ### Color palette (fillColor / strokeColor)
 
@@ -186,15 +217,32 @@ Once the user approves:
 
 ### Layout tips
 
-- Allocate ~200px per node horizontally, ~150px vertically to avoid overlaps
-- Plan a grid before assigning x/y coordinates
+**Spacing — scale with complexity:**
+
+| Diagram complexity | Nodes | Horizontal gap | Vertical gap |
+|-------------------|-------|----------------|--------------|
+| Simple | ≤5 | 200px | 150px |
+| Medium | 6–10 | 280px | 200px |
+| Complex | >10 | 350px | 250px |
+
+**Routing corridors:** between shape rows/columns, leave an extra ~80px empty corridor where edges can route without crossing shapes. Never place a shape in a gap that edges need to traverse.
+
+**General rules:**
+- Plan a grid before assigning x/y coordinates — sketch node positions on paper/mentally first
 - Group related nodes in the same horizontal or vertical band
 - Use `swimlane` cells for logical grouping with visible borders
+- Place heavily-connected "hub" nodes centrally so edges radiate outward instead of crossing
 - To force straight vertical connections, pin entry/exit points explicitly on edges:
   `exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0`
 - Always center-align a child node under its parent (same center x) to avoid diagonal routing
 - **Event bus pattern**: place Kafka/bus nodes in the **center of the service row**, not below — services on either side can reach it with short horizontal arrows (`exitX=1` left side, `exitX=0` right side), eliminating all line crossings
 - Horizontal connections (`exitX=1` or `exitX=0`) never cross vertical nodes in the same row; use them for peer-to-peer and publish connections
+
+**Avoiding edge-shape overlap:**
+- Before finalizing coordinates, trace each edge path mentally — if it must cross an unrelated shape, either move the shape or add waypoints
+- For tree/hierarchical layouts: assign nodes to layers (rows), connect only between adjacent layers to minimize crossings
+- For star/hub layouts: place the hub center, satellites around it — edges stay short and radial
+- When an edge must span multiple rows/columns, route it along the outer corridor, not through the middle of the diagram
 
 ## Export
 
@@ -250,6 +298,7 @@ fi
 | Linux: blank/error output headlessly | Prefix command with `xvfb-run -a` |
 | PDF export fails | Ensure Chromium is available (draw.io bundles it on desktop) |
 | Background color wrong in CLI export | Known CLI bug; add `--transparent` flag or set background via style |
-| Overlapping shapes | Plan a 200px grid before placing x/y coordinates |
+| Overlapping shapes | Scale spacing with complexity (200–350px); leave routing corridors |
+| Edges crossing through shapes | Add waypoints, distribute entry/exit points, or increase spacing |
 | Special characters in `value` | Use XML entities: `&amp;` `&lt;` `&gt;` `&quot;` |
 | Iteration loop never ends | After 5 rounds, suggest user open .drawio in draw.io desktop for fine-tuning |
