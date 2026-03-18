@@ -61,7 +61,9 @@
 
 ## 工作流程
 
-![工作流程](assets/workflow-cn.png)
+<p align="center">
+  <img src="assets/workflow-cn.png" width="420" alt="工作流程">
+</p>
 
 ## 依赖项
 

@@ -61,7 +61,9 @@
 
 ## How it works
 
-![Workflow](assets/workflow.png)
+<p align="center">
+  <img src="assets/workflow.png" width="420" alt="Workflow">
+</p>
 
 ## Dependencies
 
