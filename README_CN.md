@@ -39,7 +39,7 @@
 brew install --cask drawio
 
 # 验证安装
-draw.io --version
+drawio --version
 ```
 
 ### Windows
@@ -58,7 +58,7 @@ draw.io --version
 ```bash
 # 无头导出（Linux 服务器无显示器时必须）
 sudo apt install xvfb  # Debian/Ubuntu
-xvfb-run -a draw.io --version
+xvfb-run -a drawio --version
 ```
 
 ### 平台说明

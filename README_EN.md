@@ -82,7 +82,7 @@ No browser automation or Node.js dependency required.
 brew install --cask drawio
 
 # Verify
-draw.io --version
+drawio --version
 ```
 
 ### Windows
@@ -101,7 +101,7 @@ Download `.deb` or `.rpm` from: https://github.com/jgraph/drawio-desktop/release
 ```bash
 # Headless export (required on Linux servers without display)
 sudo apt install xvfb  # Debian/Ubuntu
-xvfb-run -a draw.io --version
+xvfb-run -a drawio --version
 ```
 
 ### Platform notes
