@@ -163,7 +163,7 @@ CI/CD pipeline with a closed loop and 2 spur branches. Edges flow along the peri
 - `README_EN.md` — this file (English documentation)
 - `assets/` — example diagrams and workflow images
 
-> **Note:** Only `SKILL.md` is needed for the skill to work. The `assets/`, `README.md`, and `README_CN.md` files are documentation only and can be safely deleted to save space.
+> **Note:** Only `SKILL.md` is needed for the skill to work. The `assets/`, `README.md`, and `README_EN.md` files are documentation only and can be safely deleted to save space.
 
 > All example diagrams were generated in Claude Code with Claude Opus 4.6.
 
