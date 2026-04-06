@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="zh-CN" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>drawio-skill — From Text to Professional Diagrams</title>
-  <meta name="description" content="Claude Code skill for generating professional draw.io diagrams from natural language. 6 diagram presets, ML/DL support, self-check loop, animated connectors.">
+  <title>drawio-skill — 从文本到专业图表</title>
+  <meta name="description" content="Claude Code skill，通过自然语言生成专业 draw.io 图表。6 种图表预设、ML/DL 支持、自检循环、动画连接线。">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Theme variables */
     [data-theme="dark"] {
       --bg: #0d1117; --bg-card: #161b22; --bg-code: #1c2128;
       --border: #30363d; --text: #e6edf3; --text-muted: #8b949e;
@@ -23,14 +22,13 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
       background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden;
       transition: background 0.3s, color 0.3s;
     }
     a { color: var(--accent); text-decoration: none; }
     a:hover { color: var(--accent-hover); text-decoration: underline; }
 
-    /* Nav */
     nav {
       position: sticky; top: 0; z-index: 100;
       background: var(--bg); border-bottom: 1px solid var(--border);
@@ -53,12 +51,10 @@
     }
     .theme-btn:hover { color: var(--text); border-color: var(--text-muted); }
 
-    /* Layout */
     .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
     section { padding: 72px 0; }
     section + section { border-top: 1px solid var(--border); }
 
-    /* Hero */
     .hero { text-align: center; padding: 96px 0 72px; border-bottom: 1px solid var(--border); }
     .hero-badge {
       display: inline-block; font-size: 13px; color: var(--accent);
@@ -91,11 +87,9 @@
     .btn-outline { border: 1px solid var(--border); color: var(--text); }
     .btn-outline:hover { border-color: var(--text-muted); text-decoration: none; }
 
-    /* Section headers */
     .section-title { font-size: 32px; font-weight: 700; margin-bottom: 8px; text-align: center; }
     .section-sub { color: var(--text-muted); font-size: 17px; text-align: center; margin-bottom: 48px; }
 
-    /* Feature cards */
     .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
     .feature-card {
       background: var(--bg-card); border: 1px solid var(--border);
@@ -105,14 +99,12 @@
     .feature-card h3 { font-size: 18px; margin-bottom: 8px; }
     .feature-card p { color: var(--text-muted); font-size: 14px; }
 
-    /* Demo gallery */
     .demos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
     .demo-item { text-align: center; }
     .demo-item img { width: 100%; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 12px; }
     .demo-item h4 { font-size: 16px; margin-bottom: 4px; }
     .demo-item p { color: var(--text-muted); font-size: 13px; }
 
-    /* Comparison table */
     .compare-table { width: 100%; border-collapse: collapse; font-size: 15px; }
     .compare-table th, .compare-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
     .compare-table th { color: var(--text-muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -120,7 +112,6 @@
     .check { color: var(--green); font-weight: 700; }
     .cross { color: var(--red); }
 
-    /* Install tabs */
     .tabs { display: flex; gap: 0; margin-bottom: 0; flex-wrap: wrap; }
     .tab {
       padding: 10px 20px; background: var(--bg-card); border: 1px solid var(--border);
@@ -140,7 +131,6 @@
       line-height: 1.5; white-space: pre-wrap; color: var(--green);
     }
 
-    /* Footer */
     footer {
       border-top: 1px solid var(--border); padding: 32px 0;
       text-align: center; color: var(--text-muted); font-size: 14px;
@@ -148,7 +138,6 @@
     footer a { color: var(--text-muted); }
     footer a:hover { color: var(--text); }
 
-    /* Responsive */
     @media (max-width: 640px) {
       .hero h1 { font-size: 32px; }
       .hero p { font-size: 17px; }
@@ -163,20 +152,20 @@
   <nav>
     <div class="logo">drawio-<span>skill</span></div>
     <div class="nav-right">
-      <a href="zh.html" class="lang-switch">中文</a>
-      <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">&#x1F319;</button>
+      <a href="index.html" class="lang-switch">English</a>
+      <button class="theme-btn" onclick="toggleTheme()" title="切换主题">&#x1F319;</button>
     </div>
   </nav>
 
   <!-- Hero -->
   <div class="hero">
     <div class="container">
-      <div class="hero-badge">v1.1.0 &mdash; Now with 6 Diagram Presets</div>
+      <div class="hero-badge">v1.1.0 &mdash; 新增 6 种图表预设</div>
       <h1>drawio-<span>skill</span></h1>
-      <p>From text to professional diagrams. Generate draw.io files from natural language with self-check, iterative refinement, and ML model support.</p>
+      <p>从文本到专业图表。通过自然语言生成 draw.io 文件，支持自检、迭代优化和 ML 模型图。</p>
       <div class="hero-install">
         <code id="install-cmd">git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio-skill</code>
-        <button class="copy-btn" onclick="copyInstall()">Copy</button>
+        <button class="copy-btn" onclick="copyInstall()">复制</button>
       </div>
       <div class="hero-links">
         <a href="https://github.com/Agents365-ai/drawio-skill" class="btn btn-primary">GitHub</a>
@@ -189,38 +178,38 @@
   <!-- Features -->
   <section>
     <div class="container">
-      <h2 class="section-title">Why This Skill</h2>
-      <p class="section-sub">The only pure-SKILL.md solution that reads its own output and auto-fixes before showing you.</p>
+      <h2 class="section-title">为什么选择这个 Skill</h2>
+      <p class="section-sub">唯一能自动读取输出并在展示前自动修复的纯 SKILL.md 方案。</p>
       <div class="features-grid">
         <div class="feature-card">
           <div class="feature-icon">&#x1F4CB;</div>
-          <h3>6 Diagram Presets</h3>
-          <p>ERD, UML Class, Sequence, Architecture, ML/Deep Learning, Flowchart &mdash; each with preset shapes, styles, and layout conventions.</p>
+          <h3>6 种图表预设</h3>
+          <p>ERD、UML 类图、序列图、架构图、ML/深度学习、流程图 &mdash; 每种都有预设形状、样式和布局规范。</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">&#x1F9E0;</div>
-          <h3>ML / Deep Learning</h3>
-          <p>Transformer, CNN, LSTM architectures with tensor shape annotations (B, C, H, W). Built for NeurIPS, ICML, ICLR papers.</p>
+          <h3>ML / 深度学习</h3>
+          <p>Transformer、CNN、LSTM 架构，带张量形状标注 (B, C, H, W)。专为 NeurIPS、ICML、ICLR 论文打造。</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">&#x1F50D;</div>
-          <h3>Self-Check Loop</h3>
-          <p>Reads the exported PNG, detects 6 issue types (overlaps, clipped labels, stacked edges), and auto-fixes before showing you.</p>
+          <h3>自检循环</h3>
+          <p>读取导出的 PNG，检测 6 类问题（重叠、标签裁切、连线堆叠），在展示给你之前自动修复。</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">&#x2728;</div>
-          <h3>Animated Connectors</h3>
-          <p>Add <code>flowAnimation=1</code> for moving dot animations along arrows. Ideal for data-flow and pipeline diagrams in SVG.</p>
+          <h3>动画连接线</h3>
+          <p>添加 <code>flowAnimation=1</code> 即可在箭头上显示移动动画。适合数据流和管道图的 SVG 导出。</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">&#x1F310;</div>
-          <h3>5 Platforms, Zero Config</h3>
-          <p>Claude Code, OpenClaw, Hermes, Codex, SkillsMP &mdash; just one SKILL.md file + draw.io desktop. No MCP, no Node.js.</p>
+          <h3>5 大平台、零配置</h3>
+          <p>Claude Code、OpenClaw、Hermes、Codex、SkillsMP &mdash; 仅需一个 SKILL.md + draw.io 桌面版，无需 MCP、Node.js。</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">&#x1F4BB;</div>
-          <h3>Browser Fallback</h3>
-          <p>No desktop CLI? Generates a diagrams.net URL that opens your diagram in the browser for viewing and editing.</p>
+          <h3>浏览器降级</h3>
+          <p>没有桌面 CLI？自动生成 diagrams.net URL，在浏览器中查看和编辑图表。</p>
         </div>
       </div>
     </div>
@@ -229,23 +218,23 @@
   <!-- Demo Gallery -->
   <section>
     <div class="container">
-      <h2 class="section-title">Demo Gallery</h2>
-      <p class="section-sub">Clean edge routing across different topologies &mdash; no lines crossing through shapes.</p>
+      <h2 class="section-title">示例展示</h2>
+      <p class="section-sub">不同拓扑的清晰连线路由 &mdash; 线条不会穿越无关形状。</p>
       <div class="demos">
         <div class="demo-item">
-          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/demo-star.png" alt="Star topology diagram">
-          <h4>Star Topology</h4>
-          <p>7 nodes &mdash; central broker, 6 services radiating outward</p>
+          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/demo-star-cn.png" alt="星形拓扑图">
+          <h4>星形拓扑</h4>
+          <p>7 个节点 &mdash; 中央消息代理 + 6 个微服务辐射排列</p>
         </div>
         <div class="demo-item">
-          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/demo-layered.png" alt="Layered flow diagram">
-          <h4>Layered Flow</h4>
-          <p>10 nodes, 4 tiers &mdash; with cross-connections routed cleanly</p>
+          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/demo-layered-cn.png" alt="分层流程图">
+          <h4>分层流程</h4>
+          <p>10 个节点、4 层 &mdash; 交叉连线清晰路由</p>
         </div>
         <div class="demo-item">
-          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/demo-ring.png" alt="Ring cycle diagram">
-          <h4>Ring / Cycle</h4>
-          <p>8 nodes &mdash; CI/CD pipeline with closed loop and spur branches</p>
+          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/demo-ring-cn.png" alt="环形循环图">
+          <h4>环形 / 循环</h4>
+          <p>8 个节点 &mdash; CI/CD 流水线，含闭合回路和分支</p>
         </div>
       </div>
     </div>
@@ -254,26 +243,26 @@
   <!-- Comparison -->
   <section>
     <div class="container">
-      <h2 class="section-title">vs Native Agent</h2>
-      <p class="section-sub">What you get with the skill vs prompting an LLM directly.</p>
+      <h2 class="section-title">对比原生智能体</h2>
+      <p class="section-sub">使用本 skill 与直接提示 LLM 的区别。</p>
       <table class="compare-table">
         <thead>
-          <tr><th>Feature</th><th>Native Agent</th><th>This Skill</th></tr>
+          <tr><th>功能</th><th>原生智能体</th><th>本 Skill</th></tr>
         </thead>
         <tbody>
-          <tr><td>Self-check after export</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 2-round auto-fix</td></tr>
-          <tr><td>Iterative review loop</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 5-round with targeted edits</td></tr>
-          <tr><td>Diagram type presets</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 6 presets (ERD, UML, Seq, Arch, ML, Flow)</td></tr>
-          <tr><td>ML model diagrams</td><td class="cross">&#x2717;</td><td class="check">&#x2713; Tensor shapes, layer colors</td></tr>
-          <tr><td>Animated connectors</td><td class="cross">&#x2717;</td><td class="check">&#x2713; flowAnimation=1</td></tr>
-          <tr><td>Grid-aligned layout</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 10px snap</td></tr>
-          <tr><td>Complexity-scaled spacing</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 200&ndash;350px by node count</td></tr>
-          <tr><td>Color palette</td><td class="cross">Random</td><td class="check">&#x2713; 7-color semantic system</td></tr>
-          <tr><td>Edge routing rules</td><td class="cross">Basic</td><td class="check">&#x2713; Corridors + waypoints + distribution</td></tr>
-          <tr><td>Container/group nesting</td><td class="cross">&#x2717;</td><td class="check">&#x2713; Swimlane + group + custom</td></tr>
-          <tr><td>Embed diagram in export</td><td class="cross">&#x2717;</td><td class="check">&#x2713; --embed-diagram</td></tr>
-          <tr><td>Browser fallback</td><td class="cross">&#x2717;</td><td class="check">&#x2713; diagrams.net URL</td></tr>
-          <tr><td>Auto-launch desktop app</td><td class="cross">&#x2717;</td><td class="check">&#x2713; Opens .drawio for fine-tuning</td></tr>
+          <tr><td>导出后自检</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 2 轮自动修复</td></tr>
+          <tr><td>迭代反馈循环</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 5 轮定向编辑</td></tr>
+          <tr><td>图表类型预设</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 6 种预设（ERD、UML、序列、架构、ML、流程）</td></tr>
+          <tr><td>ML 模型图</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 张量标注、层配色</td></tr>
+          <tr><td>动画连接线</td><td class="cross">&#x2717;</td><td class="check">&#x2713; flowAnimation=1</td></tr>
+          <tr><td>网格对齐布局</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 10px 对齐</td></tr>
+          <tr><td>按复杂度分级间距</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 200&ndash;350px</td></tr>
+          <tr><td>配色方案</td><td class="cross">随机</td><td class="check">&#x2713; 7 色语义系统</td></tr>
+          <tr><td>连线路由规则</td><td class="cross">基础</td><td class="check">&#x2713; 走廊 + waypoints + 分布</td></tr>
+          <tr><td>容器/分组</td><td class="cross">&#x2717;</td><td class="check">&#x2713; Swimlane + group + 自定义</td></tr>
+          <tr><td>嵌入式导出</td><td class="cross">&#x2717;</td><td class="check">&#x2713; --embed-diagram</td></tr>
+          <tr><td>浏览器降级</td><td class="cross">&#x2717;</td><td class="check">&#x2713; diagrams.net URL</td></tr>
+          <tr><td>自动启动桌面版</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 导出后打开 .drawio</td></tr>
         </tbody>
       </table>
     </div>
@@ -282,8 +271,8 @@
   <!-- Install -->
   <section>
     <div class="container">
-      <h2 class="section-title">Install</h2>
-      <p class="section-sub">Pick your platform. Takes 10 seconds.</p>
+      <h2 class="section-title">安装</h2>
+      <p class="section-sub">选择你的平台，10 秒搞定。</p>
       <div class="tabs">
         <div class="tab active" onclick="switchTab(event, 'tab-claude')">Claude Code</div>
         <div class="tab" onclick="switchTab(event, 'tab-openclaw')">OpenClaw</div>
@@ -292,32 +281,32 @@
         <div class="tab" onclick="switchTab(event, 'tab-codex')">Codex</div>
       </div>
       <div id="tab-claude" class="tab-content active">
-        <pre># Global install (available in all projects)
+        <pre># 全局安装（所有项目可用）
 git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio-skill
 
-# Project-level install
+# 项目级安装
 git clone https://github.com/Agents365-ai/drawio-skill.git .claude/skills/drawio-skill</pre>
       </div>
       <div id="tab-openclaw" class="tab-content">
-        <pre># Via ClawHub registry
+        <pre># 通过 ClawHub 安装
 clawhub install drawio-pro-skill
 
-# Manual install
+# 手动安装
 git clone https://github.com/Agents365-ai/drawio-skill.git ~/.openclaw/skills/drawio-skill</pre>
       </div>
       <div id="tab-skillsmp" class="tab-content">
-        <pre># Via SkillsMP CLI
+        <pre># 通过 SkillsMP CLI
 skills install drawio-skill</pre>
       </div>
       <div id="tab-clawhub" class="tab-content">
-        <pre># Via ClawHub CLI
+        <pre># 通过 ClawHub CLI
 clawhub install drawio-pro-skill</pre>
       </div>
       <div id="tab-codex" class="tab-content">
-        <pre># User-level install
+        <pre># 用户级安装
 git clone https://github.com/Agents365-ai/drawio-skill.git ~/.agents/skills/drawio-skill
 
-# Project-level install
+# 项目级安装
 git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio-skill</pre>
       </div>
     </div>
@@ -327,7 +316,7 @@ git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio
   <footer>
     <div class="container">
       <p>
-        MIT License &middot;
+        MIT 许可证 &middot;
         <a href="https://github.com/Agents365-ai/drawio-skill">GitHub</a> &middot;
         <a href="https://github.com/Agents365-ai">Agents365-ai</a>
       </p>
@@ -339,8 +328,8 @@ git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio
       const cmd = document.getElementById('install-cmd').textContent;
       navigator.clipboard.writeText(cmd).then(() => {
         const btn = document.querySelector('.copy-btn');
-        btn.textContent = 'Copied!';
-        setTimeout(() => btn.textContent = 'Copy', 2000);
+        btn.textContent = '已复制!';
+        setTimeout(() => btn.textContent = '复制', 2000);
       });
     }
     function switchTab(e, id) {
@@ -357,7 +346,6 @@ git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio
       localStorage.setItem('theme', next);
       document.querySelector('.theme-btn').innerHTML = next === 'dark' ? '&#x1F319;' : '&#x2600;&#xFE0F;';
     }
-    // Restore saved theme
     (function() {
       const saved = localStorage.getItem('theme');
       if (saved) {
