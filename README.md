@@ -10,18 +10,30 @@
 - Iterative design: preview, get feedback, and refine diagrams until they look right
 - Triggers automatically when diagrams would help explain complex systems
 
+## Multi-Platform Support
+
+Works with all major AI coding agents that support the [Agent Skills](https://agentskills.io) format:
+
+| Platform | Status | Details |
+|----------|--------|---------|
+| **Claude Code** | ✅ Full support | Native SKILL.md format |
+| **OpenClaw** | ✅ Full support | `metadata.openclaw` namespace, dependency gating, installer |
+| **Hermes Agent** | ✅ Full support | `metadata.hermes` namespace, tags, tool gating |
+| **OpenAI Codex** | ✅ Full support | `agents/openai.yaml` sidecar file |
+| **SkillsMP** | ✅ Indexed | GitHub topics configured |
+
 ## Comparison
 
-### vs Native Claude Code (no skill)
+### vs No Skill (native agent)
 
-| Feature | Native Claude Code | This skill |
-|---------|-------------------|------------|
-| Generate draw.io XML | Yes — Claude knows the format | Yes |
+| Feature | Native agent | This skill |
+|---------|-------------|------------|
+| Generate draw.io XML | Yes — LLMs know the format | Yes |
 | Self-check after export | No | Yes — reads PNG and auto-fixes 6 issue types |
 | Iterative review loop | No — must manually re-prompt | Yes — targeted edits, 5-round safety valve |
 | Proactive triggers | No — only when explicitly asked | Yes — auto-suggests when 3+ components |
 | Layout guidelines | None — varies by run | Complexity-scaled spacing, routing corridors, hub placement |
-| Color palette | Random/inconsistent | 7-color semantic system (blue=services, green=DB, purple=auth…) |
+| Color palette | Random/inconsistent | 7-color semantic system (blue=services, green=DB, purple=auth...) |
 | Edge routing rules | Basic | Pin entry/exit points, distribute connections, waypoint corridors |
 | Container/group patterns | None | Swimlane, group, custom container with parent-child nesting |
 | Embed diagram in export | No | Yes — `--embed-diagram` keeps exported PNG/SVG/PDF editable |
@@ -33,6 +45,7 @@
 |---------|-----------|---------------|-------------------|--------------|
 | **Approach** | Pure SKILL.md | SKILL.md / MCP / Project | YAML DSL + MCP | Plugin + browser |
 | **Dependencies** | draw.io desktop only | draw.io desktop | MCP server (`npx`) | Browser + local server |
+| **Multi-agent** | ✅ 5 platforms | ❌ Claude Code only | ❌ Claude Code only | ❌ |
 | **Self-check** | ✅ 2-round auto-fix | ❌ | ❌ | ❌ screenshot |
 | **Iterative review** | ✅ 5-round loop | ❌ generate once | ✅ 3 workflows | ❌ |
 | **Layout guidance** | ✅ complexity-scaled | ✅ basic spacing | ❌ relies on MCP | ❌ |
@@ -44,10 +57,10 @@
 | **Cloud icons** | AWS basic | ❌ | ✅ AWS/GCP/Azure/K8s | ❌ |
 | **Zero-config** | ✅ copy SKILL.md | ✅ | ❌ needs `npx` | ❌ needs plugin install |
 
-### Key advantages of this skill
+### Key advantages
 
 1. **Self-check + iterative loop** — the only pure-SKILL.md solution that reads its own output and auto-fixes before showing the user, then supports multi-round refinement
-2. **Zero-config, zero-dependency** — just one `SKILL.md` file + draw.io desktop. No MCP server, no Python, no Node.js, no browser
+2. **Multi-agent, zero-config** — works across 5 platforms with just one `SKILL.md` file + draw.io desktop. No MCP server, no Python, no Node.js, no browser
 3. **Production-grade layout** — complexity-scaled spacing, routing corridors, hub-center strategy, connection distribution rules
 4. **Full Chinese support** — proactive triggers ("画图", "架构图"), bilingual documentation
 
@@ -65,15 +78,9 @@
   <img src="assets/workflow.png" width="420" alt="Workflow">
 </p>
 
-## Dependencies
+## Prerequisites
 
-| Tool | Purpose |
-|------|---------|
-| `draw.io` desktop app | Native CLI to export `.drawio` → PNG/SVG/PDF |
-
-No browser automation or Node.js dependency required.
-
-## Install
+The draw.io desktop app must be installed for diagram export:
 
 ### macOS
 
@@ -103,8 +110,6 @@ Download `.deb` or `.rpm` from: https://github.com/jgraph/drawio-desktop/release
 sudo apt install xvfb  # Debian/Ubuntu
 xvfb-run -a drawio --version
 ```
-
-### Platform notes
 
 | Platform | Extra step |
 |----------|------------|
@@ -189,7 +194,7 @@ Create a microservices e-commerce architecture with API Gateway, auth/user/order
 Kafka message queue, notification service, and separate databases for each service
 ```
 
-Claude will generate the `.drawio` XML file and export it to PNG automatically.
+The agent will generate the `.drawio` XML file and export it to PNG automatically.
 
 ## Example
 
@@ -224,18 +229,6 @@ CI/CD pipeline with a closed loop and 2 spur branches. Edges flow along the peri
 
 ![Ring cycle](assets/demo-ring.png)
 
-## Multi-Platform Support
-
-This skill is compatible with the following platforms:
-
-| Platform | Status | Details |
-|----------|--------|---------|
-| **Claude Code** | ✅ Full support | Native SKILL.md format |
-| **OpenClaw** | ✅ Full support | `metadata.openclaw` namespace, dependency gating, installer |
-| **Hermes Agent** | ✅ Full support | `metadata.hermes` namespace, tags, tool gating |
-| **OpenAI Codex** | ✅ Full support | `agents/openai.yaml` sidecar file |
-| **SkillsMP** | ✅ Indexed | GitHub topics configured |
-
 ## Files
 
 - `SKILL.md` — **the only required file**. Loaded by all platforms as the skill instructions.
@@ -244,9 +237,9 @@ This skill is compatible with the following platforms:
 - `README_CN.md` — Chinese documentation
 - `assets/` — example diagrams and workflow images
 
-> **Note:** Only `SKILL.md` is needed for the skill to work. `agents/openai.yaml` is only needed for Codex. The `assets/`, `README.md`, and `README_EN.md` files are documentation only and can be safely deleted to save space.
+> **Note:** Only `SKILL.md` is needed for the skill to work. `agents/openai.yaml` is only needed for Codex. The `assets/` and README files are documentation only and can be safely deleted to save space.
 
-> All example diagrams were generated in Claude Code with Claude Opus 4.6.
+> All example diagrams were generated by Claude Opus 4.6 with this skill.
 
 ## License
 
