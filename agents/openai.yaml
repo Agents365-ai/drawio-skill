@@ -1,0 +1,7 @@
+interface:
+  display_name: "Draw.io Diagrams"
+  short_description: "Generate draw.io diagrams from natural language and export to PNG/SVG/PDF"
+  brand_color: "#F08705"
+
+policy:
+  allow_implicit_invocation: true

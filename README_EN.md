@@ -112,6 +112,74 @@ xvfb-run -a drawio --version
 | **Windows** | Use full path if not in PATH |
 | **Linux** | Wrap commands with `xvfb-run -a` for headless export |
 
+## Skill Installation
+
+### Claude Code
+
+```bash
+# Global install (available in all projects)
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio
+
+# Project-level install
+git clone https://github.com/Agents365-ai/drawio-skill.git .claude/skills/drawio
+```
+
+### OpenClaw
+
+```bash
+# Via ClawHub
+clawhub install drawio
+
+# Manual install
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.openclaw/skills/drawio
+
+# Project-level install
+git clone https://github.com/Agents365-ai/drawio-skill.git skills/drawio
+```
+
+### Hermes Agent
+
+```bash
+# Install under design category
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.hermes/skills/design/drawio
+```
+
+Or add an external directory in `~/.hermes/config.yaml`:
+
+```yaml
+skills:
+  external_dirs:
+    - ~/myskills/drawio-skill
+```
+
+### OpenAI Codex
+
+```bash
+# User-level install
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.agents/skills/drawio
+
+# Project-level install
+git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio
+```
+
+### SkillsMP
+
+Search for `drawio` on [skillsmp.com](https://skillsmp.com) or use the CLI:
+
+```bash
+skills install drawio
+```
+
+### Installation paths summary
+
+| Platform | Global path | Project path |
+|----------|-------------|--------------|
+| Claude Code | `~/.claude/skills/drawio/` | `.claude/skills/drawio/` |
+| OpenClaw | `~/.openclaw/skills/drawio/` | `skills/drawio/` |
+| Hermes Agent | `~/.hermes/skills/design/drawio/` | Via `external_dirs` config |
+| OpenAI Codex | `~/.agents/skills/drawio/` | `.agents/skills/drawio/` |
+| SkillsMP | N/A (installed via CLI) | N/A |
+
 ## Usage
 
 Just describe what you want:
@@ -156,14 +224,27 @@ CI/CD pipeline with a closed loop and 2 spur branches. Edges flow along the peri
 
 ![Ring cycle](assets/demo-ring.png)
 
+## Multi-Platform Support
+
+This skill is compatible with the following platforms:
+
+| Platform | Status | Details |
+|----------|--------|---------|
+| **Claude Code** | ✅ Full support | Native SKILL.md format |
+| **OpenClaw** | ✅ Full support | `metadata.openclaw` namespace, dependency gating, installer |
+| **Hermes Agent** | ✅ Full support | `metadata.hermes` namespace, tags, tool gating |
+| **OpenAI Codex** | ✅ Full support | `agents/openai.yaml` sidecar file |
+| **SkillsMP** | ✅ Indexed | GitHub topics configured |
+
 ## Files
 
-- `SKILL.md` — **the only required file**. This is what Claude Code loads as the skill instructions.
+- `SKILL.md` — **the only required file**. Loaded by all platforms as the skill instructions.
+- `agents/openai.yaml` — OpenAI Codex-specific configuration (UI, policy)
 - `README.md` — Chinese documentation (displayed on GitHub homepage)
 - `README_EN.md` — this file (English documentation)
 - `assets/` — example diagrams and workflow images
 
-> **Note:** Only `SKILL.md` is needed for the skill to work. The `assets/`, `README.md`, and `README_EN.md` files are documentation only and can be safely deleted to save space.
+> **Note:** Only `SKILL.md` is needed for the skill to work. `agents/openai.yaml` is only needed for Codex. The `assets/`, `README.md`, and `README_EN.md` files are documentation only and can be safely deleted to save space.
 
 > All example diagrams were generated in Claude Code with Claude Opus 4.6.
 
