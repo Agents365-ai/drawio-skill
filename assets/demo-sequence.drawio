@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="draw.io" type="device">
+  <diagram name="Login Sequence" id="seq-login">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Lifeline: Client -->
+        <mxCell id="10" value="Client" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="100" y="40" width="100" height="400" as="geometry" />
+        </mxCell>
+
+        <!-- Lifeline: API Gateway -->
+        <mxCell id="20" value="API Gateway" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="300" y="40" width="100" height="400" as="geometry" />
+        </mxCell>
+
+        <!-- Lifeline: Auth Service -->
+        <mxCell id="30" value="Auth Service" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="500" y="40" width="100" height="400" as="geometry" />
+        </mxCell>
+
+        <!-- Lifeline: User DB -->
+        <mxCell id="40" value="User DB" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="700" y="40" width="100" height="400" as="geometry" />
+        </mxCell>
+
+        <!-- Message 1: Client -> API Gateway: login request (sync) -->
+        <mxCell id="51" value="login(user, pass)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=orthogonalEdgeStyle;rounded=1;" edge="1" parent="1" source="10" target="20">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="150" y="120" as="sourcePoint" />
+            <mxPoint x="350" y="120" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="150" y="120" />
+              <mxPoint x="350" y="120" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Message 2: API Gateway -> Auth Service: forward auth (sync) -->
+        <mxCell id="52" value="authenticate(user, pass)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=orthogonalEdgeStyle;rounded=1;" edge="1" parent="1" source="20" target="30">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="350" y="160" as="sourcePoint" />
+            <mxPoint x="550" y="160" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="350" y="160" />
+              <mxPoint x="550" y="160" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Message 3: Auth Service -> User DB: query user (sync) -->
+        <mxCell id="53" value="SELECT * FROM users" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=orthogonalEdgeStyle;rounded=1;" edge="1" parent="1" source="30" target="40">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="550" y="200" as="sourcePoint" />
+            <mxPoint x="750" y="200" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="550" y="200" />
+              <mxPoint x="750" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Message 4: User DB -> Auth Service: return user data (dashed return) -->
+        <mxCell id="54" value="userData" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;strokeColor=#999999;edgeStyle=orthogonalEdgeStyle;rounded=1;" edge="1" parent="1" source="40" target="30">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="750" y="240" as="sourcePoint" />
+            <mxPoint x="550" y="240" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="750" y="240" />
+              <mxPoint x="550" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Message 5: Auth Service generates JWT (self-call note) -->
+        <mxCell id="55" value="generateJWT(userData)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=orthogonalEdgeStyle;rounded=1;" edge="1" parent="1" source="30" target="30">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="550" y="280" as="sourcePoint" />
+            <mxPoint x="600" y="280" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="600" y="270" />
+              <mxPoint x="600" y="290" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Message 6: Auth Service -> API Gateway: return token (dashed return) -->
+        <mxCell id="56" value="JWT token" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;strokeColor=#999999;edgeStyle=orthogonalEdgeStyle;rounded=1;" edge="1" parent="1" source="30" target="20">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="550" y="320" as="sourcePoint" />
+            <mxPoint x="350" y="320" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="550" y="320" />
+              <mxPoint x="350" y="320" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Message 7: API Gateway -> Client: return token (dashed return) -->
+        <mxCell id="57" value="{ token: JWT }" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;strokeColor=#999999;edgeStyle=orthogonalEdgeStyle;rounded=1;" edge="1" parent="1" source="20" target="10">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="350" y="360" as="sourcePoint" />
+            <mxPoint x="150" y="360" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="350" y="360" />
+              <mxPoint x="150" y="360" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

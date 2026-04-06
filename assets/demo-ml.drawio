@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="draw.io" type="device">
+  <diagram name="CNN Architecture" id="cnn-arch">
+    <mxGraphModel dx="1200" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="800" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Input Image -->
+        <mxCell id="10" value="Input Image&#xa;(B, 3, 224, 224)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="40" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Conv2D + ReLU (1) -->
+        <mxCell id="20" value="Conv2D + ReLU&#xa;(B, 64, 112, 112)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="190" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- MaxPool (1) -->
+        <mxCell id="30" value="MaxPool 2x2&#xa;(B, 64, 56, 56)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="340" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Conv2D + ReLU (2) -->
+        <mxCell id="40" value="Conv2D + ReLU&#xa;(B, 128, 56, 56)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="490" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- MaxPool (2) -->
+        <mxCell id="50" value="MaxPool 2x2&#xa;(B, 128, 28, 28)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="640" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Flatten -->
+        <mxCell id="60" value="Flatten&#xa;(B, 100352)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="320" y="790" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- FC (512) -->
+        <mxCell id="70" value="FC + ReLU&#xa;(B, 512)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="940" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- FC (10) -->
+        <mxCell id="80" value="FC&#xa;(B, 10)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="1090" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Softmax Output -->
+        <mxCell id="90" value="Softmax Output&#xa;(B, 10)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="1240" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows -->
+        <mxCell id="101" style="endArrow=block;endFill=1;html=1;" edge="1" parent="1" source="10" target="20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="102" style="endArrow=block;endFill=1;html=1;" edge="1" parent="1" source="20" target="30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="103" style="endArrow=block;endFill=1;html=1;" edge="1" parent="1" source="30" target="40">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="104" style="endArrow=block;endFill=1;html=1;" edge="1" parent="1" source="40" target="50">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="105" style="endArrow=block;endFill=1;html=1;" edge="1" parent="1" source="50" target="60">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="106" style="endArrow=block;endFill=1;html=1;" edge="1" parent="1" source="60" target="70">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="107" style="endArrow=block;endFill=1;html=1;" edge="1" parent="1" source="70" target="80">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="108" style="endArrow=block;endFill=1;html=1;" edge="1" parent="1" source="80" target="90">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

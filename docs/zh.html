@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>drawio-skill — 从文本到专业图表</title>
   <meta name="description" content="Claude Code skill，通过自然语言生成专业 draw.io 图表。6 种图表预设、ML/DL 支持、自检循环、动画连接线。">
+  <meta name="theme-color" content="#0d1117">
+  <link rel="canonical" href="https://agents365-ai.github.io/drawio-skill/zh.html">
+  <link rel="alternate" hreflang="zh" href="https://agents365-ai.github.io/drawio-skill/zh.html">
+  <link rel="alternate" hreflang="en" href="https://agents365-ai.github.io/drawio-skill/">
+  <meta property="og:title" content="drawio-skill — 从文本到专业图表">
+  <meta property="og:description" content="Claude Code skill，通过自然语言生成专业 draw.io 图表。6 种图表预设、ML/DL 支持、自检循环。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://agents365-ai.github.io/drawio-skill/zh.html">
+  <meta property="og:image" content="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/demo-star-cn.png">
+  <meta name="twitter:card" content="summary_large_image">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -120,6 +130,7 @@
     }
     .tab:first-child { border-radius: 8px 0 0 0; }
     .tab:last-child { border-radius: 0 8px 0 0; }
+    button.tab { font-family: inherit; }
     .tab.active { background: var(--bg-code); color: var(--text); border-bottom-color: var(--bg-code); }
     .tab-content {
       display: none; background: var(--bg-code); border: 1px solid var(--border);
@@ -145,18 +156,26 @@
       .features-grid { grid-template-columns: 1fr; }
       .hero-install { flex-direction: column; font-size: 13px; }
     }
+    .skip-link {
+      position: absolute; top: -40px; left: 0; background: var(--accent); color: #fff;
+      padding: 8px 16px; z-index: 200; font-size: 14px; transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; }
+    .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   </style>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">跳转到主要内容</a>
 
-  <nav>
+  <nav role="navigation" aria-label="主导航">
     <div class="logo">drawio-<span>skill</span></div>
     <div class="nav-right">
       <a href="index.html" class="lang-switch">English</a>
-      <button class="theme-btn" onclick="toggleTheme()" title="切换主题">&#x1F319;</button>
+      <button class="theme-btn" onclick="toggleTheme()" title="切换主题" aria-label="切换深色/浅色主题">&#x1F319;</button>
     </div>
   </nav>
 
+  <main id="main-content">
   <!-- Hero -->
   <div class="hero">
     <div class="container">
@@ -245,6 +264,7 @@
     <div class="container">
       <h2 class="section-title">对比原生智能体</h2>
       <p class="section-sub">使用本 skill 与直接提示 LLM 的区别。</p>
+      <div class="table-wrapper">
       <table class="compare-table">
         <thead>
           <tr><th>功能</th><th>原生智能体</th><th>本 Skill</th></tr>
@@ -265,6 +285,7 @@
           <tr><td>自动启动桌面版</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 导出后打开 .drawio</td></tr>
         </tbody>
       </table>
+      </div>
     </div>
   </section>
 
@@ -273,36 +294,36 @@
     <div class="container">
       <h2 class="section-title">安装</h2>
       <p class="section-sub">选择你的平台，10 秒搞定。</p>
-      <div class="tabs">
-        <div class="tab active" onclick="switchTab(event, 'tab-claude')">Claude Code</div>
-        <div class="tab" onclick="switchTab(event, 'tab-openclaw')">OpenClaw</div>
-        <div class="tab" onclick="switchTab(event, 'tab-skillsmp')">SkillsMP</div>
-        <div class="tab" onclick="switchTab(event, 'tab-clawhub')">ClawHub</div>
-        <div class="tab" onclick="switchTab(event, 'tab-codex')">Codex</div>
+      <div class="tabs" role="tablist" aria-label="安装平台">
+        <button class="tab active" role="tab" aria-selected="true" aria-controls="tab-claude" onclick="switchTab(event, 'tab-claude')">Claude Code</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-openclaw" onclick="switchTab(event, 'tab-openclaw')">OpenClaw</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-skillsmp" onclick="switchTab(event, 'tab-skillsmp')">SkillsMP</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-clawhub" onclick="switchTab(event, 'tab-clawhub')">ClawHub</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-codex" onclick="switchTab(event, 'tab-codex')">Codex</button>
       </div>
-      <div id="tab-claude" class="tab-content active">
+      <div id="tab-claude" class="tab-content active" role="tabpanel">
         <pre># 全局安装（所有项目可用）
 git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio-skill
 
 # 项目级安装
 git clone https://github.com/Agents365-ai/drawio-skill.git .claude/skills/drawio-skill</pre>
       </div>
-      <div id="tab-openclaw" class="tab-content">
+      <div id="tab-openclaw" class="tab-content" role="tabpanel">
         <pre># 通过 ClawHub 安装
 clawhub install drawio-pro-skill
 
 # 手动安装
 git clone https://github.com/Agents365-ai/drawio-skill.git ~/.openclaw/skills/drawio-skill</pre>
       </div>
-      <div id="tab-skillsmp" class="tab-content">
+      <div id="tab-skillsmp" class="tab-content" role="tabpanel">
         <pre># 通过 SkillsMP CLI
 skills install drawio-skill</pre>
       </div>
-      <div id="tab-clawhub" class="tab-content">
+      <div id="tab-clawhub" class="tab-content" role="tabpanel">
         <pre># 通过 ClawHub CLI
 clawhub install drawio-pro-skill</pre>
       </div>
-      <div id="tab-codex" class="tab-content">
+      <div id="tab-codex" class="tab-content" role="tabpanel">
         <pre># 用户级安装
 git clone https://github.com/Agents365-ai/drawio-skill.git ~/.agents/skills/drawio-skill
 
@@ -311,6 +332,8 @@ git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio
       </div>
     </div>
   </section>
+
+  </main>
 
   <!-- Footer -->
   <footer>
@@ -333,9 +356,10 @@ git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio
       });
     }
     function switchTab(e, id) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       e.target.classList.add('active');
+      e.target.setAttribute('aria-selected', 'true');
       document.getElementById(id).classList.add('active');
     }
     function toggleTheme() {
