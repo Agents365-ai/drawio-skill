@@ -185,6 +185,34 @@ skills install drawio-skill
 | OpenAI Codex | `~/.agents/skills/drawio-skill/` | `.agents/skills/drawio-skill/` |
 | SkillsMP | N/A (installed via CLI) | N/A |
 
+## Updates
+
+Check for updates:
+
+```bash
+# Run from anywhere — pass your install path
+bash ~/.claude/skills/drawio-skill/scripts/check-update.sh
+
+# Or from the skill directory
+cd ~/.claude/skills/drawio-skill && bash scripts/check-update.sh
+```
+
+Update to latest version:
+
+```bash
+cd <your-install-path>/drawio-skill && git pull
+```
+
+Platform-specific package managers:
+
+```bash
+# OpenClaw
+clawhub update drawio-skill
+
+# SkillsMP
+skills update drawio-skill
+```
+
 ## Usage
 
 Just describe what you want:
@@ -233,6 +261,7 @@ CI/CD pipeline with a closed loop and 2 spur branches. Edges flow along the peri
 
 - `SKILL.md` — **the only required file**. Loaded by all platforms as the skill instructions.
 - `agents/openai.yaml` — OpenAI Codex-specific configuration (UI, policy)
+- `scripts/check-update.sh` — lightweight update checker (compares local vs remote HEAD)
 - `README.md` — this file (English, displayed on GitHub homepage)
 - `README_CN.md` — Chinese documentation
 - `assets/` — example diagrams and workflow images
