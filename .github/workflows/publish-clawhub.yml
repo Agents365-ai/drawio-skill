@@ -26,5 +26,11 @@ jobs:
           mkdir -p "$HOME/.config/clawhub"
           echo '{"registry":"https://clawhub.ai","token":"'"${{ secrets.CLAWHUB_TOKEN }}"'"}' > "$HOME/.config/clawhub/config.json"
 
+      - name: Get version from metadata
+        id: version
+        run: |
+          VERSION=$(grep -o '"version":"[^"]*"' SKILL.md | head -1 | cut -d'"' -f4)
+          echo "version=${VERSION:-1.0.0}" >> "$GITHUB_OUTPUT"
+
       - name: Publish skill
-        run: clawhub publish .
+        run: clawhub publish . --version "${{ steps.version.outputs.version }}"
