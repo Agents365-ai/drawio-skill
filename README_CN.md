@@ -1,6 +1,6 @@
 # drawio-skill — From Text to Professional Diagrams
 
-[English](README.md)
+[English](README.md) | [Online Docs](https://agents365-ai.github.io/drawio-skill/)
 
 ## 功能说明
 
