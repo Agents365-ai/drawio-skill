@@ -1,4 +1,4 @@
-# drawio-skill
+# drawio-skill — From Text to Professional Diagrams
 
 [English](README.md)
 
