@@ -133,7 +133,7 @@ git clone https://github.com/Agents365-ai/drawio-skill.git .claude/skills/drawio
 
 ```bash
 # Via ClawHub
-clawhub install drawio-skill
+clawhub install drawio-pro-skill
 
 # Manual install
 git clone https://github.com/Agents365-ai/drawio-skill.git ~/.openclaw/skills/drawio-skill
@@ -169,10 +169,18 @@ git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio
 
 ### SkillsMP
 
-Search for `drawio` on [skillsmp.com](https://skillsmp.com) or use the CLI:
+Browse on [SkillsMP](https://skillsmp.com/skills/agents365-ai-drawio-skill-skill-md) or use the CLI:
 
 ```bash
 skills install drawio-skill
+```
+
+### ClawHub
+
+Browse on [ClawHub](https://clawhub.ai/agents365-ai/drawio-pro-skill) or use the CLI:
+
+```bash
+clawhub install drawio-pro-skill
 ```
 
 ### Installation paths summary
