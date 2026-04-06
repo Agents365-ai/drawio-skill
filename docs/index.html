@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>drawio-skill — From Text to Professional Diagrams</title>
+  <meta name="description" content="Claude Code skill for generating professional draw.io diagrams from natural language. 6 diagram presets, ML/DL support, self-check loop, animated connectors.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d1117;
+      --bg-card: #161b22;
+      --bg-code: #1c2128;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --orange: #d29922;
+      --purple: #bc8cff;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+    /* Layout */
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    section { padding: 72px 0; }
+    section + section { border-top: 1px solid var(--border); }
+
+    /* Hero */
+    .hero { text-align: center; padding: 96px 0 72px; border-bottom: 1px solid var(--border); }
+    .hero-badge {
+      display: inline-block;
+      font-size: 13px;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      padding: 4px 14px;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+    }
+    .hero h1 { font-size: 48px; font-weight: 800; margin-bottom: 16px; letter-spacing: -1px; }
+    .hero h1 span { color: var(--accent); }
+    .hero p { font-size: 20px; color: var(--text-muted); max-width: 600px; margin: 0 auto 32px; }
+    .hero-install {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 15px;
+      margin-bottom: 24px;
+    }
+    .hero-install code { color: var(--green); }
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover { color: var(--text); border-color: var(--text-muted); }
+    .hero-links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--accent); color: var(--bg); }
+    .btn-primary:hover { background: var(--accent-hover); text-decoration: none; }
+    .btn-outline { border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--text-muted); text-decoration: none; }
+
+    /* Section headers */
+    .section-title { font-size: 32px; font-weight: 700; margin-bottom: 8px; text-align: center; }
+    .section-sub { color: var(--text-muted); font-size: 17px; text-align: center; margin-bottom: 48px; }
+
+    /* Feature cards */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+    }
+    .feature-icon { font-size: 28px; margin-bottom: 12px; }
+    .feature-card h3 { font-size: 18px; margin-bottom: 8px; }
+    .feature-card p { color: var(--text-muted); font-size: 14px; }
+
+    /* Demo gallery */
+    .demos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .demo-item { text-align: center; }
+    .demo-item img {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    .demo-item h4 { font-size: 16px; margin-bottom: 4px; }
+    .demo-item p { color: var(--text-muted); font-size: 13px; }
+
+    /* Comparison table */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+    .compare-table th, .compare-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .compare-table th {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .compare-table tr:hover { background: var(--bg-card); }
+    .check { color: var(--green); font-weight: 700; }
+    .cross { color: var(--red); }
+
+    /* Install tabs */
+    .tabs { display: flex; gap: 0; margin-bottom: 0; flex-wrap: wrap; }
+    .tab {
+      padding: 10px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .tab:first-child { border-radius: 8px 0 0 0; }
+    .tab:last-child { border-radius: 0 8px 0 0; }
+    .tab.active { background: var(--bg-code); color: var(--text); border-bottom-color: var(--bg-code); }
+    .tab-content {
+      display: none;
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 0 8px 8px 8px;
+      padding: 20px;
+    }
+    .tab-content.active { display: block; }
+    .tab-content pre {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      color: var(--green);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    footer a { color: var(--text-muted); }
+    footer a:hover { color: var(--text); }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 32px; }
+      .hero p { font-size: 17px; }
+      section { padding: 48px 0; }
+      .features-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="container">
+      <div class="hero-badge">v1.1.0 &mdash; Now with 6 Diagram Presets</div>
+      <h1>drawio-<span>skill</span></h1>
+      <p>From text to professional diagrams. Generate draw.io files from natural language with self-check, iterative refinement, and ML model support.</p>
+      <div class="hero-install">
+        <code id="install-cmd">git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio-skill</code>
+        <button class="copy-btn" onclick="copyInstall()">Copy</button>
+      </div>
+      <div class="hero-links">
+        <a href="https://github.com/Agents365-ai/drawio-skill" class="btn btn-primary">GitHub</a>
+        <a href="https://clawhub.ai/agents365-ai/drawio-pro-skill" class="btn btn-outline">ClawHub</a>
+        <a href="https://skillsmp.com/skills/agents365-ai-drawio-skill-skill-md" class="btn btn-outline">SkillsMP</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <section>
+    <div class="container">
+      <h2 class="section-title">Why This Skill</h2>
+      <p class="section-sub">The only pure-SKILL.md solution that reads its own output and auto-fixes before showing you.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F4CB;</div>
+          <h3>6 Diagram Presets</h3>
+          <p>ERD, UML Class, Sequence, Architecture, ML/Deep Learning, Flowchart &mdash; each with preset shapes, styles, and layout conventions.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F9E0;</div>
+          <h3>ML / Deep Learning</h3>
+          <p>Transformer, CNN, LSTM architectures with tensor shape annotations (B, C, H, W). Built for NeurIPS, ICML, ICLR papers.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F50D;</div>
+          <h3>Self-Check Loop</h3>
+          <p>Reads the exported PNG, detects 6 issue types (overlaps, clipped labels, stacked edges), and auto-fixes before showing you.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x2728;</div>
+          <h3>Animated Connectors</h3>
+          <p>Add <code>flowAnimation=1</code> for moving dot animations along arrows. Ideal for data-flow and pipeline diagrams in SVG.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F310;</div>
+          <h3>5 Platforms, Zero Config</h3>
+          <p>Claude Code, OpenClaw, Hermes, Codex, SkillsMP &mdash; just one SKILL.md file + draw.io desktop. No MCP, no Node.js.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F4BB;</div>
+          <h3>Browser Fallback</h3>
+          <p>No desktop CLI? Generates a diagrams.net URL that opens your diagram in the browser for viewing and editing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo Gallery -->
+  <section>
+    <div class="container">
+      <h2 class="section-title">Demo Gallery</h2>
+      <p class="section-sub">Clean edge routing across different topologies &mdash; no lines crossing through shapes.</p>
+      <div class="demos">
+        <div class="demo-item">
+          <img src="../assets/demo-star.png" alt="Star topology diagram">
+          <h4>Star Topology</h4>
+          <p>7 nodes &mdash; central broker, 6 services radiating outward</p>
+        </div>
+        <div class="demo-item">
+          <img src="../assets/demo-layered.png" alt="Layered flow diagram">
+          <h4>Layered Flow</h4>
+          <p>10 nodes, 4 tiers &mdash; with cross-connections routed cleanly</p>
+        </div>
+        <div class="demo-item">
+          <img src="../assets/demo-ring.png" alt="Ring cycle diagram">
+          <h4>Ring / Cycle</h4>
+          <p>8 nodes &mdash; CI/CD pipeline with closed loop and spur branches</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison -->
+  <section>
+    <div class="container">
+      <h2 class="section-title">vs Native Agent</h2>
+      <p class="section-sub">What you get with the skill vs prompting an LLM directly.</p>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Native Agent</th>
+            <th>This Skill</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Self-check after export</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 2-round auto-fix</td></tr>
+          <tr><td>Iterative review loop</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 5-round with targeted edits</td></tr>
+          <tr><td>Diagram type presets</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 6 presets (ERD, UML, Seq, Arch, ML, Flow)</td></tr>
+          <tr><td>ML model diagrams</td><td class="cross">&#x2717;</td><td class="check">&#x2713; Tensor shapes, layer colors</td></tr>
+          <tr><td>Animated connectors</td><td class="cross">&#x2717;</td><td class="check">&#x2713; flowAnimation=1</td></tr>
+          <tr><td>Grid-aligned layout</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 10px snap</td></tr>
+          <tr><td>Complexity-scaled spacing</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 200&ndash;350px by node count</td></tr>
+          <tr><td>Color palette</td><td class="cross">Random</td><td class="check">&#x2713; 7-color semantic system</td></tr>
+          <tr><td>Edge routing rules</td><td class="cross">Basic</td><td class="check">&#x2713; Corridors + waypoints + distribution</td></tr>
+          <tr><td>Container/group nesting</td><td class="cross">&#x2717;</td><td class="check">&#x2713; Swimlane + group + custom</td></tr>
+          <tr><td>Embed diagram in export</td><td class="cross">&#x2717;</td><td class="check">&#x2713; --embed-diagram</td></tr>
+          <tr><td>Browser fallback</td><td class="cross">&#x2717;</td><td class="check">&#x2713; diagrams.net URL</td></tr>
+          <tr><td>Auto-launch desktop app</td><td class="cross">&#x2717;</td><td class="check">&#x2713; Opens .drawio for fine-tuning</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Install -->
+  <section>
+    <div class="container">
+      <h2 class="section-title">Install</h2>
+      <p class="section-sub">Pick your platform. Takes 10 seconds.</p>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(event, 'tab-claude')">Claude Code</div>
+        <div class="tab" onclick="switchTab(event, 'tab-openclaw')">OpenClaw</div>
+        <div class="tab" onclick="switchTab(event, 'tab-skillsmp')">SkillsMP</div>
+        <div class="tab" onclick="switchTab(event, 'tab-clawhub')">ClawHub</div>
+        <div class="tab" onclick="switchTab(event, 'tab-codex')">Codex</div>
+      </div>
+      <div id="tab-claude" class="tab-content active">
+        <pre># Global install (available in all projects)
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio-skill
+
+# Project-level install
+git clone https://github.com/Agents365-ai/drawio-skill.git .claude/skills/drawio-skill</pre>
+      </div>
+      <div id="tab-openclaw" class="tab-content">
+        <pre># Via ClawHub registry
+clawhub install drawio-pro-skill
+
+# Manual install
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.openclaw/skills/drawio-skill</pre>
+      </div>
+      <div id="tab-skillsmp" class="tab-content">
+        <pre># Via SkillsMP CLI
+skills install drawio-skill</pre>
+      </div>
+      <div id="tab-clawhub" class="tab-content">
+        <pre># Via ClawHub CLI
+clawhub install drawio-pro-skill</pre>
+      </div>
+      <div id="tab-codex" class="tab-content">
+        <pre># User-level install
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.agents/skills/drawio-skill
+
+# Project-level install
+git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio-skill</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>
+        MIT License &middot;
+        <a href="https://github.com/Agents365-ai/drawio-skill">GitHub</a> &middot;
+        <a href="https://github.com/Agents365-ai">Agents365-ai</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    function copyInstall() {
+      const cmd = document.getElementById('install-cmd').textContent;
+      navigator.clipboard.writeText(cmd).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 2000);
+      });
+    }
+    function switchTab(e, id) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      document.getElementById(id).classList.add('active');
+    }
+  </script>
+</body>
+</html>

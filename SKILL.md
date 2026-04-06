@@ -2,7 +2,8 @@
 name: drawio-skill
 description: Use when user requests diagrams, flowcharts, architecture charts, or visualizations. Also use proactively when explaining systems with 3+ components, complex data flows, or relationships that benefit from visual representation. Generates .drawio XML files and exports to PNG/SVG/PDF locally using the native draw.io desktop CLI.
 license: MIT
-compatibility: Requires draw.io desktop app CLI on PATH (macOS/Linux/Windows)
+homepage: https://github.com/Agents365-ai/drawio-skill
+compatibility: Requires draw.io desktop app CLI on PATH (macOS/Linux/Windows). Self-check step requires a vision-enabled model (e.g., Claude Sonnet/Opus); gracefully skipped if unavailable.
 platforms: [macos, linux, windows]
 metadata: {"openclaw":{"requires":{"anyBins":["draw.io","drawio"]},"emoji":"📐","os":["darwin","linux","win32"],"install":[{"id":"brew-drawio","kind":"brew","formula":"drawio","bins":["draw.io"],"label":"Install draw.io via Homebrew","os":["darwin"]}]},"hermes":{"tags":["drawio","diagram","flowchart","architecture","visualization","uml"],"category":"design","requires_tools":["draw.io"],"related_skills":["mermaid","excalidraw","plantuml"]},"author":"Agents365-ai","version":"1.1.0"}
 ---
@@ -58,13 +59,13 @@ Install draw.io desktop if missing:
 2. **Plan** — identify shapes, relationships, layout (LR or TB), group by tier/layer
 3. **Generate** — write `.drawio` XML file to disk (output dir same as user's working dir)
 4. **Export draft** — run CLI to produce PNG for preview
-5. **Self-check** — read the exported PNG, catch obvious issues, auto-fix before showing user
+5. **Self-check** — use the agent's built-in vision capability to read the exported PNG, catch obvious issues, auto-fix before showing user (requires a vision-enabled model such as Claude Sonnet/Opus)
 6. **Review loop** — show image to user, collect feedback, apply targeted XML edits, re-export, repeat until approved
 7. **Final export** — export approved version to all requested formats, report file paths
 
 ### Step 5: Self-Check
 
-After exporting the draft PNG, read the image and check for these issues before showing the user:
+After exporting the draft PNG, use the agent's vision capability (e.g., Claude's image input) to read the image and check for these issues before showing the user. If the agent does not support vision, skip self-check and show the PNG directly:
 
 | Check | What to look for | Auto-fix action |
 |-------|-----------------|-----------------|
@@ -337,7 +338,7 @@ print('https://viewer.diagrams.net/?tags=%7B%7D&lightbox=1&edit=_blank#R' + urll
 " input.drawio
 ```
 
-This produces a URL that opens the diagram in the browser for viewing and editing — useful when the user cannot install the desktop app.
+This produces a client-side URL that opens the diagram in the browser for viewing and editing. No data is uploaded to any server — the entire diagram XML is encoded in the URL fragment (after `#`), which is never sent to the server. Useful when the user cannot install the desktop app.
 
 ### Checking if draw.io is in PATH
 
