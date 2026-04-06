@@ -22,7 +22,7 @@ jobs:
         run: npm install -g clawhub
 
       - name: Authenticate with GitHub token
-        run: clawhub auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
+        run: clawhub auth login --token "${{ secrets.GITHUB_TOKEN }}" --no-browser
 
       - name: Publish skill
         run: clawhub skill publish .
