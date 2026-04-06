@@ -27,4 +27,4 @@ jobs:
           echo '{"registry":"https://clawhub.ai","token":"'"${{ secrets.CLAWHUB_TOKEN }}"'"}' > "$HOME/.config/clawhub/config.json"
 
       - name: Publish skill
-        run: clawhub skill publish .
+        run: clawhub publish .
