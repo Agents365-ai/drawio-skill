@@ -8,6 +8,13 @@ on:
       - 'SKILL.md'
       - 'scripts/**'
 
+concurrency:
+  group: clawhub-publish
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -19,12 +26,13 @@ jobs:
           node-version: '20'
 
       - name: Install ClawHub CLI
-        run: npm install -g clawhub
+        run: npm install -g clawhub@latest
 
       - name: Authenticate with ClawHub
         run: |
           mkdir -p "$HOME/.config/clawhub"
           echo '{"registry":"https://clawhub.ai","token":"'"${{ secrets.CLAWHUB_TOKEN }}"'"}' > "$HOME/.config/clawhub/config.json"
+          chmod 600 "$HOME/.config/clawhub/config.json"
 
       - name: Get version from metadata
         id: version

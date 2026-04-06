@@ -13,21 +13,40 @@ if ! git -C "$SKILL_DIR" rev-parse --git-dir &>/dev/null; then
   exit 2
 fi
 
-REMOTE_HASH=$(git -C "$SKILL_DIR" ls-remote origin HEAD 2>/dev/null | cut -f1)
+# Detect current branch and its upstream
+BRANCH=$(git -C "$SKILL_DIR" symbolic-ref --short HEAD 2>/dev/null) || {
+  echo "Detached HEAD — cannot check for updates. Please checkout a branch." >&2
+  exit 2
+}
+
+UPSTREAM=$(git -C "$SKILL_DIR" rev-parse --abbrev-ref "${BRANCH}@{upstream}" 2>/dev/null) || {
+  echo "Branch '$BRANCH' has no upstream configured. Set with: git branch --set-upstream-to=origin/$BRANCH" >&2
+  exit 2
+}
+
+REMOTE_NAME="${UPSTREAM%%/*}"
+
+# Fetch latest refs from remote
+if ! git -C "$SKILL_DIR" fetch "$REMOTE_NAME" --quiet 2>/dev/null; then
+  echo "Cannot reach remote '$REMOTE_NAME' (offline?)" >&2
+  exit 2
+fi
+
 LOCAL_HASH=$(git -C "$SKILL_DIR" rev-parse HEAD 2>/dev/null)
+REMOTE_HASH=$(git -C "$SKILL_DIR" rev-parse "$UPSTREAM" 2>/dev/null)
 
 if [ -z "$REMOTE_HASH" ]; then
-  echo "Cannot reach remote (offline?)" >&2
+  echo "Cannot resolve upstream ref '$UPSTREAM'" >&2
   exit 2
 fi
 
 if [ "$REMOTE_HASH" != "$LOCAL_HASH" ]; then
-  echo "Update available for drawio-skill."
+  echo "Update available for drawio-skill (branch: $BRANCH)."
   echo "  Local:  ${LOCAL_HASH:0:8}"
   echo "  Remote: ${REMOTE_HASH:0:8}"
-  echo "  Run:    cd $SKILL_DIR && git pull"
+  echo "  Run:    cd \"$SKILL_DIR\" && git pull"
   exit 0
 else
-  echo "drawio-skill is up to date."
+  echo "drawio-skill is up to date (branch: $BRANCH)."
   exit 1
 fi

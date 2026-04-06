@@ -55,6 +55,13 @@ Install draw.io desktop if missing:
 
 ## Workflow
 
+Before starting the workflow, assess whether the user's request is specific enough. If key details are missing, ask 1-3 focused questions:
+- **Diagram type** — which preset? (ERD, UML, Sequence, Architecture, ML/DL, Flowchart, or general)
+- **Output format** — PNG (default), SVG, PDF, or JPG?
+- **Scope/fidelity** — how many components? Any specific technologies or labels?
+
+Skip clarification if the request already specifies these details or is clearly simple (e.g., "draw a flowchart of X").
+
 1. **Check deps** — verify `draw.io --version` succeeds; note platform for correct CLI path
 2. **Plan** — identify shapes, relationships, layout (LR or TB), group by tier/layer
 3. **Generate** — write `.drawio` XML file to disk (output dir same as user's working dir)
@@ -339,6 +346,17 @@ print('https://viewer.diagrams.net/?tags=%7B%7D&lightbox=1&edit=_blank#R' + urll
 ```
 
 This produces a client-side URL that opens the diagram in the browser for viewing and editing. No data is uploaded to any server — the entire diagram XML is encoded in the URL fragment (after `#`), which is never sent to the server. Useful when the user cannot install the desktop app.
+
+### Fallback chain
+
+When tools are unavailable, degrade gracefully:
+
+| Scenario | Behavior |
+|----------|----------|
+| draw.io CLI missing, Python available | Use browser fallback (diagrams.net URL) |
+| draw.io CLI missing, Python missing | Generate `.drawio` XML only; instruct user to open in draw.io desktop or diagrams.net manually |
+| Vision unavailable for self-check | Skip self-check (step 5); proceed directly to showing user the exported PNG |
+| Export fails (Chromium/display issues) | On Linux, retry with `xvfb-run -a`; if still failing, deliver `.drawio` XML and suggest manual export |
 
 ### Checking if draw.io is in PATH
 

@@ -1,7 +1,19 @@
 interface:
   display_name: "Draw.io Diagrams"
-  short_description: "Generate draw.io diagrams from natural language and export to PNG/SVG/PDF"
+  short_description: "Generate draw.io diagrams from natural language and export to PNG/SVG/PDF/JPG with self-check and iterative refinement"
   brand_color: "#F08705"
 
 policy:
   allow_implicit_invocation: true
+
+capabilities:
+  - Generate .drawio XML from natural language descriptions
+  - Export to PNG, SVG, PDF, JPG via draw.io desktop CLI
+  - 6 diagram presets (ERD, UML Class, Sequence, Architecture, ML/DL, Flowchart)
+  - Self-check exported images and auto-fix layout issues
+  - Iterative review loop with targeted XML edits
+  - Browser fallback via diagrams.net URL when CLI unavailable
+  - Animated connectors for data-flow diagrams
+
+prerequisites:
+  - draw.io desktop app (macOS/Linux/Windows)
