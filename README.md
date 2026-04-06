@@ -6,8 +6,13 @@
 
 - Generates `.drawio` XML files from natural language descriptions
 - Exports diagrams to PNG, SVG, PDF, or JPG using the native draw.io desktop CLI
-- Supports multi-page diagrams and layered grouping
+- **6 diagram type presets**: ERD, UML Class, Sequence, Architecture, ML/Deep Learning, Flowchart — with preset shapes, styles, and layout conventions
+- **Animated connectors** (`flowAnimation=1`) for data-flow and pipeline diagrams (visible in SVG and draw.io desktop)
+- **ML model diagram support** with tensor shape annotations `(B, C, H, W)` — ideal for NeurIPS/ICML/ICLR papers
+- **Grid-aligned layout** — all coordinates snap to 10px multiples for clean alignment
+- **Browser fallback** — generates diagrams.net URLs when the desktop CLI is unavailable
 - Iterative design: preview, get feedback, and refine diagrams until they look right
+- **Auto-launch** draw.io desktop after export for manual fine-tuning
 - Triggers automatically when diagrams would help explain complex systems
 
 ## Multi-Platform Support
@@ -33,11 +38,16 @@ Works with all major AI coding agents that support the [Agent Skills](https://ag
 | Iterative review loop | No — must manually re-prompt | Yes — targeted edits, 5-round safety valve |
 | Proactive triggers | No — only when explicitly asked | Yes — auto-suggests when 3+ components |
 | Layout guidelines | None — varies by run | Complexity-scaled spacing, routing corridors, hub placement |
+| Grid alignment | No | Yes — all coordinates snap to 10px multiples |
+| Diagram type presets | No | Yes — 6 presets (ERD, UML, Sequence, Architecture, ML/DL, Flowchart) |
+| Animated connectors | No | Yes — `flowAnimation=1` for data-flow visualization |
+| ML model diagrams | No | Yes — tensor shape annotations, layer-type color coding |
 | Color palette | Random/inconsistent | 7-color semantic system (blue=services, green=DB, purple=auth...) |
 | Edge routing rules | Basic | Pin entry/exit points, distribute connections, waypoint corridors |
 | Container/group patterns | None | Swimlane, group, custom container with parent-child nesting |
 | Embed diagram in export | No | Yes — `--embed-diagram` keeps exported PNG/SVG/PDF editable |
-| Chinese language triggers | No | Yes — "画图", "架构图", "流程图" |
+| Browser fallback | No | Yes — generates diagrams.net URL when CLI unavailable |
+| Auto-launch desktop app | No | Yes — opens `.drawio` file after export for fine-tuning |
 
 ### vs Other draw.io Skills & Tools
 
@@ -48,28 +58,35 @@ Works with all major AI coding agents that support the [Agent Skills](https://ag
 | **Multi-agent** | ✅ 5 platforms | ❌ Claude Code only | ❌ Claude Code only | ❌ |
 | **Self-check** | ✅ 2-round auto-fix | ❌ | ❌ | ❌ screenshot |
 | **Iterative review** | ✅ 5-round loop | ❌ generate once | ✅ 3 workflows | ❌ |
-| **Layout guidance** | ✅ complexity-scaled | ✅ basic spacing | ❌ relies on MCP | ❌ |
+| **Layout guidance** | ✅ complexity-scaled + grid snap | ✅ basic spacing | ❌ relies on MCP | ❌ |
+| **Diagram presets** | ✅ 6 types (ERD, UML, Seq, Arch, ML, Flow) | ❌ | ❌ | ❌ |
+| **Animated edges** | ✅ `flowAnimation=1` | ❌ | ❌ | ❌ |
+| **ML/DL diagrams** | ✅ tensor shapes, layer colors | ❌ | ❌ | ❌ |
 | **Color system** | ✅ 7-color semantic | ❌ | ✅ 5 themes | ❌ |
 | **Container/group** | ✅ swimlane + group | ✅ detailed | ❌ | ❌ |
 | **Embed diagram** | ✅ `--embed-diagram` | ✅ | ❌ | ❌ |
 | **Edge routing** | ✅ corridors + waypoints | ✅ arrowhead rules | ❌ | ❌ |
-| **Chinese support** | ✅ triggers + docs | ❌ | ❌ | ✅ |
+| **Browser fallback** | ✅ diagrams.net URL | ❌ | ❌ | ❌ |
+| **Auto-launch** | ✅ opens desktop app | ❌ | ❌ | ❌ |
 | **Cloud icons** | AWS basic | ❌ | ✅ AWS/GCP/Azure/K8s | ❌ |
 | **Zero-config** | ✅ copy SKILL.md | ✅ | ❌ needs `npx` | ❌ needs plugin install |
 
 ### Key advantages
 
 1. **Self-check + iterative loop** — the only pure-SKILL.md solution that reads its own output and auto-fixes before showing the user, then supports multi-round refinement
-2. **Multi-agent, zero-config** — works across 5 platforms with just one `SKILL.md` file + draw.io desktop. No MCP server, no Python, no Node.js, no browser
-3. **Production-grade layout** — complexity-scaled spacing, routing corridors, hub-center strategy, connection distribution rules
-4. **Full Chinese support** — proactive triggers ("画图", "架构图"), bilingual documentation
+2. **6 diagram type presets** — ERD, UML Class, Sequence, Architecture, ML/Deep Learning, Flowchart — each with preset shapes, styles, and layout conventions
+3. **ML/DL model diagrams** — tensor shape annotations, layer-type color coding, encoder/decoder swimlanes — built for academic papers
+4. **Multi-agent, zero-config** — works across 5 platforms with just one `SKILL.md` file + draw.io desktop. No MCP server, no Python, no Node.js, no browser
+5. **Production-grade layout** — grid-aligned coordinates, complexity-scaled spacing, routing corridors, hub-center strategy, animated connectors
+6. **Browser fallback** — generates diagrams.net URLs when the desktop CLI is unavailable, plus auto-launch for desktop editing
 
 ## Supported diagram types
 
-- **Architecture**: microservices, cloud (AWS/GCP/Azure), network topology, deployment
-- **Flowcharts**: business processes, workflows, decision trees, state machines
-- **UML**: class diagrams, sequence diagrams, use case diagrams
-- **Data**: ER diagrams, data flow diagrams (DFD)
+- **Architecture**: microservices, cloud (AWS/GCP/Azure), network topology, deployment — with tier-based swimlanes and hub-center strategy
+- **ML / Deep Learning**: Transformer, CNN, LSTM, GRU architectures — with tensor shape annotations and layer-type color coding
+- **Flowcharts**: business processes, workflows, decision trees, state machines — with semantic shape types (parallelogram I/O, diamond decisions)
+- **UML**: class diagrams (inheritance/composition/aggregation arrows), sequence diagrams (lifelines, activation boxes)
+- **Data**: ER diagrams (table containers, PK/FK notation), data flow diagrams (DFD)
 - **Other**: org charts, mind maps, wireframes
 
 ## How it works

@@ -4,7 +4,7 @@ description: Use when user requests diagrams, flowcharts, architecture charts, o
 license: MIT
 compatibility: Requires draw.io desktop app CLI on PATH (macOS/Linux/Windows)
 platforms: [macos, linux, windows]
-metadata: {"openclaw":{"requires":{"anyBins":["draw.io","drawio"]},"emoji":"📐","os":["darwin","linux","win32"],"install":[{"id":"brew-drawio","kind":"brew","formula":"drawio","bins":["draw.io"],"label":"Install draw.io via Homebrew","os":["darwin"]}]},"hermes":{"tags":["drawio","diagram","flowchart","architecture","visualization","uml"],"category":"design","requires_tools":["draw.io"],"related_skills":["mermaid","excalidraw","plantuml"]},"author":"Agents365-ai","version":"1.0.0"}
+metadata: {"openclaw":{"requires":{"anyBins":["draw.io","drawio"]},"emoji":"📐","os":["darwin","linux","win32"],"install":[{"id":"brew-drawio","kind":"brew","formula":"drawio","bins":["draw.io"],"label":"Install draw.io via Homebrew","os":["darwin"]}]},"hermes":{"tags":["drawio","diagram","flowchart","architecture","visualization","uml"],"category":"design","requires_tools":["draw.io"],"related_skills":["mermaid","excalidraw","plantuml"]},"author":"Agents365-ai","version":"1.1.0"}
 ---
 
 # Draw.io Diagrams
@@ -19,7 +19,7 @@ PNG, SVG, and PDF exports support `--embed-diagram` (`-e`) — the exported file
 
 ## When to Use
 
-**Explicit triggers:** user says "画图", "diagram", "visualize", "flowchart", "draw", "架构图", "流程图"
+**Explicit triggers:** user says "diagram", "visualize", "flowchart", "draw", "architecture diagram", "process flow", "ER diagram", "UML", "sequence diagram", "class diagram", "neural network", "model architecture"
 
 **Proactive triggers:**
 - Explaining a system with 3+ interacting components
@@ -100,7 +100,7 @@ After self-check, show the exported image and ask the user for feedback.
 - For layout-wide changes (e.g., swap LR↔TB, "start over"): regenerate full XML
 - Overwrite the same `{name}.png` each iteration — do not create `v1`, `v2`, `v3` files
 - After applying edits, re-export and show the updated image
-- Loop continues until user says approved / done / LGTM / 完成
+- Loop continues until user says approved / done / LGTM
 - **Safety valve:** after 5 iteration rounds, suggest the user open the `.drawio` file in draw.io desktop for fine-grained adjustments
 
 ### Step 7: Final Export
@@ -108,6 +108,7 @@ After self-check, show the exported image and ask the user for feedback.
 Once the user approves:
 - Export to all requested formats (PNG, SVG, PDF, JPG) — default to PNG if not specified
 - Report file paths for both the `.drawio` source file and exported image(s)
+- **Auto-launch:** offer to open the `.drawio` file in draw.io desktop for fine-tuning — `open diagram.drawio` (macOS), `xdg-open` (Linux), `start` (Windows)
 - Confirm files are saved and ready to use
 
 ## Draw.io XML Structure
@@ -136,6 +137,7 @@ Once the user approves:
 - All text uses `html=1` in style for proper rendering
 - **Never use `--` inside XML comments** — it's illegal per XML spec and causes parse errors
 - Escape special characters in attribute values: `&amp;`, `&lt;`, `&gt;`, `&quot;`
+- **Multi-line text in labels:** use `&#xa;` for line breaks inside `value` attributes (not literal `\n`). Example: `value="Line 1&#xa;Line 2"`
 
 ### Shape types (vertex)
 
@@ -222,6 +224,7 @@ For architecture diagrams with nested elements, use draw.io's parent-child conta
 ```
 
 **Edge style rules:**
+- **Animated connectors:** add `flowAnimation=1;` to any edge style to show a moving dot animation along the arrow. Works in SVG export and draw.io desktop — ideal for data-flow and pipeline diagrams. Example: `style="edgeStyle=orthogonalEdgeStyle;flowAnimation=1;rounded=1;..."`
 - **Always** include `rounded=1;orthogonalLoop=1;jettySize=auto` — these enable smart routing that avoids overlaps
 - Pin `exitX/exitY/entryX/entryY` on every edge when a node has 2+ connections — distributes lines across the shape perimeter
 - Add `<Array as="points">` waypoints when an edge must detour around an intermediate shape
@@ -265,6 +268,8 @@ When multiple edges connect to the same shape, assign different entry/exit point
 | Complex | >10 | 350px | 250px |
 
 **Routing corridors:** between shape rows/columns, leave an extra ~80px empty corridor where edges can route without crossing shapes. Never place a shape in a gap that edges need to traverse.
+
+**Grid alignment:** snap all `x`, `y`, `width`, `height` values to **multiples of 10** — this ensures shapes align cleanly on draw.io's default grid and makes manual editing easier.
 
 **General rules:**
 - Plan a grid before assigning x/y coordinates — sketch node positions on paper/mentally first
@@ -317,6 +322,23 @@ draw.io -x -f pdf -o diagram.pdf input.drawio
 - `-t` — transparent background (PNG only)
 - `--page-index 0` — export specific page (default: all)
 
+### Browser fallback (no CLI needed)
+
+When the draw.io desktop CLI is unavailable, generate a browser-editable URL by deflate-compressing and base64-encoding the XML:
+
+```bash
+# Encode .drawio XML into a diagrams.net URL
+python3 -c "
+import zlib, base64, urllib.parse, sys
+xml = open(sys.argv[1]).read()
+compressed = zlib.compress(xml.encode('utf-8'), 9)
+encoded = base64.urlsafe_b64encode(compressed).decode('utf-8')
+print('https://viewer.diagrams.net/?tags=%7B%7D&lightbox=1&edit=_blank#R' + urllib.parse.quote(encoded, safe=''))
+" input.drawio
+```
+
+This produces a URL that opens the diagram in the browser for viewing and editing — useful when the user cannot install the desktop app.
+
 ### Checking if draw.io is in PATH
 
 ```bash
@@ -347,3 +369,84 @@ fi
 | Self-closing edge `mxCell` | Always use expanded form with `<mxGeometry>` child — self-closing edges won't render |
 | `--` inside XML comments | Illegal per XML spec — use single hyphens or rephrase |
 | Arrowhead overlaps bend | Final edge segment before target must be ≥20px — increase spacing or add waypoints |
+| Literal `\n` in label text | Use `&#xa;` for line breaks in `value` attributes |
+
+## Diagram Type Presets
+
+When the user requests a specific diagram type, apply the matching preset below for shapes, styles, and layout conventions.
+
+### ERD (Entity-Relationship Diagram)
+
+| Element | Style | Notes |
+|---------|-------|-------|
+| Table | `shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;strokeColor=#6c8ebf;fillColor=#dae8fc;` | Each table is a container |
+| Row (column) | `shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;` | Child of table, `parent=tableId` |
+| PK column | Bold text: `fontStyle=1` on the row | Mark with `PK` prefix or key icon |
+| FK relationship | Dashed edge: `dashed=1;endArrow=ERmandOne;startArrow=ERmandOne;` | Use ER notation arrows |
+| Layout | TB, tables spaced 300px apart | Group related tables vertically |
+
+### UML Class Diagram
+
+| Element | Style | Notes |
+|---------|-------|-------|
+| Class box | `swimlane;fontStyle=1;align=center;startSize=26;html=1;` | 3-section: title / attributes / methods |
+| Separator | `line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=10;rotatable=0;labelPosition=left;points=[];portConstraint=eastwest;` | Between sections |
+| Inheritance | `endArrow=block;endFill=0;` | Hollow triangle arrow |
+| Implementation | `endArrow=block;endFill=0;dashed=1;` | Dashed + hollow triangle |
+| Composition | `endArrow=diamondThin;endFill=1;` | Filled diamond |
+| Aggregation | `endArrow=diamondThin;endFill=0;` | Hollow diamond |
+| Layout | TB, classes 250px apart | Interfaces above implementations |
+
+### Sequence Diagram
+
+| Element | Style | Notes |
+|---------|-------|-------|
+| Actor/Object | `shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;` | Lifeline with dashed vertical line |
+| Sync message | `html=1;verticalAlign=bottom;endArrow=block;` | Solid line, filled arrowhead |
+| Async message | `html=1;verticalAlign=bottom;endArrow=open;dashed=1;` | Dashed line, open arrowhead |
+| Return message | `html=1;verticalAlign=bottom;endArrow=open;dashed=1;strokeColor=#999999;` | Grey dashed |
+| Activation box | `shape=umlFrame;whiteSpace=wrap;` on the lifeline | Narrow rectangle on lifeline |
+| Layout | LR, lifelines spaced 200px apart | Time flows top to bottom |
+
+### Architecture Diagram
+
+| Element | Style | Notes |
+|---------|-------|-------|
+| Layer/tier | `swimlane;startSize=30;` | Containers for grouping: Client / API / Service / Data |
+| Service | `rounded=1;whiteSpace=wrap;html=1;` + tier color | Use color palette by tier |
+| Database | `shape=cylinder3;whiteSpace=wrap;html=1;` | Green palette |
+| Queue/Bus | `rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;` | Yellow — place centrally for hub pattern |
+| Gateway/LB | `shape=mxgraph.aws4.resourceIcon;` or `rounded=1;` with orange | Orange palette |
+| External | `rounded=1;dashed=1;fillColor=#f5f5f5;strokeColor=#666666;` | Dashed border for external systems |
+| Layout | TB or LR by tier count; ≥4 tiers → TB | Hub nodes centered |
+
+### ML / Deep Learning Model Diagram
+
+For neural network architecture diagrams — ideal for papers targeting NeurIPS, ICML, ICLR.
+
+| Element | Style | Notes |
+|---------|-------|-------|
+| Layer block | `rounded=1;whiteSpace=wrap;html=1;` + type color | Main building block |
+| Input/Output | `fillColor=#d5e8d4;strokeColor=#82b366;` | Green |
+| Conv / Pooling | `fillColor=#dae8fc;strokeColor=#6c8ebf;` | Blue |
+| Attention / Transformer | `fillColor=#e1d5e7;strokeColor=#9673a6;` | Purple |
+| RNN / LSTM / GRU | `fillColor=#fff2cc;strokeColor=#d6b656;` | Yellow |
+| FC / Linear | `fillColor=#ffe6cc;strokeColor=#d79b00;` | Orange |
+| Loss / Activation | `fillColor=#f8cecc;strokeColor=#b85450;` | Red/Pink |
+| Skip connection | `dashed=1;endArrow=block;curved=1;` | Dashed curved arrow |
+| Tensor shape label | Add shape annotation as secondary label: `value="Conv2D&#xa;(B, 64, 32, 32)"` | Use `&#xa;` for multi-line |
+| Layout | TB (data flows top→bottom), layers 150px apart | Group encoder/decoder as swimlanes |
+
+**Tensor shape convention:** annotate each layer with input/output tensor dimensions in `(B, C, H, W)` or `(B, T, D)` format. Place dimensions as the second line of the label using `&#xa;`.
+
+### Flowchart (enhanced)
+
+| Element | Style | Notes |
+|---------|-------|-------|
+| Start/End | `ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;` | Green oval |
+| Process | `rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;` | Blue rectangle |
+| Decision | `rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;` | Yellow diamond |
+| I/O | `shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;` | Orange parallelogram |
+| Subprocess | `rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;` + double border | Purple |
+| Yes/No labels | `value="Yes"` / `value="No"` on decision edges | Always label decision branches |
+| Layout | TB, 200px vertical gap | Decisions branch LR, merge back to center |
