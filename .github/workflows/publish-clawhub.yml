@@ -21,8 +21,10 @@ jobs:
       - name: Install ClawHub CLI
         run: npm install -g clawhub
 
-      - name: Authenticate with GitHub token
-        run: clawhub auth login --token "${{ secrets.CLAWHUB_TOKEN }}" --no-browser
+      - name: Authenticate with ClawHub
+        run: |
+          mkdir -p "$HOME/.config/clawhub"
+          echo '{"registry":"https://clawhub.ai","token":"'"${{ secrets.CLAWHUB_TOKEN }}"'"}' > "$HOME/.config/clawhub/config.json"
 
       - name: Publish skill
         run: clawhub skill publish .
