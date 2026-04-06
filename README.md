@@ -123,30 +123,30 @@ xvfb-run -a drawio --version
 
 ```bash
 # Global install (available in all projects)
-git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio-skill
 
 # Project-level install
-git clone https://github.com/Agents365-ai/drawio-skill.git .claude/skills/drawio
+git clone https://github.com/Agents365-ai/drawio-skill.git .claude/skills/drawio-skill
 ```
 
 ### OpenClaw
 
 ```bash
 # Via ClawHub
-clawhub install drawio
+clawhub install drawio-skill
 
 # Manual install
-git clone https://github.com/Agents365-ai/drawio-skill.git ~/.openclaw/skills/drawio
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.openclaw/skills/drawio-skill
 
 # Project-level install
-git clone https://github.com/Agents365-ai/drawio-skill.git skills/drawio
+git clone https://github.com/Agents365-ai/drawio-skill.git skills/drawio-skill
 ```
 
 ### Hermes Agent
 
 ```bash
 # Install under design category
-git clone https://github.com/Agents365-ai/drawio-skill.git ~/.hermes/skills/design/drawio
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.hermes/skills/design/drawio-skill
 ```
 
 Or add an external directory in `~/.hermes/config.yaml`:
@@ -161,10 +161,10 @@ skills:
 
 ```bash
 # User-level install
-git clone https://github.com/Agents365-ai/drawio-skill.git ~/.agents/skills/drawio
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.agents/skills/drawio-skill
 
 # Project-level install
-git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio
+git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio-skill
 ```
 
 ### SkillsMP
@@ -172,17 +172,17 @@ git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio
 Search for `drawio` on [skillsmp.com](https://skillsmp.com) or use the CLI:
 
 ```bash
-skills install drawio
+skills install drawio-skill
 ```
 
 ### Installation paths summary
 
 | Platform | Global path | Project path |
 |----------|-------------|--------------|
-| Claude Code | `~/.claude/skills/drawio/` | `.claude/skills/drawio/` |
-| OpenClaw | `~/.openclaw/skills/drawio/` | `skills/drawio/` |
-| Hermes Agent | `~/.hermes/skills/design/drawio/` | Via `external_dirs` config |
-| OpenAI Codex | `~/.agents/skills/drawio/` | `.agents/skills/drawio/` |
+| Claude Code | `~/.claude/skills/drawio-skill/` | `.claude/skills/drawio-skill/` |
+| OpenClaw | `~/.openclaw/skills/drawio-skill/` | `skills/drawio-skill/` |
+| Hermes Agent | `~/.hermes/skills/design/drawio-skill/` | Via `external_dirs` config |
+| OpenAI Codex | `~/.agents/skills/drawio-skill/` | `.agents/skills/drawio-skill/` |
 | SkillsMP | N/A (installed via CLI) | N/A |
 
 ## Usage

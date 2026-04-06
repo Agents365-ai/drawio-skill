@@ -123,30 +123,30 @@ xvfb-run -a drawio --version
 
 ```bash
 # 全局安装（所有项目可用）
-git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio-skill
 
 # 项目级安装
-git clone https://github.com/Agents365-ai/drawio-skill.git .claude/skills/drawio
+git clone https://github.com/Agents365-ai/drawio-skill.git .claude/skills/drawio-skill
 ```
 
 ### OpenClaw
 
 ```bash
 # 通过 ClawHub 安装
-clawhub install drawio
+clawhub install drawio-skill
 
 # 手动安装
-git clone https://github.com/Agents365-ai/drawio-skill.git ~/.openclaw/skills/drawio
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.openclaw/skills/drawio-skill
 
 # 项目级安装
-git clone https://github.com/Agents365-ai/drawio-skill.git skills/drawio
+git clone https://github.com/Agents365-ai/drawio-skill.git skills/drawio-skill
 ```
 
 ### Hermes Agent
 
 ```bash
 # 安装到 design 分类
-git clone https://github.com/Agents365-ai/drawio-skill.git ~/.hermes/skills/design/drawio
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.hermes/skills/design/drawio-skill
 ```
 
 或在 `~/.hermes/config.yaml` 中添加外部目录：
@@ -161,10 +161,10 @@ skills:
 
 ```bash
 # 用户级安装
-git clone https://github.com/Agents365-ai/drawio-skill.git ~/.agents/skills/drawio
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.agents/skills/drawio-skill
 
 # 项目级安装
-git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio
+git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio-skill
 ```
 
 ### SkillsMP
@@ -172,17 +172,17 @@ git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio
 在 [skillsmp.com](https://skillsmp.com) 搜索 `drawio` 或使用 CLI：
 
 ```bash
-skills install drawio
+skills install drawio-skill
 ```
 
 ### 安装路径总结
 
 | 平台 | 全局路径 | 项目路径 |
 |------|----------|----------|
-| Claude Code | `~/.claude/skills/drawio/` | `.claude/skills/drawio/` |
-| OpenClaw | `~/.openclaw/skills/drawio/` | `skills/drawio/` |
-| Hermes Agent | `~/.hermes/skills/design/drawio/` | 通过 `external_dirs` 配置 |
-| OpenAI Codex | `~/.agents/skills/drawio/` | `.agents/skills/drawio/` |
+| Claude Code | `~/.claude/skills/drawio-skill/` | `.claude/skills/drawio-skill/` |
+| OpenClaw | `~/.openclaw/skills/drawio-skill/` | `skills/drawio-skill/` |
+| Hermes Agent | `~/.hermes/skills/design/drawio-skill/` | 通过 `external_dirs` 配置 |
+| OpenAI Codex | `~/.agents/skills/drawio-skill/` | `.agents/skills/drawio-skill/` |
 | SkillsMP | N/A（通过 CLI 安装） | N/A |
 
 ## 使用方式
