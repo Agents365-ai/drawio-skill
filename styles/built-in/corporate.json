@@ -6,13 +6,13 @@
   "source": { "type": "built-in" },
   "confidence": "high",
   "palette": {
-    "primary":   { "fillColor": "#E3F2FD", "strokeColor": "#1565C0" },
-    "success":   { "fillColor": "#E8F5E9", "strokeColor": "#2E7D32" },
-    "warning":   { "fillColor": "#FFF8E1", "strokeColor": "#F57C00" },
-    "accent":    { "fillColor": "#FFF3E0", "strokeColor": "#E65100" },
-    "danger":    { "fillColor": "#FFEBEE", "strokeColor": "#C62828" },
-    "neutral":   { "fillColor": "#ECEFF1", "strokeColor": "#455A64" },
-    "secondary": { "fillColor": "#F3E5F5", "strokeColor": "#6A1B9A" }
+    "primary":   { "fillColor": "#e3f2fd", "strokeColor": "#1565c0" },
+    "success":   { "fillColor": "#e8f5e9", "strokeColor": "#2e7d32" },
+    "warning":   { "fillColor": "#fff9c4", "strokeColor": "#f57c00" },
+    "accent":    { "fillColor": "#fff3e0", "strokeColor": "#e65100" },
+    "danger":    { "fillColor": "#ffebee", "strokeColor": "#c62828" },
+    "neutral":   { "fillColor": "#eceff1", "strokeColor": "#455a64" },
+    "secondary": { "fillColor": "#f3e5f5", "strokeColor": "#6a1b9a" }
   },
   "roles": {
     "service":  "primary",

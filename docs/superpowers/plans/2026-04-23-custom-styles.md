@@ -243,13 +243,13 @@ git commit -m "feat: add preset JSON schema for custom styles"
   "source": { "type": "built-in" },
   "confidence": "high",
   "palette": {
-    "primary":   { "fillColor": "#E3F2FD", "strokeColor": "#1565C0" },
-    "success":   { "fillColor": "#E8F5E9", "strokeColor": "#2E7D32" },
-    "warning":   { "fillColor": "#FFF8E1", "strokeColor": "#F57C00" },
-    "accent":    { "fillColor": "#FFF3E0", "strokeColor": "#E65100" },
-    "danger":    { "fillColor": "#FFEBEE", "strokeColor": "#C62828" },
-    "neutral":   { "fillColor": "#ECEFF1", "strokeColor": "#455A64" },
-    "secondary": { "fillColor": "#F3E5F5", "strokeColor": "#6A1B9A" }
+    "primary":   { "fillColor": "#e3f2fd", "strokeColor": "#1565c0" },
+    "success":   { "fillColor": "#e8f5e9", "strokeColor": "#2e7d32" },
+    "warning":   { "fillColor": "#fff9c4", "strokeColor": "#f57c00" },
+    "accent":    { "fillColor": "#fff3e0", "strokeColor": "#e65100" },
+    "danger":    { "fillColor": "#ffebee", "strokeColor": "#c62828" },
+    "neutral":   { "fillColor": "#eceff1", "strokeColor": "#455a64" },
+    "secondary": { "fillColor": "#f3e5f5", "strokeColor": "#6a1b9a" }
   },
   "roles": {
     "service":  "primary",
@@ -297,13 +297,13 @@ git commit -m "feat: add preset JSON schema for custom styles"
   "source": { "type": "built-in" },
   "confidence": "high",
   "palette": {
-    "primary":   { "fillColor": "#FFE4B5", "strokeColor": "#B8651E" },
-    "success":   { "fillColor": "#DEF0DC", "strokeColor": "#5C8A49" },
-    "warning":   { "fillColor": "#FFF4CC", "strokeColor": "#B8901A" },
-    "accent":    { "fillColor": "#FFD9B3", "strokeColor": "#C25100" },
-    "danger":    { "fillColor": "#FFCDBF", "strokeColor": "#A53D3D" },
-    "neutral":   { "fillColor": "#F5E6D3", "strokeColor": "#8B7355" },
-    "secondary": { "fillColor": "#E6D7E8", "strokeColor": "#7B4397" }
+    "primary":   { "fillColor": "#ffe4b5", "strokeColor": "#b8651e" },
+    "success":   { "fillColor": "#def0dc", "strokeColor": "#5c8a49" },
+    "warning":   { "fillColor": "#fff4cc", "strokeColor": "#b8901a" },
+    "accent":    { "fillColor": "#ffd9b3", "strokeColor": "#c25100" },
+    "danger":    { "fillColor": "#ffcdbf", "strokeColor": "#a53d3d" },
+    "neutral":   { "fillColor": "#f5e6d3", "strokeColor": "#8b7355" },
+    "secondary": { "fillColor": "#e6d7e8", "strokeColor": "#7b4397" }
   },
   "roles": {
     "service":  "primary",
