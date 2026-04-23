@@ -165,3 +165,86 @@ Input: a `.drawio` file path. Output: candidate preset JSON. Deterministic, no L
 | Non-standard `shape=` keywords (e.g., `shape=mxgraph.aws4.*`) | These do not match the Step 4 precedence ladder, so the vertex falls through to `rounded=0` for shape-class purposes. Iconography is lost; color, label, and edge style are still captured. Role inference still runs via the label-regex rules. Summary notes: *"Non-standard shape library detected — iconography not preserved in preset (color and label captured)."* |
 | Non-English labels | The English-keyword regexes in step 4 will mostly miss; most vertices collapse to `service`. Palette/shapes/font/edges still captured correctly (they don't depend on label text). `confidence` stays `"high"`. Summary notes: *"Role labels not in English — `service`/`database`/`decision`/`container`/`external` inferred from shape class; other roles not mapped."* |
 | File has no `<mxCell vertex="1">` at all | Stop. Refuse to save. Message: *"Nothing to learn from — source file has no shapes."* |
+
+## Image extraction path
+
+Input: path to a PNG/JPG (or any vision-readable image format). Output: candidate preset JSON. Inference-based; `confidence: "medium"` at best.
+
+**Prerequisite:** the agent's vision capability must be available (same mechanism the main workflow's self-check uses). If vision is not available, stop and tell the user:
+*"Image-based learning needs a vision-enabled model (Claude Sonnet or Opus). Re-run on such a model, or provide the `.drawio` source file instead."*
+
+### Steps
+
+1. **Read the image.** Use the agent's vision input — the same path the main workflow's step 5 uses to read exported PNGs during self-check.
+
+2. **Extract palette by visual inspection.** Identify distinct fill-color regions on shape bodies.
+
+   For each distinct fill:
+   - `fillColor` — quantize: round each RGB channel to the nearest multiple of 16, harmonize lightness to ~85% (drawio-standard pastel look). Emit as `#RRGGBB`.
+   - `strokeColor` — read the matching border. If unreadable, derive from fill by darkening ~25% (match HSL, drop L by 0.25).
+
+   Map each `(fillColor, strokeColor)` pair to a named slot by hue of the fill:
+   - blue family → `primary`
+   - green family → `success`
+   - yellow family → `warning`
+   - orange family → `accent`
+   - red/pink family → `danger`
+   - grey family → `neutral`
+   - purple family → `secondary`
+
+   Two distinct colors in the same hue family: keep the more frequently-used one in its canonical slot; the other spills to the nearest empty slot (adjacent hue).
+
+3. **Extract shape vocabulary.** Classify every visible shape by silhouette:
+   - rounded rectangle → `rounded=1`
+   - sharp rectangle → `rounded=0`
+   - circle / oval → `ellipse`
+   - diamond → `rhombus`
+   - cylinder (rectangle with curved top/bottom) → `shape=cylinder3`
+   - titled container (header bar + nested children inside) → `swimlane;startSize=30`
+   - dashed-bordered rectangle → `rounded=1;dashed=1`
+
+   Role assignment uses the **same label-text + shape rules as the XML path step 4**. Visible labels are read via vision.
+
+4. **Extract fonts.** Best-effort. Distinguishable categories:
+   - clearly serif → `fontFamily: "Georgia"`
+   - clearly monospaced → `fontFamily: "Courier New"`
+   - otherwise → `fontFamily: "Helvetica"`
+
+   Size by relative appearance:
+   - small → `fontSize: 11`
+   - medium → `fontSize: 12`
+   - large → `fontSize: 14`
+
+   If titles/container headers are distinctly larger or bolder → set `titleFontSize` accordingly and `titleBold: true`.
+
+5. **Extract edge defaults.**
+   - Right-angle orthogonal arrows → `edges.style = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1"`.
+   - Curved arrows → append `;curved=1` to `edges.style`.
+   - Filled triangle arrowheads → `edges.arrow = "endArrow=classic;endFill=1"`.
+   - Open V-shaped arrowheads → `edges.arrow = "endArrow=open;endFill=0"`.
+   - Any dashed arrows near labels like "optional", "async", "fallback", "secondary" → add those label tokens to `edges.dashedFor`.
+
+6. **Extract extras.**
+   - Visibly hand-drawn / rough / sketch look (wavy strokes, uneven fills) → `extras.sketch = true`.
+   - Heavy strokes (clearly >1.5× normal) → `extras.globalStrokeWidth = 2`.
+   - Otherwise default: `extras = { "sketch": false, "globalStrokeWidth": 1 }`.
+
+7. **Set provenance and confidence.**
+   ```json
+   {
+     "source": { "type": "image", "path": "<input absolute path>", "extracted_at": "YYYY-MM-DD" },
+     "confidence": "medium"
+   }
+   ```
+   Adjustments:
+   - <3 distinct shapes identifiable → `confidence: "low"`.
+   - Very clean image, ≥5 roles confidently mapped, all seven palette slots filled → may upgrade to `"high"`.
+
+### Image edge cases
+
+| Situation | Behavior |
+|---|---|
+| Vision unavailable | Stop as described above — do not fall back to guessing. |
+| Image has <3 identifiable shapes | Continue; mark `confidence: "low"`; summary explicitly warns the user that the preset is a loose approximation. |
+| Image has no visible labels | Role assignment collapses to shape-class only: cylinders → `database`, diamonds → `decision`, swimlanes → `container`, everything else → `service`. Palette/font/edges still captured. Summary notes: *"No labels readable — semantic roles beyond shape-class not inferred."* |
+| Two palette slots would land in the same hue family | Keep the more frequent one in its canonical slot; spill the other to the adjacent empty slot (rule in step 2). |
