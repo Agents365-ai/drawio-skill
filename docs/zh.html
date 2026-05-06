@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>drawio-skill — 从文本到专业图表</title>
+  <meta name="description" content="Claude Code skill，通过自然语言生成专业 draw.io 图表。6 种图表预设、ML/DL 支持、自检循环、动画连接线。">
+  <meta name="theme-color" content="#0d1117">
+  <link rel="canonical" href="https://agents365-ai.github.io/drawio-skill/zh.html">
+  <link rel="alternate" hreflang="zh" href="https://agents365-ai.github.io/drawio-skill/zh.html">
+  <link rel="alternate" hreflang="en" href="https://agents365-ai.github.io/drawio-skill/">
+  <meta property="og:title" content="drawio-skill — 从文本到专业图表">
+  <meta property="og:description" content="Claude Code skill，通过自然语言生成专业 draw.io 图表。6 种图表预设、ML/DL 支持、自检循环。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://agents365-ai.github.io/drawio-skill/zh.html">
+  <meta property="og:image" content="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/demo-star-cn.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    [data-theme="dark"] {
+      --bg: #0d1117; --bg-card: #161b22; --bg-code: #1c2128;
+      --border: #30363d; --text: #e6edf3; --text-muted: #8b949e;
+      --accent: #58a6ff; --accent-hover: #79c0ff;
+      --green: #3fb950; --red: #f85149;
+    }
+    [data-theme="light"] {
+      --bg: #ffffff; --bg-card: #f6f8fa; --bg-code: #f0f3f6;
+      --border: #d0d7de; --text: #1f2328; --text-muted: #656d76;
+      --accent: #0969da; --accent-hover: #0550ae;
+      --green: #1a7f37; --red: #cf222e;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: 12px 24px; display: flex; justify-content: space-between; align-items: center;
+      transition: background 0.3s;
+    }
+    nav .logo { font-weight: 700; font-size: 16px; color: var(--text); }
+    nav .logo span { color: var(--accent); }
+    nav .nav-right { display: flex; align-items: center; gap: 16px; }
+    .lang-switch {
+      font-size: 14px; font-weight: 500; color: var(--text-muted);
+      padding: 4px 12px; border: 1px solid var(--border); border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .lang-switch:hover { color: var(--text); border-color: var(--text-muted); text-decoration: none; }
+    .theme-btn {
+      background: none; border: 1px solid var(--border); color: var(--text-muted);
+      border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 16px;
+      transition: all 0.2s; line-height: 1;
+    }
+    .theme-btn:hover { color: var(--text); border-color: var(--text-muted); }
+
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    section { padding: 72px 0; }
+    section + section { border-top: 1px solid var(--border); }
+
+    .hero { text-align: center; padding: 96px 0 72px; border-bottom: 1px solid var(--border); }
+    .hero-badge {
+      display: inline-block; font-size: 13px; color: var(--accent);
+      border: 1px solid var(--accent); border-radius: 20px;
+      padding: 4px 14px; margin-bottom: 20px; letter-spacing: 0.5px;
+    }
+    .hero h1 { font-size: 48px; font-weight: 800; margin-bottom: 16px; letter-spacing: -1px; }
+    .hero h1 span { color: var(--accent); }
+    .hero p { font-size: 20px; color: var(--text-muted); max-width: 600px; margin: 0 auto 32px; }
+    .hero-install {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: var(--bg-code); border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px 20px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 15px;
+      margin-bottom: 24px;
+    }
+    .hero-install code { color: var(--green); }
+    .copy-btn {
+      background: none; border: 1px solid var(--border); color: var(--text-muted);
+      border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 13px; transition: all 0.2s;
+    }
+    .copy-btn:hover { color: var(--text); border-color: var(--text-muted); }
+    .hero-links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px;
+      border-radius: 8px; font-size: 15px; font-weight: 600; transition: all 0.2s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    [data-theme="light"] .btn-primary { color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); text-decoration: none; }
+    .btn-outline { border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--text-muted); text-decoration: none; }
+
+    .section-title { font-size: 32px; font-weight: 700; margin-bottom: 8px; text-align: center; }
+    .section-sub { color: var(--text-muted); font-size: 17px; text-align: center; margin-bottom: 48px; }
+
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .feature-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 28px; transition: background 0.3s;
+    }
+    .feature-icon { font-size: 28px; margin-bottom: 12px; }
+    .feature-card h3 { font-size: 18px; margin-bottom: 8px; }
+    .feature-card p { color: var(--text-muted); font-size: 14px; }
+
+    .demos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .demo-item { text-align: center; }
+    .demo-item img { width: 100%; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 12px; }
+    .demo-item h4 { font-size: 16px; margin-bottom: 4px; }
+    .demo-item p { color: var(--text-muted); font-size: 13px; }
+
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+    .compare-table th, .compare-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    .compare-table th { color: var(--text-muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .compare-table tr:hover { background: var(--bg-card); }
+    .check { color: var(--green); font-weight: 700; }
+    .cross { color: var(--red); }
+
+    .tabs { display: flex; gap: 0; margin-bottom: 0; flex-wrap: wrap; }
+    .tab {
+      padding: 10px 20px; background: var(--bg-card); border: 1px solid var(--border);
+      border-bottom: none; color: var(--text-muted); cursor: pointer;
+      font-size: 14px; font-weight: 500; transition: all 0.2s;
+    }
+    .tab:first-child { border-radius: 8px 0 0 0; }
+    .tab:last-child { border-radius: 0 8px 0 0; }
+    button.tab { font-family: inherit; }
+    .tab.active { background: var(--bg-code); color: var(--text); border-bottom-color: var(--bg-code); }
+    .tab-content {
+      display: none; background: var(--bg-code); border: 1px solid var(--border);
+      border-radius: 0 8px 8px 8px; padding: 20px;
+    }
+    .tab-content.active { display: block; }
+    .tab-content pre {
+      font-family: 'SF Mono', 'Fira Code', monospace; font-size: 14px;
+      line-height: 1.5; white-space: pre-wrap; color: var(--green);
+    }
+
+    .support-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px; max-width: 820px; margin: 0 auto 40px;
+    }
+    .support-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      transition: background 0.3s;
+    }
+    .support-card img {
+      width: 160px; height: 160px; object-fit: contain;
+      border-radius: 8px; margin-bottom: 12px; background: #fff;
+    }
+    .support-card b { font-size: 14px; color: var(--text); }
+    .author-block {
+      text-align: center; padding-top: 32px; margin-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .author-block h3 { font-size: 18px; margin-bottom: 8px; font-weight: 700; }
+    .author-block p { color: var(--text-muted); margin-bottom: 12px; }
+    .author-links { display: inline-flex; gap: 24px; font-size: 14px; }
+
+    footer {
+      border-top: 1px solid var(--border); padding: 32px 0;
+      text-align: center; color: var(--text-muted); font-size: 14px;
+    }
+    footer a { color: var(--text-muted); }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 32px; }
+      .hero p { font-size: 17px; }
+      section { padding: 48px 0; }
+      .features-grid { grid-template-columns: 1fr; }
+      .hero-install { flex-direction: column; font-size: 13px; }
+    }
+    .skip-link {
+      position: absolute; top: -40px; left: 0; background: var(--accent); color: #fff;
+      padding: 8px 16px; z-index: 200; font-size: 14px; transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; }
+    .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">跳转到主要内容</a>
+
+  <nav role="navigation" aria-label="主导航">
+    <div class="logo">drawio-<span>skill</span></div>
+    <div class="nav-right">
+      <a href="index.html" class="lang-switch">English</a>
+      <button class="theme-btn" onclick="toggleTheme()" title="切换主题" aria-label="切换深色/浅色主题">&#x1F319;</button>
+    </div>
+  </nav>
+
+  <main id="main-content">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="container">
+      <div class="hero-badge">v1.5.0 &mdash; 插件市场 + 模块化 SKILL.md</div>
+      <h1>drawio-<span>skill</span></h1>
+      <p>从文本到专业图表。通过自然语言生成 draw.io 文件，支持自检、迭代优化和 ML 模型图。</p>
+      <div class="hero-install">
+        <code id="install-cmd">/plugin marketplace add Agents365-ai/365-skills</code>
+        <button class="copy-btn" onclick="copyInstall()">复制</button>
+      </div>
+      <div class="hero-links">
+        <a href="https://github.com/Agents365-ai/drawio-skill" class="btn btn-primary">GitHub</a>
+        <a href="https://clawhub.ai/agents365-ai/drawio-pro-skill" class="btn btn-outline">ClawHub</a>
+        <a href="https://skillsmp.com/skills/agents365-ai-drawio-skill-skill-md" class="btn btn-outline">SkillsMP</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <section>
+    <div class="container">
+      <h2 class="section-title">为什么选择这个 Skill</h2>
+      <p class="section-sub">唯一能自动读取输出并在展示前自动修复的纯 SKILL.md 方案。</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F4CB;</div>
+          <h3>6 种图表预设</h3>
+          <p>ERD、UML 类图、序列图、架构图、ML/深度学习、流程图 &mdash; 每种都有预设形状、样式和布局规范。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F9E0;</div>
+          <h3>ML / 深度学习</h3>
+          <p>Transformer、CNN、LSTM 架构，带张量形状标注 (B, C, H, W)。专为 NeurIPS、ICML、ICLR 论文打造。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F50D;</div>
+          <h3>自检循环</h3>
+          <p>读取导出的 PNG，检测 6 类问题（重叠、标签裁切、连线堆叠），在展示给你之前自动修复。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x2728;</div>
+          <h3>动画连接线</h3>
+          <p>添加 <code>flowAnimation=1</code> 即可在箭头上显示移动动画。适合数据流和管道图的 SVG 导出。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F3A8;</div>
+          <h3>样式预设</h3>
+          <p>用一个 <code>.drawio</code> 文件或图片"教会" Skill 你的风格，命名保存后可在后续图表中复用。内置 3 种预设：<code>default</code>、<code>corporate</code>、<code>handdrawn</code>。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F310;</div>
+          <h3>6 大平台、零配置</h3>
+          <p>Claude Code、Opencode、OpenClaw、Hermes、Codex、SkillsMP &mdash; 仅需一个 SKILL.md + draw.io 桌面版，无需 MCP、Node.js。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F4BB;</div>
+          <h3>浏览器降级</h3>
+          <p>没有桌面 CLI？自动生成 diagrams.net URL，在浏览器中查看和编辑图表。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo Gallery -->
+  <section>
+    <div class="container">
+      <h2 class="section-title">示例展示</h2>
+      <p class="section-sub">不同拓扑的清晰连线路由 &mdash; 线条不会穿越无关形状。</p>
+      <div class="demos">
+        <div class="demo-item">
+          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/demo-star-cn.png" alt="星形拓扑图">
+          <h4>星形拓扑</h4>
+          <p>7 个节点 &mdash; 中央消息代理 + 6 个微服务辐射排列</p>
+        </div>
+        <div class="demo-item">
+          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/demo-layered-cn.png" alt="分层流程图">
+          <h4>分层流程</h4>
+          <p>10 个节点、4 层 &mdash; 交叉连线清晰路由</p>
+        </div>
+        <div class="demo-item">
+          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/demo-ring-cn.png" alt="环形循环图">
+          <h4>环形 / 循环</h4>
+          <p>8 个节点 &mdash; CI/CD 流水线，含闭合回路和分支</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison -->
+  <section>
+    <div class="container">
+      <h2 class="section-title">对比原生智能体</h2>
+      <p class="section-sub">使用本 skill 与直接提示 LLM 的区别。</p>
+      <div class="table-wrapper">
+      <table class="compare-table">
+        <thead>
+          <tr><th>功能</th><th>原生智能体</th><th>本 Skill</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>导出后自检</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 2 轮自动修复</td></tr>
+          <tr><td>迭代反馈循环</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 5 轮定向编辑</td></tr>
+          <tr><td>图表类型预设</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 6 种预设（ERD、UML、序列、架构、ML、流程）</td></tr>
+          <tr><td>ML 模型图</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 张量标注、层配色</td></tr>
+          <tr><td>动画连接线</td><td class="cross">&#x2717;</td><td class="check">&#x2713; flowAnimation=1</td></tr>
+          <tr><td>网格对齐布局</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 10px 对齐</td></tr>
+          <tr><td>按复杂度分级间距</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 200&ndash;350px</td></tr>
+          <tr><td>配色方案</td><td class="cross">随机</td><td class="check">&#x2713; 7 色语义系统</td></tr>
+          <tr><td>连线路由规则</td><td class="cross">基础</td><td class="check">&#x2713; 走廊 + waypoints + 分布</td></tr>
+          <tr><td>容器/分组</td><td class="cross">&#x2717;</td><td class="check">&#x2713; Swimlane + group + 自定义</td></tr>
+          <tr><td>嵌入式导出</td><td class="cross">&#x2717;</td><td class="check">&#x2713; --embed-diagram</td></tr>
+          <tr><td>浏览器降级</td><td class="cross">&#x2717;</td><td class="check">&#x2713; diagrams.net URL</td></tr>
+          <tr><td>自动启动桌面版</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 导出后打开 .drawio</td></tr>
+          <tr><td>样式预设</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 学习、保存并应用命名样式</td></tr>
+          <tr><td>插件市场安装</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 通过 Agents365-ai/365-skills</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Install -->
+  <section>
+    <div class="container">
+      <h2 class="section-title">安装</h2>
+      <p class="section-sub">选择你的平台，10 秒搞定。</p>
+      <div class="tabs" role="tablist" aria-label="安装平台">
+        <button class="tab active" role="tab" aria-selected="true" aria-controls="tab-claude" onclick="switchTab(event, 'tab-claude')">Claude Code</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-opencode" onclick="switchTab(event, 'tab-opencode')">Opencode</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-openclaw" onclick="switchTab(event, 'tab-openclaw')">OpenClaw</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-skillsmp" onclick="switchTab(event, 'tab-skillsmp')">SkillsMP</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-clawhub" onclick="switchTab(event, 'tab-clawhub')">ClawHub</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-codex" onclick="switchTab(event, 'tab-codex')">Codex</button>
+      </div>
+      <div id="tab-claude" class="tab-content active" role="tabpanel">
+        <pre># 插件市场（推荐）
+/plugin marketplace add Agents365-ai/365-skills
+/plugin install drawio
+
+# 手动全局安装
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio-skill
+
+# 手动项目级安装
+git clone https://github.com/Agents365-ai/drawio-skill.git .claude/skills/drawio-skill</pre>
+      </div>
+      <div id="tab-opencode" class="tab-content" role="tabpanel">
+        <pre># 全局安装（Opencode 原生路径）
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.config/opencode/skills/drawio-skill
+
+# 项目级安装
+git clone https://github.com/Agents365-ai/drawio-skill.git .opencode/skills/drawio-skill
+
+# 也可自动识别已有的 Claude Code 安装
+# （~/.claude/skills/ 和 .claude/skills/ 会被自动读取）</pre>
+      </div>
+      <div id="tab-openclaw" class="tab-content" role="tabpanel">
+        <pre># 通过 ClawHub 安装
+clawhub install drawio-pro-skill
+
+# 手动安装
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.openclaw/skills/drawio-skill</pre>
+      </div>
+      <div id="tab-skillsmp" class="tab-content" role="tabpanel">
+        <pre># 通过 SkillsMP CLI
+skills install drawio-skill</pre>
+      </div>
+      <div id="tab-clawhub" class="tab-content" role="tabpanel">
+        <pre># 通过 ClawHub CLI
+clawhub install drawio-pro-skill</pre>
+      </div>
+      <div id="tab-codex" class="tab-content" role="tabpanel">
+        <pre># 用户级安装
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/.agents/skills/drawio-skill
+
+# 项目级安装
+git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio-skill</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 支持作者 -->
+  <section id="support">
+    <div class="container">
+      <h2 class="section-title">支持作者</h2>
+      <p class="section-sub">如果这个 skill 对你有帮助，欢迎支持作者。</p>
+      <div class="support-grid">
+        <div class="support-card">
+          <img src="https://raw.githubusercontent.com/Agents365-ai/images_payment/main/qrcode/wechat-pay.png" alt="微信支付" loading="lazy">
+          <b>微信支付</b>
+        </div>
+        <div class="support-card">
+          <img src="https://raw.githubusercontent.com/Agents365-ai/images_payment/main/qrcode/alipay.png" alt="支付宝" loading="lazy">
+          <b>支付宝</b>
+        </div>
+        <div class="support-card">
+          <img src="https://raw.githubusercontent.com/Agents365-ai/images_payment/main/qrcode/buymeacoffee.png" alt="Buy Me a Coffee" loading="lazy">
+          <b>Buy Me a Coffee</b>
+        </div>
+        <div class="support-card">
+          <img src="https://raw.githubusercontent.com/Agents365-ai/images_payment/main/awarding/award.gif" alt="打赏" loading="lazy">
+          <b>打赏</b>
+        </div>
+      </div>
+      <div class="author-block">
+        <h3>作者</h3>
+        <p><strong>Agents365-ai</strong></p>
+        <div class="author-links">
+          <a href="https://github.com/Agents365-ai">GitHub</a>
+          <a href="https://space.bilibili.com/441831884">Bilibili</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>
+        MIT 许可证 &middot;
+        <a href="https://github.com/Agents365-ai/drawio-skill">GitHub</a> &middot;
+        <a href="https://github.com/Agents365-ai">Agents365-ai</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    function copyInstall() {
+      const cmd = document.getElementById('install-cmd').textContent;
+      navigator.clipboard.writeText(cmd).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = '已复制!';
+        setTimeout(() => btn.textContent = '复制', 2000);
+      });
+    }
+    function switchTab(e, id) {
+      document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      e.target.setAttribute('aria-selected', 'true');
+      document.getElementById(id).classList.add('active');
+    }
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      document.querySelector('.theme-btn').innerHTML = next === 'dark' ? '&#x1F319;' : '&#x2600;&#xFE0F;';
+    }
+    (function() {
+      const saved = localStorage.getItem('theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+        document.querySelector('.theme-btn').innerHTML = saved === 'dark' ? '&#x1F319;' : '&#x2600;&#xFE0F;';
+      }
+    })();
+  </script>
+</body>
+</html>
