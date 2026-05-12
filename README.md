@@ -2,286 +2,68 @@
 
 [中文文档](README_CN.md) | [Online Docs](https://agents365-ai.github.io/drawio-skill/)
 
+<p align="center">
+  <img src="assets/workflow.png" width="900" alt="Workflow">
+</p>
+
+A skill that turns natural-language descriptions into `.drawio` XML and exports them to PNG / SVG / PDF / JPG via the native draw.io desktop CLI — with 6 diagram presets (ERD, UML Class, Sequence, Architecture, ML/DL, Flowchart), self-check + auto-fix (2 rounds), an iterative feedback loop (5 rounds), and style presets you can capture from a sample file or image.
+
+Works with Claude Code, Cursor, Copilot, OpenClaw, Codex, Hermes, and any agent that supports the [Agent Skills](https://agentskills.io) format.
+
+## Documentation
+
+| Doc | What's inside |
+|---|---|
+| [docs/COMPARISON.md](docs/COMPARISON.md) | Side-by-side tables vs. native agents and other draw.io skills/tools, with key-advantages summary |
+| [docs/INSTALL_CLI.md](docs/INSTALL_CLI.md) | draw.io desktop CLI install recipes for macOS / Windows / Linux |
+| [docs/INSTALL_SKILL.md](docs/INSTALL_SKILL.md) | Plugin marketplace, manual clone, and update commands |
+| [docs/USAGE.md](docs/USAGE.md) | Natural-language prompts, microservices walkthrough, topology demos (star / layered / ring) |
+| [docs/STYLE_PRESETS.md](docs/STYLE_PRESETS.md) | Built-in presets, "learn my style from a file" workflow, manage-presets commands |
+| [skills/drawio-skill/SKILL.md](skills/drawio-skill/SKILL.md) | Workflow guide loaded by the agent |
+
 ## What it does
 
-- Generates `.drawio` XML files from natural language descriptions
-- Exports diagrams to PNG, SVG, PDF, or JPG using the native draw.io desktop CLI
-- **6 diagram type presets**: ERD, UML Class, Sequence, Architecture, ML/Deep Learning, Flowchart — with preset shapes, styles, and layout conventions
-- **Animated connectors** (`flowAnimation=1`) for data-flow and pipeline diagrams (visible in SVG and draw.io desktop)
-- **ML model diagram support** with tensor shape annotations `(B, C, H, W)` — ideal for NeurIPS/ICML/ICLR papers
-- **Grid-aligned layout** — all coordinates snap to 10px multiples for clean alignment
-- **Browser fallback** — generates diagrams.net URLs when the desktop CLI is unavailable
-- Iterative design: preview, get feedback, and refine diagrams until they look right
-- **Auto-launch** draw.io desktop after export for manual fine-tuning
-- Triggers automatically when diagrams would help explain complex systems
-- **Style presets (v1.3 new)** — teach the skill your visual style from a `.drawio` file or image, save it by name, and apply it to future diagrams. See `## Style Presets` in SKILL.md.
-- **Custom output directory (v1.4 new)** — ask for any output path (e.g. `./artifacts/`, `docs/images/`) and the skill will `mkdir -p` and export there; ideal for CI/CD artifact pipelines.
-
-## Comparison
-
-### vs No Skill (native agent)
-
-| Feature | Native agent | This skill |
-|---------|-------------|------------|
-| Generate draw.io XML | Yes — LLMs know the format | Yes |
-| Self-check after export | No | Yes — reads PNG and auto-fixes 6 issue types |
-| Iterative review loop | No — must manually re-prompt | Yes — targeted edits, 5-round safety valve |
-| Proactive triggers | No — only when explicitly asked | Yes — auto-suggests when 3+ components |
-| Layout guidelines | None — varies by run | Complexity-scaled spacing, routing corridors, hub placement |
-| Grid alignment | No | Yes — all coordinates snap to 10px multiples |
-| Diagram type presets | No | Yes — 6 presets (ERD, UML, Sequence, Architecture, ML/DL, Flowchart) |
-| Animated connectors | No | Yes — `flowAnimation=1` for data-flow visualization |
-| ML model diagrams | No | Yes — tensor shape annotations, layer-type color coding |
-| Color palette | Random/inconsistent | 7-color semantic system (blue=services, green=DB, purple=auth...) |
-| Edge routing rules | Basic | Pin entry/exit points, distribute connections, waypoint corridors |
-| Container/group patterns | None | Swimlane, group, custom container with parent-child nesting |
-| Embed diagram in export | No | Yes — `--embed-diagram` keeps exported PNG/SVG/PDF editable |
-| Browser fallback | No | Yes — generates diagrams.net URL when CLI unavailable |
-| Auto-launch desktop app | No | Yes — opens `.drawio` file after export for fine-tuning |
-
-### vs Other draw.io Skills & Tools
-
-| Feature | This skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp) (official, 1.3k⭐) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills) (60⭐) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio) (63⭐) |
-|---------|-----------|---------------|-------------------|--------------|
-| **Approach** | Pure SKILL.md | SKILL.md / MCP / Project | YAML DSL + MCP | Plugin + browser |
-| **Dependencies** | draw.io desktop only | draw.io desktop | MCP server (`npx`) | Browser + local server |
-| **Multi-agent** | ✅ 6 platforms | ❌ Claude Code only | ❌ Claude Code only | ❌ |
-| **Self-check** | ✅ 2-round auto-fix | ❌ | ❌ | ❌ screenshot |
-| **Iterative review** | ✅ 5-round loop | ❌ generate once | ✅ 3 workflows | ❌ |
-| **Layout guidance** | ✅ complexity-scaled + grid snap | ✅ basic spacing | ❌ relies on MCP | ❌ |
-| **Diagram presets** | ✅ 6 types (ERD, UML, Seq, Arch, ML, Flow) | ❌ | ❌ | ❌ |
-| **Animated edges** | ✅ `flowAnimation=1` | ❌ | ❌ | ❌ |
-| **ML/DL diagrams** | ✅ tensor shapes, layer colors | ❌ | ❌ | ❌ |
-| **Color system** | ✅ 7-color semantic | ❌ | ✅ 5 themes | ❌ |
-| **Container/group** | ✅ swimlane + group | ✅ detailed | ❌ | ❌ |
-| **Embed diagram** | ✅ `--embed-diagram` | ✅ | ❌ | ❌ |
-| **Edge routing** | ✅ corridors + waypoints | ✅ arrowhead rules | ❌ | ❌ |
-| **Browser fallback** | ✅ diagrams.net URL | ❌ | ❌ | ❌ |
-| **Auto-launch** | ✅ opens desktop app | ❌ | ❌ | ❌ |
-| **Cloud icons** | AWS basic | ❌ | ✅ AWS/GCP/Azure/K8s | ❌ |
-| **Zero-config** | ✅ copy skills/drawio-skill/ | ✅ | ❌ needs `npx` | ❌ needs plugin install |
-
-### Key advantages
-
-1. **Self-check + iterative loop** — the only pure-SKILL.md solution that reads its own output and auto-fixes before showing the user, then supports multi-round refinement
-2. **6 diagram type presets** — ERD, UML Class, Sequence, Architecture, ML/Deep Learning, Flowchart — each with preset shapes, styles, and layout conventions
-3. **ML/DL model diagrams** — tensor shape annotations, layer-type color coding, encoder/decoder swimlanes — built for academic papers
-4. **Multi-agent, zero-config** — works across 6 platforms with just the `skills/drawio-skill/` directory + draw.io desktop. No MCP server, no Python, no Node.js, no browser
-5. **Production-grade layout** — grid-aligned coordinates, complexity-scaled spacing, routing corridors, hub-center strategy, animated connectors
-6. **Browser fallback** — generates diagrams.net URLs when the desktop CLI is unavailable, plus auto-launch for desktop editing
+| Capability | Description |
+|---|---|
+| `.drawio` XML generation | From natural-language descriptions |
+| Multi-format export | PNG / SVG / PDF / JPG via the native draw.io desktop CLI |
+| 6 diagram type presets | ERD, UML Class, Sequence, Architecture, ML/Deep Learning, Flowchart |
+| Iterative review | Self-check + auto-fix (up to 2 rounds), then a 5-round feedback loop until you approve |
+| Style presets | Capture your visual style from a `.drawio` file or image, save by name, reapply on demand |
+| Auto-trigger | Activates whenever diagrams would help explain complex systems |
 
 ## Supported diagram types
 
-- **Architecture**: microservices, cloud (AWS/GCP/Azure), network topology, deployment — with tier-based swimlanes and hub-center strategy
-- **ML / Deep Learning**: Transformer, CNN, LSTM, GRU architectures — with tensor shape annotations and layer-type color coding
-- **Flowcharts**: business processes, workflows, decision trees, state machines — with semantic shape types (parallelogram I/O, diamond decisions)
-- **UML**: class diagrams (inheritance/composition/aggregation arrows), sequence diagrams (lifelines, activation boxes)
-- **Data**: ER diagrams (table containers, PK/FK notation), data flow diagrams (DFD)
-- **Other**: org charts, mind maps, wireframes
+| Category | Examples | Notable features |
+|---|---|---|
+| Architecture | microservices, cloud (AWS/GCP/Azure), network topology, deployment | Tier-based swimlanes, hub-center strategy |
+| ML / Deep Learning | Transformer, CNN, LSTM, GRU | Tensor shape annotations, layer-type color coding |
+| Flowcharts | business processes, workflows, decision trees, state machines | Semantic shapes (parallelogram I/O, diamond decisions) |
+| UML | class diagrams, sequence diagrams | Inheritance / composition / aggregation arrows; lifelines + activation boxes |
+| Data | ER diagrams, data flow diagrams (DFD) | Table containers, PK/FK notation |
+| Other | org charts, mind maps, wireframes | — |
 
-## How it works
+## Quick Start
 
-<p align="center">
-  <img src="assets/workflow.png" width="420" alt="Workflow">
-</p>
-
-## Prerequisites
-
-The draw.io desktop app must be installed for diagram export:
-
-### macOS
-
-```bash
-# Recommended — Homebrew
-brew install --cask drawio
-
-# Verify
-drawio --version
-```
-
-### Windows
-
-Download and install from: https://github.com/jgraph/drawio-desktop/releases
-
-```powershell
-# Verify
-"C:\Program Files\draw.io\draw.io.exe" --version
-```
-
-### Linux
-
-Download `.deb` or `.rpm` from: https://github.com/jgraph/drawio-desktop/releases
-
-```bash
-# Headless export (required on Linux servers without display)
-sudo apt install xvfb  # Debian/Ubuntu
-xvfb-run -a drawio --version
-```
-
-| Platform | Extra step |
-|----------|------------|
-| **macOS** | No extra steps after Homebrew install |
-| **Windows** | Use full path if not in PATH |
-| **Linux** | Wrap commands with `xvfb-run -a` for headless export |
-
-## Installation
-
-```bash
-# Any agent (Claude Code, Cursor, Copilot, etc.)
-npx skills add Agents365-ai/365-skills -g
-
-# Claude Code only
-> /plugin marketplace add Agents365-ai/365-skills
-> /plugin install drawio
-```
-
-Manual install — clone into your agent's skills directory:
-
-```bash
-git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio-skill
-```
-
-Common paths: `~/.claude/skills/` (Claude Code), `~/.config/opencode/skills/` (Opencode), `~/.openclaw/skills/` (OpenClaw), `~/.agents/skills/` (Codex). Also indexed on [SkillsMP](https://skillsmp.com/skills/agents365-ai-drawio-skill-skill-md) and [ClawHub](https://clawhub.ai/agents365-ai/drawio-pro-skill).
-
-## Updates
-
-The skill auto-checks for updates once per 24 hours on first use in a conversation. When a new version is available, the agent prints a one-line notice in the reply. To apply:
-
-```bash
-cd <your-install-path>/drawio-skill && git pull
-```
-
-The check is read-only, self-throttled, and silent when up to date, offline, or not a git install — it won't block or slow the workflow.
-
-Plugin-marketplace installs update automatically via the 365-skills umbrella. Package-manager installs handle updates themselves:
-
-```bash
-# Claude Code plugin
-/plugin update drawio
-
-# OpenClaw
-clawhub update drawio-pro-skill
-
-# SkillsMP
-skills update drawio-skill
-```
-
-## Usage
-
-Just describe what you want:
+Two steps — install the draw.io CLI first (see [docs/INSTALL_CLI.md](docs/INSTALL_CLI.md)), then drop the skill into your host (see [docs/INSTALL_SKILL.md](docs/INSTALL_SKILL.md)). After that, just describe what you want:
 
 ```
 Create a microservices e-commerce architecture with API Gateway, auth/user/order/product/payment services,
 Kafka message queue, notification service, and separate databases for each service
 ```
 
-The agent will generate the `.drawio` XML file and export it to PNG automatically.
+The skill plans the layout, generates the `.drawio` XML, exports to your chosen format, self-checks, and lets you iterate.
 
-## Example
+## Community
 
-**Prompt:**
-> Create a microservices e-commerce architecture with Mobile/Web/Admin clients, API Gateway,
-> Auth/User/Order/Product/Payment services, Kafka message queue, Notification service,
-> and User DB / Order DB / Product DB / Redis Cache / Stripe API
+Join us for help, Q&A, and updates:
 
-**Output:**
+- **Discord:** https://discord.gg/79JF5Atuk
+- **WeChat:** scan the QR code below
 
-![Microservices Architecture](assets/microservices-example.png)
-
-## Topology demos
-
-The skill handles various diagram topologies with clean edge routing — no lines crossing through shapes.
-
-### Star topology (7 nodes)
-
-Central message broker with 6 microservices radiating outward. Edges enter Kafka from different sides, zero crossings.
-
-![Star topology](assets/demo-star.png)
-
-### Layered flow (10 nodes, 4 tiers)
-
-E-commerce architecture with 2 cross-connections: Order→Product (same-tier horizontal) and Auth→Redis (diagonal via routing corridor). All edges route cleanly.
-
-![Layered flow](assets/demo-layered.png)
-
-### Ring / cycle (8 nodes)
-
-CI/CD pipeline with a closed loop and 2 spur branches. Edges flow along the perimeter without crossing the interior.
-
-![Ring cycle](assets/demo-ring.png)
-
-## Files
-
-- `skills/drawio-skill/SKILL.md` — **the only required file**. Loaded by all platforms as the skill instructions.
-- `skills/drawio-skill/references/` — detail references (diagram types, style presets, extraction, troubleshooting)
-- `skills/drawio-skill/scripts/` — bundled scripts (PNG repair, browser URL encoder)
-- `skills/drawio-skill/styles/built-in/` — built-in style presets (`default.json`, `corporate.json`, `handdrawn.json`)
-- `README.md` — this file (English, displayed on GitHub homepage)
-- `README_CN.md` — Chinese documentation
-- `assets/` — example diagrams and workflow images
-
-> **Note:** Only `skills/drawio-skill/SKILL.md` and its `references/` + `scripts/` + `styles/` are needed for the skill to work. The `assets/` and README files are documentation only and can be safely deleted to save space.
-
-> All example diagrams were generated by Claude Opus 4.6 with this skill.
-
-## Style Presets
-
-Style presets let you capture and reuse a visual style across diagrams. When a preset is active, it replaces the built-in color palette, shape vocabulary, fonts, and edge defaults.
-
-### Built-in presets
-
-| Name | Description |
-|------|-------------|
-| `default` | Clean blue/green/yellow palette matching the built-in conventions |
-| `corporate` | Muted, professional palette suited for business presentations |
-| `handdrawn` | Sketch-style strokes for informal or whiteboard-style diagrams |
-
-### Apply a preset to a diagram
-
-```
-Draw a microservices architecture using my "corporate" style
-```
-
-Or set a default so all future diagrams use it automatically:
-
-```
-Make "corporate" my default style
-```
-
-### Learn your style from a file
-
-Point the skill at any `.drawio` file or flat image:
-
-```
-Learn my style from ~/diagrams/brand.drawio as "mybrand"
-Learn my style from ~/diagrams/screenshot.png as "mybrand"
-```
-
-The skill extracts colors, shapes, fonts, and edge style, renders a sample diagram for preview, and saves to `~/.drawio-skill/styles/mybrand.json` only after you approve.
-
-### Manage presets
-
-| What you say | What happens |
-|---|---|
-| "list my styles" | Shows all user and built-in presets in a table |
-| "show my `<name>` style" | Pretty-prints the preset JSON |
-| "make `<name>` the default" | Sets it as the active default for all diagrams |
-| "remove default" | Clears the default (reverts to built-in conventions) |
-| "delete `<name>`" | Deletes the user preset (prompts for confirmation) |
-| "rename `<a>` to `<b>`" | Renames a user preset |
-
-## Known Limitations
-
-- **Command name varies by platform**: macOS Homebrew installs the command as `draw.io`; some Linux packages use `drawio`. The skill handles both, but verify which name works on your system with `draw.io --version` or `drawio --version`
-- **Linux headless export**: Requires `xvfb` for display virtualization — without it, CLI export will fail on servers without a display
-- **Browser fallback requires Python**: The `diagrams.net` URL generator uses `python3` for compression/encoding. If neither CLI nor Python is available, the skill generates `.drawio` XML only
-- **Self-check requires vision**: The auto-fix step reads exported PNGs using the model's vision capability. Models without vision support skip this step
-- **Cloud icons**: Currently supports basic AWS resource icons. GCP, Azure, and Kubernetes icon sets are not yet included
-- **No source .drawio for microservices example**: The `microservices-example.png` in assets was generated in a session but the source `.drawio` was not preserved
-
-## License
-
-MIT
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Agents365-ai/images_payment/main/qrcode/agents365ai_wechat_1.png" width="200" alt="WeChat Community Group">
+</p>
 
 ## Support
 
@@ -318,3 +100,7 @@ If this skill helps you, consider supporting the author:
 
 - Bilibili: https://space.bilibili.com/441831884
 - GitHub: https://github.com/Agents365-ai
+
+## License
+
+MIT

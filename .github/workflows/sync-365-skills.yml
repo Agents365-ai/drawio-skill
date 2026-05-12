@@ -1,0 +1,85 @@
+name: Sync to 365-skills
+
+# Pushes changes under skills/drawio-skill/ into
+# Agents365-ai/365-skills:plugins/drawio/skills/drawio-skill/
+# and bumps the version field in marketplace.json.
+#
+# Required repo secret: SYNC_365_SKILLS_TOKEN — fine-grained PAT or GitHub App
+# token with "Contents: write" on Agents365-ai/365-skills.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/drawio-skill/**'
+  workflow_dispatch: {}
+
+concurrency:
+  group: sync-365-skills
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          path: source
+
+      - name: Checkout 365-skills
+        uses: actions/checkout@v4
+        with:
+          repository: Agents365-ai/365-skills
+          token: ${{ secrets.SYNC_365_SKILLS_TOKEN }}
+          path: target
+
+      - name: Sync skill files
+        run: |
+          set -euo pipefail
+          dest=target/plugins/drawio/skills/drawio-skill
+          mkdir -p "$dest"
+          rsync -a --delete source/skills/drawio-skill/ "$dest/"
+
+      - name: Bump version in marketplace.json
+        run: |
+          set -euo pipefail
+          version=$(python3 -c '
+          import re, json
+          text = open("source/skills/drawio-skill/SKILL.md").read()
+          m = re.search(r"^metadata:\s*(\{.*\})\s*$", text, re.M)
+          print(json.loads(m.group(1)).get("version", "") if m else "")
+          ')
+          if [ -z "$version" ]; then
+            echo "::warning::could not parse version from SKILL.md frontmatter"
+            exit 0
+          fi
+          echo "Source version: $version"
+          python3 - "$version" <<'PY'
+          import re, sys
+          version = sys.argv[1]
+          path = "target/.claude-plugin/marketplace.json"
+          content = open(path).read()
+          pattern = r'("name":\s*"drawio"(?:[^{}]|\{[^{}]*\})*?"version":\s*)"[^"]*"'
+          new_content, n = re.subn(pattern, lambda m: m.group(1) + f'"{version}"', content, count=1, flags=re.S)
+          if n == 0:
+              print("::warning::drawio plugin entry not found in marketplace.json")
+          else:
+              open(path, "w").write(new_content)
+              print(f"marketplace.json updated to {version}")
+          PY
+
+      - name: Commit and push to 365-skills
+        working-directory: target
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add plugins/drawio .claude-plugin/marketplace.json
+          if git diff --staged --quiet; then
+            echo "No changes to sync"
+            exit 0
+          fi
+          git commit -m "chore: sync drawio from source" \
+                     -m "Triggered by ${{ github.repository }}@${{ github.sha }}"
+          git push
