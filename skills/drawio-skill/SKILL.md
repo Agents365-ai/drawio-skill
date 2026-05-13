@@ -41,7 +41,7 @@ The draw.io desktop app must be installed and the CLI accessible:
 ```bash
 # macOS (Homebrew — recommended; CLI binary is `drawio`, not `draw.io`)
 brew install --cask drawio
-draw.io --version
+drawio --version
 
 # macOS (full path if not in PATH)
 /Applications/draw.io.app/Contents/MacOS/draw.io --version
