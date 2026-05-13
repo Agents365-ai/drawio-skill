@@ -39,7 +39,7 @@ The draw.io desktop app must be installed and the CLI accessible:
 **macOS sandbox / sandbox isolation note (e.g., codex.app):** In some sandboxed macOS environments, invoking the draw.io desktop CLI (even `draw.io --version`) can crash the draw.io process or produce no output. If that happens, treat the CLI as **unavailable in this sandbox isolation** — do not keep retrying inside the sandbox. Prefer a **non-sandboxed host environment** (outside sandbox isolation) for any CLI export work, or use the browser fallback / XML-only outputs.
 
 ```bash
-# macOS (Homebrew — recommended)
+# macOS (Homebrew — recommended; CLI binary is `drawio`, not `draw.io`)
 brew install --cask drawio
 draw.io --version
 
