@@ -1,72 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="drawio" version="26.0.0">
   <diagram name="Page-1">
-    <mxGraphModel pageWidth="1400" pageHeight="320" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" math="0" shadow="0">
+    <mxGraphModel pageWidth="820" pageHeight="460" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
-        <!-- Start -->
+        <!-- Row 1 -->
         <mxCell id="2" value="Start" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-          <mxGeometry x="20" y="130" width="80" height="40" as="geometry" />
+          <mxGeometry x="20" y="90" width="80" height="40" as="geometry" />
         </mxCell>
-
-        <!-- 1. Check deps -->
         <mxCell id="3" value="1. Check deps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="120" y="120" width="120" height="60" as="geometry" />
+          <mxGeometry x="130" y="80" width="130" height="60" as="geometry" />
         </mxCell>
-
-        <!-- 2. Plan diagram -->
         <mxCell id="4" value="2. Plan diagram" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="260" y="120" width="120" height="60" as="geometry" />
+          <mxGeometry x="300" y="80" width="130" height="60" as="geometry" />
         </mxCell>
-
-        <!-- 3. Generate XML -->
         <mxCell id="5" value="3. Generate .drawio XML" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="400" y="120" width="140" height="60" as="geometry" />
+          <mxGeometry x="470" y="80" width="140" height="60" as="geometry" />
         </mxCell>
-
-        <!-- 4. Export draft PNG -->
         <mxCell id="6" value="4. Export draft PNG" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="560" y="120" width="130" height="60" as="geometry" />
+          <mxGeometry x="650" y="80" width="140" height="60" as="geometry" />
         </mxCell>
 
-        <!-- 5. Self-check &amp; auto-fix -->
+        <!-- Row 2 -->
         <mxCell id="7" value="5. Self-check &amp; auto-fix&lt;br&gt;&lt;i style=&quot;font-size:11px&quot;&gt;(max 2 rounds)&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
-          <mxGeometry x="710" y="115" width="140" height="70" as="geometry" />
+          <mxGeometry x="20" y="230" width="160" height="80" as="geometry" />
         </mxCell>
-
-        <!-- 6. Show image to user -->
         <mxCell id="8" value="6. Show to user" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="870" y="120" width="120" height="60" as="geometry" />
+          <mxGeometry x="220" y="240" width="130" height="60" as="geometry" />
         </mxCell>
-
-        <!-- Approved? -->
         <mxCell id="9" value="Approved?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
-          <mxGeometry x="1010" y="110" width="100" height="80" as="geometry" />
+          <mxGeometry x="390" y="230" width="110" height="80" as="geometry" />
         </mxCell>
-
-        <!-- 7. Final export -->
         <mxCell id="12" value="7. Final export" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-          <mxGeometry x="1130" y="120" width="120" height="60" as="geometry" />
+          <mxGeometry x="540" y="240" width="130" height="60" as="geometry" />
         </mxCell>
-
-        <!-- Done -->
         <mxCell id="13" value="Done" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-          <mxGeometry x="1270" y="130" width="80" height="40" as="geometry" />
+          <mxGeometry x="710" y="250" width="80" height="40" as="geometry" />
         </mxCell>
 
-        <!-- Edit XML (below) -->
+        <!-- Feedback row -->
         <mxCell id="10" value="Edit XML per feedback" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
-          <mxGeometry x="990" y="240" width="140" height="50" as="geometry" />
+          <mxGeometry x="375" y="380" width="140" height="50" as="geometry" />
         </mxCell>
-
-        <!-- Re-export PNG (below) -->
         <mxCell id="11" value="Re-export PNG" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
-          <mxGeometry x="830" y="240" width="130" height="50" as="geometry" />
+          <mxGeometry x="220" y="380" width="130" height="50" as="geometry" />
         </mxCell>
 
-        <!-- Edges: main left-to-right flow -->
+        <!-- Edges: Row 1 LTR -->
         <mxCell id="20" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="2" target="3">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
@@ -79,37 +61,38 @@
         <mxCell id="23" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="5" target="6">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="24" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6" target="7">
-          <mxGeometry relative="1" as="geometry" />
+
+        <!-- Wrap: 4. Export draft PNG -> 5. Self-check (down, left, up) -->
+        <mxCell id="24" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6" target="7">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="720" y="190" />
+              <mxPoint x="100" y="190" />
+            </Array>
+          </mxGeometry>
         </mxCell>
+
+        <!-- Edges: Row 2 LTR -->
         <mxCell id="25" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="7" target="8">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="26" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="8" target="9">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <!-- Approved? → Yes → Final export -->
         <mxCell id="27" value="Yes" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="9" target="12">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <!-- Final export → Done -->
         <mxCell id="31" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="12" target="13">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- Approved? → No → Edit XML (downward) -->
+        <!-- Feedback loop -->
         <mxCell id="28" value="No" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="9" target="10">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <!-- Edit XML → Re-export (right-to-left) -->
         <mxCell id="29" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="10" target="11">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <!-- Re-export → 6. Show to user (upward loop) -->
         <mxCell id="30" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="11" target="8">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
