@@ -129,9 +129,9 @@ Learn my style from ~/diagrams/brand.drawio as "mybrand"
 
 The skill extracts colors, shapes, fonts, and edge style, renders a preview, and only saves the preset after you approve. Full preset-management commands in [docs/STYLE_PRESETS.md](docs/STYLE_PRESETS.md).
 
-## 🆚 Why drawio-skill?
+## 🆚 Comparison
 
-Compared with a native agent (no skill):
+### vs Native Agent (no skill)
 
 | Feature | Native agent | drawio-skill |
 |---|---|---|
@@ -142,7 +142,22 @@ Compared with a native agent (no skill):
 | Color palette | random / inconsistent | ✅ 7-color semantic system |
 | Style presets | ❌ | ✅ learn from `.drawio` file or image |
 
-Full comparison with other draw.io skills, MCP servers, and plugins in [docs/COMPARISON.md](docs/COMPARISON.md).
+### vs Other draw.io Skills & Tools
+
+| Feature | drawio-skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp)<br>(official, 1.3k⭐) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills)<br>(60⭐) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio)<br>(63⭐) |
+|---|---|---|---|---|
+| **Approach** | Pure SKILL.md | SKILL.md / MCP / Project | YAML DSL + MCP | Plugin + browser |
+| **Dependencies** | draw.io desktop only | draw.io desktop | MCP server (`npx`) | Browser + local server |
+| **Multi-agent** | ✅ 6 platforms | ❌ Claude Code only | ❌ Claude Code only | ❌ |
+| **Self-check + auto-fix** | ✅ 2-round | ❌ | ❌ | ❌ screenshot only |
+| **Iterative review** | ✅ 5-round loop | ❌ generate once | ✅ 3 workflows | ❌ |
+| **Diagram presets** | ✅ 6 types | ❌ | ❌ | ❌ |
+| **ML/DL diagrams** | ✅ tensor shapes, layer colors | ❌ | ❌ | ❌ |
+| **Color system** | ✅ 7-color semantic | ❌ | ✅ 5 themes | ❌ |
+| **Browser fallback** | ✅ diagrams.net URL | ❌ | ❌ | ❌ |
+| **Zero-config** | ✅ copy `skills/drawio-skill/` | ✅ | ❌ needs `npx` | ❌ needs plugin install |
+
+Full 18-row comparison + key-advantages summary in [docs/COMPARISON.md](docs/COMPARISON.md).
 
 ## 📚 Documentation
 

@@ -128,9 +128,9 @@ Skill 会自动规划布局、生成 `.drawio` XML、导出为你选择的格式
 
 Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确认后**才保存预设。完整管理命令见 [docs/STYLE_PRESETS_CN.md](docs/STYLE_PRESETS_CN.md)。
 
-## 🆚 为什么用 drawio-skill？
+## 🆚 对比
 
-对比原生智能体（无 skill）：
+### 对比原生智能体（无 skill）
 
 | 功能 | 原生智能体 | drawio-skill |
 |------|-----------|--------------|
@@ -141,7 +141,22 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 | 配色方案 | 随机 / 不一致 | ✅ 7 色语义系统 |
 | 样式预设 | ❌ | ✅ 从 `.drawio` 文件或图片学习 |
 
-与其他 draw.io skills、MCP 服务、插件的完整对比见 [docs/COMPARISON_CN.md](docs/COMPARISON_CN.md)。
+### 对比其他 draw.io Skills 与工具
+
+| 功能 | drawio-skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp)<br>（官方，1.3k⭐） | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills)<br>（60⭐） | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio)<br>（63⭐） |
+|------|------|------|------|------|
+| **方式** | 纯 SKILL.md | SKILL.md / MCP / Project | YAML DSL + MCP | 插件 + 浏览器 |
+| **依赖** | 仅 draw.io 桌面版 | draw.io 桌面版 | MCP 服务（`npx`） | 浏览器 + 本地服务 |
+| **多智能体支持** | ✅ 6 个平台 | ❌ 仅 Claude Code | ❌ 仅 Claude Code | ❌ |
+| **自检 + 自动修复** | ✅ 2 轮 | ❌ | ❌ | ❌ 仅截图 |
+| **迭代审查** | ✅ 5 轮循环 | ❌ 一次生成 | ✅ 3 种工作流 | ❌ |
+| **图表预设** | ✅ 6 种 | ❌ | ❌ | ❌ |
+| **ML/DL 图** | ✅ 张量标注、层配色 | ❌ | ❌ | ❌ |
+| **配色系统** | ✅ 7 色语义 | ❌ | ✅ 5 种主题 | ❌ |
+| **浏览器降级** | ✅ diagrams.net URL | ❌ | ❌ | ❌ |
+| **零配置** | ✅ 复制 `skills/drawio-skill/` | ✅ | ❌ 需 `npx` | ❌ 需安装插件 |
+
+完整 18 行对比 + 核心优势总结见 [docs/COMPARISON_CN.md](docs/COMPARISON_CN.md)。
 
 ## 📚 文档导航
 
