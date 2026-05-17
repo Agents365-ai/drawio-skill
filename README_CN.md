@@ -88,7 +88,9 @@ git clone https://github.com/Agents365-ai/drawio-skill.git \
   ~/.claude/skills/drawio-skill
 ```
 
-同时索引于 [SkillsMP](https://skillsmp.com/skills/agents365-ai-drawio-skill-skill-md) 与 [ClawHub](https://clawhub.ai/agents365-ai/drawio-pro-skill)。完整方案与更新命令见 [docs/INSTALL_SKILL_CN.md](docs/INSTALL_SKILL_CN.md)。
+同时索引于 [SkillsMP](https://skillsmp.com/skills/agents365-ai-drawio-skill-skill-md) 与 [ClawHub](https://clawhub.ai/agents365-ai/drawio-pro-skill)。
+
+**更新：** `/plugin update drawio`（Claude Code）、`skills update drawio-skill`（SkillsMP）、`clawhub update drawio-pro-skill`（OpenClaw），或 `git pull`（手动安装）—— 详见 [docs/INSTALL_SKILL_CN.md#更新](docs/INSTALL_SKILL_CN.md#更新)。
 
 ## ⚡ 快速开始
 
@@ -111,6 +113,20 @@ Skill 会自动规划布局、生成 `.drawio` XML、导出为你选择的格式
 | UML | 类图、序列图 | 继承 / 组合 / 聚合箭头；生命线 + 激活框 |
 | 数据图 | ER 图、数据流图（DFD） | 表容器、PK/FK 标记 |
 | 其他 | 组织架构图、思维导图、线框图 | — |
+
+## 🎨 样式预设
+
+把视觉风格"教"给 Skill 一次，所有图表自动复用。内置三种预设：`default`、`corporate`、`handdrawn`；也可以从 `.drawio` 文件或图片学习你的风格：
+
+```
+画一个微服务架构图，使用我的 "corporate" 样式
+```
+
+```
+从 ~/diagrams/brand.drawio 学习我的样式，保存为 "mybrand"
+```
+
+Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确认后**才保存预设。完整管理命令见 [docs/STYLE_PRESETS_CN.md](docs/STYLE_PRESETS_CN.md)。
 
 ## 🆚 为什么用 drawio-skill？
 

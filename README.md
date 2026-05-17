@@ -88,7 +88,9 @@ git clone https://github.com/Agents365-ai/drawio-skill.git \
   ~/.claude/skills/drawio-skill
 ```
 
-Also indexed on [SkillsMP](https://skillsmp.com/skills/agents365-ai-drawio-skill-skill-md) and [ClawHub](https://clawhub.ai/agents365-ai/drawio-pro-skill). Full options + update commands in [docs/INSTALL_SKILL.md](docs/INSTALL_SKILL.md).
+Also indexed on [SkillsMP](https://skillsmp.com/skills/agents365-ai-drawio-skill-skill-md) and [ClawHub](https://clawhub.ai/agents365-ai/drawio-pro-skill).
+
+**Updating:** `/plugin update drawio` (Claude Code), `skills update drawio-skill` (SkillsMP), `clawhub update drawio-pro-skill` (OpenClaw), or `git pull` for manual installs — see [docs/INSTALL_SKILL.md#updates](docs/INSTALL_SKILL.md#updates).
 
 ## ⚡ Quick Start
 
@@ -112,6 +114,20 @@ The skill plans the layout, generates the `.drawio` XML, exports to your chosen 
 | UML | class diagrams, sequence diagrams | Inheritance / composition / aggregation arrows; lifelines + activation boxes |
 | Data | ER diagrams, data flow diagrams (DFD) | Table containers, PK/FK notation |
 | Other | org charts, mind maps, wireframes | — |
+
+## 🎨 Style Presets
+
+Capture a visual style once, reuse it everywhere. Three presets are built in — `default`, `corporate`, `handdrawn` — and you can teach the skill your own style from a `.drawio` file or a flat image:
+
+```
+Draw a microservices architecture using my "corporate" style
+```
+
+```
+Learn my style from ~/diagrams/brand.drawio as "mybrand"
+```
+
+The skill extracts colors, shapes, fonts, and edge style, renders a preview, and only saves the preset after you approve. Full preset-management commands in [docs/STYLE_PRESETS.md](docs/STYLE_PRESETS.md).
 
 ## 🆚 Why drawio-skill?
 
