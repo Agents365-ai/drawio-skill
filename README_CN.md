@@ -153,7 +153,7 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 
 ### 对比其他 draw.io Skills 与工具
 
-| 功能 | drawio-skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp)<br>（官方，1.3k⭐） | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills)<br>（60⭐） | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio)<br>（63⭐） |
+| 功能 | drawio-skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp)（官方）<br>![](https://img.shields.io/github/stars/jgraph/drawio-mcp?style=flat-square&logo=github) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills)<br>![](https://img.shields.io/github/stars/bahayonghang/drawio-skills?style=flat-square&logo=github) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio)<br>![](https://img.shields.io/github/stars/GBSOSS/ai-drawio?style=flat-square&logo=github) |
 |------|------|------|------|------|
 | **方式** | 纯 SKILL.md | SKILL.md / MCP / Project | YAML DSL + MCP | 插件 + 浏览器 |
 | **依赖** | 仅 draw.io 桌面版 | draw.io 桌面版 | MCP 服务（`npx`） | 浏览器 + 本地服务 |

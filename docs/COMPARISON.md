@@ -24,7 +24,7 @@
 
 ## vs Other draw.io Skills & Tools
 
-| Feature | This skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp) (official, 1.3k⭐) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills) (60⭐) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio) (63⭐) |
+| Feature | This skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp) (official) ![](https://img.shields.io/github/stars/jgraph/drawio-mcp?style=flat-square&logo=github) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills) ![](https://img.shields.io/github/stars/bahayonghang/drawio-skills?style=flat-square&logo=github) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio) ![](https://img.shields.io/github/stars/GBSOSS/ai-drawio?style=flat-square&logo=github) |
 |---------|-----------|---------------|-------------------|--------------|
 | **Approach** | Pure SKILL.md | SKILL.md / MCP / Project | YAML DSL + MCP | Plugin + browser |
 | **Dependencies** | draw.io desktop only | draw.io desktop | MCP server (`npx`) | Browser + local server |

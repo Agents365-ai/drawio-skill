@@ -154,7 +154,7 @@ The skill extracts colors, shapes, fonts, and edge style, renders a preview, and
 
 ### vs Other draw.io Skills & Tools
 
-| Feature | drawio-skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp)<br>(official, 1.3k⭐) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills)<br>(60⭐) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio)<br>(63⭐) |
+| Feature | drawio-skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp) (official)<br>![](https://img.shields.io/github/stars/jgraph/drawio-mcp?style=flat-square&logo=github) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills)<br>![](https://img.shields.io/github/stars/bahayonghang/drawio-skills?style=flat-square&logo=github) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio)<br>![](https://img.shields.io/github/stars/GBSOSS/ai-drawio?style=flat-square&logo=github) |
 |---|---|---|---|---|
 | **Approach** | Pure SKILL.md | SKILL.md / MCP / Project | YAML DSL + MCP | Plugin + browser |
 | **Dependencies** | draw.io desktop only | draw.io desktop | MCP server (`npx`) | Browser + local server |
