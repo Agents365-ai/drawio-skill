@@ -140,7 +140,7 @@ def main():
         if args.group:
             rest = label(m).split("/")
             if len(rest) > 1:                            # has a sub-directory
-                d["group"] = rest[0]
+                d["group"] = "/".join(rest[:-1])         # full directory path -> nested boxes
         return d
 
     graph = {

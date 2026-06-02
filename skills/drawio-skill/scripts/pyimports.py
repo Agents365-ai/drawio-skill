@@ -131,7 +131,7 @@ def main():
         if args.group:
             rest = label(m).split(".")
             if len(rest) > 1:                            # nested under a sub-package
-                d["group"] = rest[0]
+                d["group"] = "/".join(rest[:-1])         # full sub-package path -> nested boxes
         return d
 
     graph = {
