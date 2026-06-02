@@ -51,7 +51,7 @@ It prints `wrote diagram.drawio (N nodes, M edges)` to stderr and writes a norma
 | `direction` | no | `TB` | `TB` (top→bottom) or `LR` (left→right) — the layout rank direction |
 | `nodes[].id` | **yes** | — | Unique; must not be `0` or `1` (reserved for draw.io root cells) |
 | `nodes[].label` | no | the `id` | Display text; auto XML-escaped |
-| `nodes[].style` | no | blue rounded box | Any draw.io style string — reuse the role/shape styles from `diagram-types.md` and the active preset |
+| `nodes[].style` | no | group colour, else blue | Any draw.io style string — reuse the role/shape styles from `diagram-types.md` and the active preset. A styleless node is tinted by its group (see **Containers / grouping**); an explicit style always wins |
 | `nodes[].width` / `height` | no | `120` / `60` | Pixels; dot lays out at this real size |
 | `nodes[].group` | no | none | Group key, or a `/`-delimited path (`"core/db"`) for **nested** containers — nodes sharing a path are boxed together (see **Containers / grouping**) |
 | `nodes[].groupLabel` | no | last path segment | Title shown on the node's deepest container (first node with the path wins) |
@@ -70,6 +70,7 @@ Give nodes a `group` key and the script wraps each group in a labeled container 
 
 **Nesting.** A `group` value with `/` separators builds nested containers: `"core/db"` puts the node inside a `db` box that itself sits inside a `core` box. Every path prefix becomes a container, so an arbitrarily deep package tree maps to nested boxes. A node can also sit *directly* in a parent box (`group: "core"`) alongside a sibling sub-box (`group: "core/db"`).
 
+- **Colour by group.** Each top-level group is assigned a colour from the skill's own palette (`styles/built-in/default.json`, cycled in role order: blue → green → orange → purple → yellow → red → grey). A node with no `style` of its own is tinted with its group's colour, and the container's border + title match — so related modules read as a coloured cluster instead of monochrome boxes. A node that carries its own `style` (e.g. from an applied preset) is left untouched. Pass `--mono` to turn colouring off (dashed grey boxes, default-blue nodes — the previous look). Ungrouped graphs are unaffected.
 - Each container box is the bounding box of its members and child boxes plus a uniform padding. The dot cluster margin is set to that same padding, so each box equals dot's cluster box — which dot keeps non-overlapping at **any nesting depth**.
 - The title sits in the top padding (`verticalAlign=top`); the box title is the path's last segment, or a member's `groupLabel`.
 - Containers are visual only (no edges of their own). Edges still connect node→node and route across containers normally.

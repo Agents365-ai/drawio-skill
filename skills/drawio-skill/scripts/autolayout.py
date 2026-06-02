@@ -25,6 +25,7 @@ Usage: python3 autolayout.py graph.json [-o diagram.drawio]
 """
 import argparse
 import json
+import os
 import shlex
 import subprocess
 import sys
@@ -35,6 +36,32 @@ NODE_STYLE = "rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c
 EDGE_STYLE = "html=1;rounded=0;"
 GROUP_STYLE = ("rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;"
                "verticalAlign=top;fontStyle=2;dashed=1;")
+# Group colours come from the skill's own palette (styles/built-in/default.json)
+# so there is a single source of truth, not a second list baked in here. When a
+# grouped graph is laid out, each top-level group takes the next colour (cycled
+# in a fixed, harmonious role order) so related modules read as a coloured
+# cluster. Nodes that carry their own `style` keep it; only styleless grouped
+# nodes are tinted. Disable with --mono.
+_PALETTE_ORDER = ["primary", "success", "accent", "secondary", "warning", "danger", "neutral"]
+_PALETTE_FILE = os.path.join(os.path.dirname(__file__), "..", "styles", "built-in", "default.json")
+_FALLBACK_PALETTE = [("#dae8fc", "#6c8ebf"), ("#d5e8d4", "#82b366"), ("#ffe6cc", "#d79b00"),
+                     ("#e1d5e7", "#9673a6"), ("#fff2cc", "#d6b656"), ("#f8cecc", "#b85450")]
+
+
+def load_palette():
+    """Ordered (fill, stroke) list from the default preset's palette; fall back
+    to the same colours inline if the preset file can't be read."""
+    try:
+        pal = json.load(open(_PALETTE_FILE, encoding="utf-8"))["palette"]
+        colors = [(pal[r]["fillColor"], pal[r]["strokeColor"]) for r in _PALETTE_ORDER if r in pal]
+        if colors:
+            return colors
+    except (OSError, KeyError, ValueError):
+        pass
+    return _FALLBACK_PALETTE
+
+
+PALETTE = load_palette()
 # Uniform container padding; the title sits in the top pad (verticalAlign=top).
 # dot's cluster margin is set to this same value so each container box equals
 # dot's cluster box — which dot guarantees never overlaps, at any nesting depth.
@@ -142,7 +169,13 @@ def layout(dot_src):
     return height, pos, edges
 
 
-def to_drawio(graph, height, pos, edge_pts):
+def group_style(stroke):
+    """Container box styled with a group's colour (coloured border + title)."""
+    return (f"rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor={stroke};"
+            f"fontColor={stroke};verticalAlign=top;fontStyle=2;dashed=1;")
+
+
+def to_drawio(graph, height, pos, edge_pts, color=True):
     nodes = graph["nodes"]
     # Absolute snapped rect for every placed node.
     rects = {}
@@ -158,6 +191,16 @@ def to_drawio(graph, height, pos, edge_pts):
     # Parse the (possibly nested) group tree and assign each container a
     # collision-free id and a title (the path's last segment, or a member's groupLabel).
     gpath, direct, children, ordered = group_tree(nodes)
+    # Assign each top-level group a palette colour, in order of first appearance.
+    top_order = []
+    for node in nodes:
+        t = gpath.get(node["id"])
+        if t and t[0] not in top_order:
+            top_order.append(t[0])
+
+    def gcolor(seg):
+        return PALETTE[top_order.index(seg) % len(PALETTE)]
+
     used = {n["id"] for n in nodes}
     label_override = {}
     for node in nodes:
@@ -208,9 +251,10 @@ def to_drawio(graph, height, pos, edge_pts):
             continue
         gx, gy, gw, gh = gbox[p]
         x, y, parent = rebase(gx, gy, p[:-1] if len(p) > 1 else None)
+        gstyle = group_style(gcolor(p[0])[1]) if color else GROUP_STYLE
         cells.append(
             f'        <mxCell id="{attr(gid[p])}" value="{attr(glabel[p])}" '
-            f'style="{GROUP_STYLE}" vertex="1" parent="{attr(parent)}">\n'
+            f'style="{gstyle}" vertex="1" parent="{attr(parent)}">\n'
             f'          <mxGeometry x="{x}" y="{y}" width="{gw}" height="{gh}" as="geometry"/>\n'
             f"        </mxCell>"
         )
@@ -220,7 +264,13 @@ def to_drawio(graph, height, pos, edge_pts):
             continue
         rx, ry, w, h = rects[nid]
         x, y, parent = rebase(rx, ry, gpath.get(nid) if gpath.get(nid) in gbox else None)
-        style = node.get("style", NODE_STYLE)
+        if node.get("style"):
+            style = node["style"]                         # explicit style always wins
+        elif color and nid in gpath:
+            fill, stroke = gcolor(gpath[nid][0])          # tint styleless nodes by group
+            style = f"rounded=1;whiteSpace=wrap;html=1;fillColor={fill};strokeColor={stroke};"
+        else:
+            style = NODE_STYLE
         cells.append(
             f'        <mxCell id="{attr(nid)}" value="{attr(node.get("label", nid))}" '
             f'style="{style}" vertex="1" parent="{attr(parent)}">\n'
@@ -264,11 +314,13 @@ def main():
     ap = argparse.ArgumentParser(description="Auto-layout a graph JSON into draw.io XML.")
     ap.add_argument("input", help="graph JSON file")
     ap.add_argument("-o", "--output", help="output .drawio path (default: stdout)")
+    ap.add_argument("--mono", action="store_true",
+                    help="don't colour groups by palette (monochrome boxes)")
     args = ap.parse_args()
     with open(args.input, encoding="utf-8") as f:
         graph = json.load(f)
     height, pos, edge_pts = layout(build_dot(graph))
-    xml = to_drawio(graph, height, pos, edge_pts)
+    xml = to_drawio(graph, height, pos, edge_pts, color=not args.mono)
     if args.output:
         with open(args.output, "w", encoding="utf-8") as f:
             f.write(xml)

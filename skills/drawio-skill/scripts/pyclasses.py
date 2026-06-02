@@ -26,8 +26,6 @@ import re
 import subprocess
 import sys
 
-CLASS_STYLE = "rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;"
-
 
 def discover(root):
     """Map dotted module name -> file path; qualify with the package name when
@@ -129,7 +127,9 @@ def main():
     short = lambda m: m[len(strip):] if strip and m.startswith(strip) else m
 
     def node(cid):
-        d = {"id": cid, "label": cid.rsplit(".", 1)[1], "style": CLASS_STYLE}
+        # No hard-coded colour: autolayout tints nodes by their group (module),
+        # so a grouped class hierarchy reads as coloured-by-module.
+        d = {"id": cid, "label": cid.rsplit(".", 1)[1]}
         if args.group:
             mod = classes[cid][0]
             path = short(mod).replace(".", "/")          # module path -> nested boxes
