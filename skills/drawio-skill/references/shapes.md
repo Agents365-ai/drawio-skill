@@ -45,6 +45,30 @@ BPMN, ER, electrical, P&ID, mockup/wireframe, flowchart, network, and the
 general/basic sets. The bundled index (`data/shape-index.json.gz`) is the
 upstream draw.io shape data — see `data/SHAPE-INDEX-NOTICE.md` for attribution.
 
+## AI / LLM brand logos
+
+draw.io's bundled libraries have **no** modern AI/LLM brand logos, so an "LLM app
+architecture" otherwise renders as generic boxes. `scripts/aiicons.py` resolves a
+brand name (OpenAI, Claude, Gemini, Mistral, Llama, HuggingFace, Ollama,
+LangChain, …321 brands) to a draw.io `image` style backed by the
+[lobe-icons](https://github.com/lobehub/lobe-icons) set (MIT).
+
+```bash
+python3 <this-skill-dir>/scripts/aiicons.py "claude" --json        # CDN reference
+python3 <this-skill-dir>/scripts/aiicons.py "openai" --embed        # self-contained
+python3 <this-skill-dir>/scripts/aiicons.py --list                  # all brands
+```
+
+- Picks the `-color` variant when it exists, else the mono logo (e.g. OpenAI is
+  mono-only). Returns a square `image` style; use the reported `--size` (default
+  48) for both width and height.
+- **Default references the icon by CDN URL** — the SVG lives on unpkg, not in
+  this repo, so **draw.io needs network access when the diagram is rendered or
+  opened**; an offline export draws a blank box. Pass `--embed` to fetch the SVG
+  once and inline it as a data URI (portable, renders offline, larger XML).
+- Logos are trademarks of their respective owners, referenced for identification
+  only — the same basis on which draw.io ships AWS/Azure icons.
+
 ## Cheatsheet — hand-writable styles
 
 These are stable enough to write without searching. Combine with `whiteSpace=wrap;html=1;`.
