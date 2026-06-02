@@ -94,6 +94,7 @@ Bundled importers turn a codebase into a graph JSON ready for autolayout, so "vi
 | Python | `scripts/pyimports.py <dir>` | module / package (`ast`) | intra-project `import` / `from` |
 | JS / TS | `scripts/jsimports.py <dir>` | source file (`.ts/.tsx/.js/.jsx/.mjs/.cjs`) | resolved relative `import`/`export from`/`require()`/`import()` |
 | Go | `scripts/goimports.py <dir>` | package (directory, via `go.mod`) | intra-module package import |
+| Rust | `scripts/rustimports.py <dir>` | module (`.rs` file / `mod`) | intra-crate `use crate::` / `super::` / `self::` |
 | Python (classes) | `scripts/pyclasses.py <dir>` | class (`ast`) | subclass → base (inheritance) |
 
 ```bash
@@ -106,6 +107,7 @@ Each keeps only **intra-project** edges (third-party/stdlib imports are ignored)
 - **Python** (`pyimports.py`): if the directory is itself a package (`__init__.py` present), module names are package-qualified so the project's own absolute imports resolve; nested subpackages (`pkg.sub.mod`) are handled.
 - **JS/TS** (`jsimports.py`): resolution is path-based (tries the source extensions and directory `index` files); `node_modules` and bare specifiers are skipped. Scanning is regex-based, not a full parser.
 - **Go** (`goimports.py`): reads the `module` path from `go.mod`; each directory of `.go` files is one package; `*_test.go` and `vendor/` are skipped.
+- **Rust** (`rustimports.py`): each `.rs` file is a module (`mod.rs`/`main.rs`/`lib.rs` name the enclosing module); edges come from `use` paths rooted at `crate::`/`super::`/`self::` (brace groups expanded). `std`/external crates and `target/` are skipped. Regex-based — inline `mod { … }` blocks aren't split out, and 2015-edition bare intra-crate paths aren't resolved.
 - **Python classes** (`pyclasses.py`): a finer granularity — one node per class, edges from each subclass to the project base classes it extends, so the result is an auto-generated class hierarchy. Bases are matched by name (preferring the same module); external bases (`object`, third-party) are ignored. With `--group`, classes are boxed by their module, so a deep package tree nests naturally. Inheritance only — function-level call graphs are out of scope (static call resolution in Python is unreliable).
 
 **Density reduction is on by default** — this is the key to a readable result. Real import graphs are dense (asyncio: 33 modules / ~149 edges); without reduction they render as a hairball. Every importer applies **transitive reduction** (Graphviz `tred` — drops edges already implied by a longer path), which on asyncio cuts ~149 edges to ~46 and turns the hairball into a clean, traceable diagram. Pass `--no-reduce` to keep every edge.
