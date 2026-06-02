@@ -4,6 +4,23 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.14.0] — 2026-06-03
+### Added
+- `aiicons.py` resolves common RAG/LLM **data-store brands** (Qdrant, Redis,
+  Postgres, Mongo, Elasticsearch, Milvus, Supabase, Neo4j, … 18 total) via the
+  [simple-icons](https://simpleicons.org) (CC0) CDN when lobe-icons lacks them;
+  lobe stays the default for AI/LLM brands. Unmatched brands get a
+  cylinder/`shapesearch` suggestion.
+- Test coverage for `jsimports` / `goimports` / `rustimports` (suite now 21).
+- `docs/` USAGE + COMPARISON sub-pages document codebase visualization, shape
+  search, and AI logos.
+
+## [1.13.1] — 2026-06-03
+### Added
+- Dependency-free `unittest` regression suite (`tests/`) + GitHub Actions CI.
+### Fixed
+- Unclosed file handle in `autolayout.load_palette()`.
+
 ## [1.13.0] — 2026-06-03
 ### Added
 - **Palette-based group colouring** in auto-layout: grouped code-visualization
@@ -118,6 +135,8 @@ Ideas adapted from [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp) (Ap
 - Diagram-type presets, ML/Deep-Learning model support, and quality-of-life
   enhancements.
 
+[1.14.0]: https://github.com/Agents365-ai/drawio-skill/releases/tag/v1.14.0
+[1.13.1]: https://github.com/Agents365-ai/drawio-skill/releases/tag/v1.13.1
 [1.13.0]: https://github.com/Agents365-ai/drawio-skill/releases/tag/v1.13.0
 [1.12.0]: https://github.com/Agents365-ai/drawio-skill/releases/tag/v1.12.0
 [1.11.1]: https://github.com/Agents365-ai/drawio-skill/releases/tag/v1.11.1
