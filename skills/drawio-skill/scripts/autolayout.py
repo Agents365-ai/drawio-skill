@@ -32,7 +32,7 @@ from xml.sax.saxutils import escape
 
 DEFAULT_W, DEFAULT_H = 120, 60
 NODE_STYLE = "rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;"
-EDGE_STYLE = "edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;"
+EDGE_STYLE = "html=1;rounded=0;"
 
 
 def attr(value):
@@ -46,7 +46,9 @@ def snap(value, grid=10):
 
 def build_dot(graph):
     rankdir = "LR" if str(graph.get("direction", "TB")).upper() == "LR" else "TB"
-    lines = [f"digraph G {{ rankdir={rankdir}; node [shape=box fixedsize=true];"]
+    # splines=ortho makes dot route edges as orthogonal polylines; we replay
+    # those bends as draw.io waypoints so edges go around nodes, not through them.
+    lines = [f"digraph G {{ rankdir={rankdir}; splines=ortho; node [shape=box fixedsize=true];"]
     for node in graph["nodes"]:
         # Pass our pixel sizes to dot as inches so it lays out at the real size.
         w = node.get("width", DEFAULT_W) / 72.0
@@ -59,7 +61,11 @@ def build_dot(graph):
 
 
 def layout(dot_src):
-    """Run `dot -Tplain`; return (graph_height_inches, {id: (xc, yc) inches})."""
+    """Run `dot -Tplain`; return (height_in, {id: (xc, yc)}, {(src, dst): [(x, y), ...]}).
+
+    Node coords are inches (bottom-left origin); each edge's value is the list
+    of orthogonal control points dot computed for routing, endpoints included.
+    """
     try:
         proc = subprocess.run(
             ["dot", "-Tplain"], input=dot_src,
@@ -69,7 +75,7 @@ def layout(dot_src):
         sys.exit("error: Graphviz `dot` not found on PATH (brew install graphviz)")
     except subprocess.CalledProcessError as exc:
         sys.exit(f"error: dot failed: {exc.stderr.strip()}")
-    height, pos = 0.0, {}
+    height, pos, edges = 0.0, {}, {}
     for line in proc.stdout.splitlines():
         tok = shlex.split(line)
         if not tok:
@@ -78,10 +84,15 @@ def layout(dot_src):
             height = float(tok[3])                        # graph scale width height
         elif tok[0] == "node":
             pos[tok[1]] = (float(tok[2]), float(tok[3]))  # node name x y ...
-    return height, pos
+        elif tok[0] == "edge":                            # edge tail head n x1 y1 ... xn yn
+            n = int(tok[3])
+            edges[(tok[1], tok[2])] = [
+                (float(tok[4 + 2 * i]), float(tok[5 + 2 * i])) for i in range(n)
+            ]
+    return height, pos, edges
 
 
-def to_drawio(graph, height, pos):
+def to_drawio(graph, height, pos, edge_pts):
     cells = []
     for node in graph["nodes"]:
         nid = node["id"]
@@ -99,11 +110,23 @@ def to_drawio(graph, height, pos):
             f"        </mxCell>"
         )
     for i, edge in enumerate(graph.get("edges", [])):
+        # Drop the first/last points (they sit on the node borders, where
+        # draw.io attaches anyway) and replay the interior bends as waypoints.
+        interior = edge_pts.get((edge["source"], edge["target"]), [])[1:-1]
+        if interior:
+            points = "".join(
+                f'<mxPoint x="{snap(x * 72)}" y="{snap((height - y) * 72)}"/>'
+                for x, y in interior
+            )
+            geom = (f'<mxGeometry relative="1" as="geometry">'
+                    f'<Array as="points">{points}</Array></mxGeometry>')
+        else:
+            geom = '<mxGeometry relative="1" as="geometry"/>'
         cells.append(
             f'        <mxCell id="e{i}" value="{attr(edge.get("label", ""))}" '
             f'style="{EDGE_STYLE}" edge="1" parent="1" '
             f'source="{attr(edge["source"])}" target="{attr(edge["target"])}">\n'
-            f'          <mxGeometry relative="1" as="geometry"/>\n'
+            f"          {geom}\n"
             f"        </mxCell>"
         )
     return (
@@ -126,8 +149,8 @@ def main():
     args = ap.parse_args()
     with open(args.input, encoding="utf-8") as f:
         graph = json.load(f)
-    height, pos = layout(build_dot(graph))
-    xml = to_drawio(graph, height, pos)
+    height, pos, edge_pts = layout(build_dot(graph))
+    xml = to_drawio(graph, height, pos, edge_pts)
     if args.output:
         with open(args.output, "w", encoding="utf-8") as f:
             f.write(xml)
