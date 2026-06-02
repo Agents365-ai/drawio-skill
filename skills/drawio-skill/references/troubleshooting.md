@@ -25,3 +25,39 @@ Read this when something looks wrong in the output (rendering, export, layout, e
 | Background color wrong in CLI export | Known CLI bug; add `--transparent` flag or set background via style |
 | Vision returns 400 "Could not process image" on draft PNG | Re-export the preview without `-e` (issue #8). Root cause is a truncated IEND chunk in `-e` PNGs, not the `zTXt` chunk itself — but skipping `-e` for the preview is the simplest fix. |
 | Final `-e` PNG won't open in image viewers / vision APIs | Run `python3 <this-skill-dir>/scripts/repair_png.py <path>`. draw.io CLI emits `-e` PNGs with an 8-byte truncation at IEND. SVG/PDF unaffected. |
+| WSL2: `drawio` / `draw.io` not found | The CLI lives on the Windows side. Use the Windows desktop exe via `/mnt/c`: `"/mnt/c/Program Files/draw.io/draw.io.exe"` (or per-user `"/mnt/c/Users/<you>/AppData/Local/Programs/draw.io/draw.io.exe"`). |
+| WSL2: opening an exported file fails with a `/mnt/c/...`-style path | `cmd.exe` can't resolve WSL paths — convert first: `cmd.exe /c start "" "$(wslpath -w diagram.drawio.png)"`. The empty `""` after `start` is the (required) window title. |
+| Browser URL opens to a blank/empty diagram (Windows/WSL2) | `cmd.exe`'s `start` treats `&` as a separator and drops everything after `#` — so the `#R…`/`#create=…` fragment (the whole diagram) is lost. Never pass the URL straight to `start`. Write a `.url` shortcut file and open *that* (see "WSL2 / Windows" below). |
+
+## WSL2 / Windows specifics
+
+**Locate the CLI.** Detect WSL2 with `grep -qi microsoft /proc/version`. On WSL2 the
+export CLI is the Windows desktop exe, reached through `/mnt/c` (quote the path —
+it contains a space):
+
+```bash
+"/mnt/c/Program Files/draw.io/draw.io.exe" --version
+# per-user install fallback:
+"/mnt/c/Users/$USER/AppData/Local/Programs/draw.io/draw.io.exe" --version
+```
+
+**Open a file.** Convert the WSL path to a Windows path first; `cmd.exe` cannot
+follow `/mnt/c/...`:
+
+```bash
+cmd.exe /c start "" "$(wslpath -w diagram.drawio.png)"
+```
+
+**Open a browser-fallback URL.** `cmd.exe /c start` strips the URL fragment
+(`&` ends the command, `#…` is dropped) — and the fragment carries the entire
+diagram. Write a `.url` shortcut and open it instead, so the URL survives intact:
+
+```bash
+URL=$(python3 <this-skill-dir>/scripts/encode_drawio_url.py --edit diagram.drawio)
+TMP=$(mktemp --suffix=.url)
+printf '[InternetShortcut]\r\nURL=%s\r\n' "$URL" > "$TMP"
+cmd.exe /c start "" "$(wslpath -w "$TMP")"
+```
+
+On native Windows the same `.url`-file trick applies (`start "" "%TEMP%\d.url"`).
+On macOS/Linux just `open "$URL"` / `xdg-open "$URL"` — no workaround needed.
