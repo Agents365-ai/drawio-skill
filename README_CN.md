@@ -25,6 +25,7 @@
 - **6 种图表类型预设** —— ER 图、UML 类图、序列图、架构图、ML/深度学习、流程图
 - **可视化代码库** —— 提取并自动布局一个 Python / JS-TS / Go / Rust 项目的结构（导入关系图）或 Python 类继承层级 —— Graphviz 布点、传递约简、按子包嵌套的容器
 - **搜索 10,000+ 个官方形状** —— 直接拿到 AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN 图标的精确 style，不靠猜（杜绝 `shape=mxgraph.*` 拼错变空白框）
+- **AI / LLM 品牌图标** —— 321 个 draw.io 自身没有的 logo（OpenAI、Claude、Gemini、Mistral、Llama、Ollama、LangChain……），专为 LLM 应用架构图准备
 - **自检 + 自动修复** —— 读取自己导出的 PNG，自动修复重叠、截断标签、连线堆叠等问题（最多 2 轮）
 - **迭代反馈循环** —— 最多 5 轮定向优化
 - **样式预设** —— 用 `.drawio` 文件或图片"教会"Skill 你的风格，命名保存后随时复用
@@ -174,7 +175,28 @@ python3 scripts/shapesearch.py "aws lambda" --limit 5
 #   outlineConnect=0;...;shape=mxgraph.aws3.lambda;fillColor=#F58534;...
 ```
 
+<p align="center">
+  <img src="assets/shape-search-example.png" width="900" alt="用 shapesearch.py 解析出的官方 draw.io 图标搭建的 AWS 无服务器架构图">
+</p>
+
+<sub>↑ 一张 AWS 无服务器架构图 —— 每个图标都是 <code>shapesearch.py</code> 解析出的真实官方 draw.io 形状，而非手猜的 <code>shape=</code> 字符串。</sub>
+
 覆盖 AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN / ER / 电气 / P&ID 以及通用形状集。可手写的 style 速查表 + 搜索用法见 [references/shapes.md](skills/drawio-skill/references/shapes.md)。
+
+## 🤖 AI / LLM 品牌图标
+
+draw.io **没有**任何现代 AI/LLM 品牌图标，所以画 LLM 应用架构时只能是一堆方框。`aiicons.py` 能把品牌名解析成 draw.io 图片样式，覆盖 [lobe-icons](https://github.com/lobehub/lobe-icons)（MIT）的 **321 个图标**（OpenAI、Claude、Gemini、Mistral、Llama、Cohere、DeepSeek、Qwen、Ollama、LangChain、HuggingFace……）。
+
+```bash
+python3 scripts/aiicons.py "claude" --json      # CDN 引用（默认）
+python3 scripts/aiicons.py "openai" --embed     # 内联为自包含 data URI
+```
+
+<p align="center">
+  <img src="assets/ai-logos-example.png" width="900" alt="用 aiicons.py 解析出的真实 AI 品牌图标搭建的多供应商 LLM 应用图">
+</p>
+
+<sub>↑ 一张多供应商 LLM 应用图 —— 每个品牌 logo 都由 <code>aiicons.py</code> 解析。默认从 unpkg CDN 引用图标（渲染时需联网），<code>--embed</code> 可内联以离线使用。logo 为各自所有者的商标，仅用于标识。</sub>
 
 ## 🎨 样式预设
 
@@ -211,6 +233,7 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 | 大图自动布局 | ❌ 手动摆放、易重叠 | ✅ Graphviz 布点、正交路由、嵌套容器 |
 | 结构校验 | ❌ | ✅ 确定性 `.drawio` linter |
 | 官方形状搜索 | ❌ 靠猜、变空白框 | ✅ 1 万+ AWS/Azure/GCP/UML 形状的精确 style |
+| AI/LLM 品牌图标 | ❌ 没有 | ✅ 321 个 logo（OpenAI/Claude/Gemini/…）经 aiicons.py |
 | 网格对齐布局 | ❌ | ✅ 10px 对齐、路由走廊 |
 | 配色方案 | 随机 / 不一致 | ✅ 7 色语义系统 |
 | 样式预设 | ❌ | ✅ 从 `.drawio` 文件或图片学习 |
@@ -228,6 +251,7 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 | **ML/DL 图** | ✅ 张量标注、层配色 | ❌ | ❌ | ❌ |
 | **配色系统** | ✅ 7 色语义 | ❌ | ✅ 6 种主题 | ❌ |
 | **官方形状搜索** | ✅ 1 万+ 形状（本地） | ✅ 1 万+ 形状（MCP） | ❌ | ❌ |
+| **AI/LLM 品牌图标** | ✅ 321 个（lobe-icons） | ❌ | ❌ | ❌ |
 | **浏览器降级** | ✅ diagrams.net URL（查看 + 可编辑） | ❌ 仅内联预览 | ✅ 通过可选 MCP | ✅ diagrams.net viewer（主要） |
 | **零配置** | ✅ 复制 `skills/drawio-skill/` | ✅ | ✅ 桌面版模式 | ❌ 需安装插件 |
 

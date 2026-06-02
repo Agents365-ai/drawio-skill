@@ -25,6 +25,7 @@ A skill that turns natural-language descriptions into `.drawio` XML and exports 
 - **6 diagram type presets** — ERD, UML Class, Sequence, Architecture, ML/Deep Learning, Flowchart
 - **Visualize a codebase** — extract and auto-lay-out the structure of a Python / JS-TS / Go / Rust project (import graphs) or a Python class hierarchy — Graphviz placement, transitive reduction, nested module containers
 - **Search 10,000+ official shapes** — resolve the exact AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN icon style instead of guessing (no more blank-box `shape=mxgraph.*` typos)
+- **AI / LLM brand logos** — 321 logos (OpenAI, Claude, Gemini, Mistral, Llama, Ollama, LangChain…) that draw.io has none of, for LLM-app architecture diagrams
 - **Self-check + auto-fix** — reads its own PNG output and auto-fixes overlaps, clipped labels, stacked edges, and more (up to 2 rounds)
 - **Iterative feedback loop** — up to 5 rounds of targeted refinement
 - **Style presets** — capture your visual style from a `.drawio` file or image, reuse on demand
@@ -176,7 +177,28 @@ python3 scripts/shapesearch.py "aws lambda" --limit 5
 #   outlineConnect=0;...;shape=mxgraph.aws3.lambda;fillColor=#F58534;...
 ```
 
+<p align="center">
+  <img src="assets/shape-search-example.png" width="900" alt="Serverless AWS architecture built from official draw.io icons resolved by shapesearch.py">
+</p>
+
+<sub>↑ A serverless AWS architecture — every icon is the real official draw.io shape resolved by <code>shapesearch.py</code>, not a hand-guessed <code>shape=</code> string.</sub>
+
 Covers AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN / ER / electrical / P&ID and the general shape sets. Hand-writable style cheatsheet + search usage in [references/shapes.md](skills/drawio-skill/references/shapes.md).
+
+## 🤖 AI / LLM Brand Logos
+
+draw.io ships **no** modern AI/LLM logos, so an LLM-app diagram renders as generic boxes. `aiicons.py` resolves a brand name to a draw.io image style for any of **321 logos** (OpenAI, Claude, Gemini, Mistral, Llama, Cohere, DeepSeek, Qwen, Ollama, LangChain, HuggingFace…) from [lobe-icons](https://github.com/lobehub/lobe-icons) (MIT).
+
+```bash
+python3 scripts/aiicons.py "claude" --json      # CDN-referenced (default)
+python3 scripts/aiicons.py "openai" --embed     # self-contained data URI
+```
+
+<p align="center">
+  <img src="assets/ai-logos-example.png" width="900" alt="Multi-provider LLM app diagram with real AI brand logos resolved by aiicons.py">
+</p>
+
+<sub>↑ A multi-provider LLM app — every brand logo resolved by <code>aiicons.py</code>. Icons are referenced from the unpkg CDN by default (network needed at render time); <code>--embed</code> inlines them for offline use. Logos are trademarks of their owners, used for identification only.</sub>
 
 ## 🎨 Style Presets
 
@@ -213,6 +235,7 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 | Auto-layout for large graphs | ❌ hand-places, overlaps | ✅ Graphviz placement, ortho routing, nested containers |
 | Structural validation | ❌ | ✅ deterministic `.drawio` linter |
 | Official shape search | ❌ guesses, blank boxes | ✅ exact style for 10k+ AWS/Azure/GCP/UML shapes |
+| AI/LLM brand logos | ❌ none | ✅ 321 logos (OpenAI/Claude/Gemini/…) via aiicons.py |
 | Grid-aligned layout | ❌ | ✅ 10px snap, routing corridors |
 | Color palette | random / inconsistent | ✅ 7-color semantic system |
 | Style presets | ❌ | ✅ learn from `.drawio` file or image |
@@ -230,6 +253,7 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 | **ML/DL diagrams** | ✅ tensor shapes, layer colors | ❌ | ❌ | ❌ |
 | **Color system** | ✅ 7-color semantic | ❌ | ✅ 6 themes | ❌ |
 | **Official shape search** | ✅ 10k+ shapes (local) | ✅ 10k+ shapes (MCP) | ❌ | ❌ |
+| **AI/LLM brand logos** | ✅ 321 (lobe-icons) | ❌ | ❌ | ❌ |
 | **Browser fallback** | ✅ diagrams.net URL (viewer + editable) | ❌ inline preview only | ✅ via optional MCP | ✅ diagrams.net viewer (primary) |
 | **Zero-config** | ✅ copy `skills/drawio-skill/` | ✅ | ✅ desktop-only mode | ❌ needs plugin install |
 
