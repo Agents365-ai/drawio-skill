@@ -28,6 +28,10 @@ python3 <this-skill-dir>/scripts/shapesearch.py "uml actor" --json
   `--json`, emits `[{style,w,h,title}]` for programmatic use.
 - Copy the `style` verbatim into an `mxCell`, and use the reported `w`/`h` as the
   `mxGeometry` width/height (vendor icons are drawn at a fixed aspect ratio).
+- **Scan the top results by title — don't blind-grab #1.** Ranking is by tag
+  relevance, so a closely-tagged neighbor can outrank the exact shape (e.g.
+  `dynamodb` surfaces *Attribute* above *DynamoDB*). Run with `--limit 5` and
+  pick the row whose title matches what you actually want.
 
 ```xml
 <mxCell id="2" value="Lambda" style="<paste the searched style here>" vertex="1" parent="1">
