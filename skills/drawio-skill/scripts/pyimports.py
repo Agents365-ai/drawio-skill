@@ -108,6 +108,8 @@ def main():
     ap.add_argument("project", help="package or project directory")
     ap.add_argument("-o", "--output", help="output JSON path (default: stdout)")
     ap.add_argument("--direction", default="TB", choices=["TB", "LR"])
+    ap.add_argument("--group", action="store_true",
+                    help="group nodes into containers by sub-package")
     ap.add_argument("--no-reduce", action="store_true",
                     help="keep every edge (skip transitive reduction)")
     args = ap.parse_args()
@@ -123,9 +125,18 @@ def main():
     # Drop the shared package prefix from labels for readability; ids stay full.
     strip = base + "." if base else ""
     label = lambda m: m[len(strip):] if strip and m.startswith(strip) else m
+
+    def node(m):
+        d = {"id": m, "label": label(m)}
+        if args.group:
+            rest = label(m).split(".")
+            if len(rest) > 1:                            # nested under a sub-package
+                d["group"] = rest[0]
+        return d
+
     graph = {
         "direction": args.direction,
-        "nodes": [{"id": m, "label": label(m)} for m in modules],
+        "nodes": [node(m) for m in modules],
         "edges": [{"source": s, "target": t} for s, t in edges],
     }
     text = json.dumps(graph, indent=2)
