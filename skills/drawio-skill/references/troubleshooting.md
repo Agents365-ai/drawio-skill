@@ -14,7 +14,9 @@ Read this when something looks wrong in the output (rendering, export, layout, e
 | Edges crossing through shapes | Add waypoints, distribute entry/exit points, or increase spacing |
 | Arrowhead overlaps bend | Final edge segment before target must be ≥20px — increase spacing or add waypoints |
 | Iteration loop never ends | After 5 rounds, suggest user open .drawio in draw.io desktop for fine-tuning |
+| `command not found: draw.io` after `brew install --cask drawio` | Homebrew installs the binary as `drawio` (no dot). Use `drawio --version`, not `draw.io --version`. The dot-name only exists inside the `.app` bundle (`/Applications/draw.io.app/Contents/MacOS/draw.io`) and on Windows (`draw.io.exe`). |
 | Export command not found on macOS | Try full path `/Applications/draw.io.app/Contents/MacOS/draw.io` |
+| Vision returns "Unable to resize image — dimensions exceed the 2576x2576px limit" | The preview PNG is too large for Claude's vision API. Re-export with `--width 2000` instead of `-s 2` (the flag is `--width`; there is no short `-w` — passing `-w 2000` silently breaks input-file parsing and drawio errors with "input file/directory not found"). For very tall-narrow diagrams that still overshoot, use `--height 2000` instead. |
 | Linux: blank/error output headlessly | Prefix command with `xvfb-run -a` |
 | Linux: `--no-sandbox` placed before input file (parsed as filename) | Move `--no-sandbox` to the very end of the command (drawio-desktop#249, #1056) |
 | Linux: `Failed to get 'appData' path` / `Home directory not accessible` | `export HOME=/tmp` before invoking drawio (drawio-desktop#127) |

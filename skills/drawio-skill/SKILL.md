@@ -1,12 +1,12 @@
 ---
 name: drawio-skill
-version: 1.5.2
+version: 1.5.3
 description: Use when the user requests diagrams, flowcharts, architecture diagrams, ER diagrams, UML / sequence / class diagrams, network topology, ML/DL model figures (Transformer/CNN/LSTM), mind maps, or any visualization. Also use proactively when explaining systems with 3+ components, complex data flows, or relationships that benefit from visual representation. Best suited when the diagram needs custom styling, rich shape vocabulary, swimlanes, or exportable images (PNG/SVG/PDF/JPG). Generates .drawio XML and exports locally via the native draw.io desktop CLI.
 license: MIT
 homepage: https://github.com/Agents365-ai/drawio-skill
 compatibility: Requires draw.io desktop app CLI on PATH (macOS/Linux/Windows). Self-check step requires a vision-enabled model (e.g., Claude Sonnet/Opus); gracefully skipped if unavailable.
 platforms: [macos, linux, windows]
-metadata: {"openclaw":{"requires":{"anyBins":["draw.io","drawio"]},"emoji":"📐","os":["darwin","linux","win32"],"install":[{"id":"brew-drawio","kind":"brew","formula":"drawio","bins":["draw.io"],"label":"Install draw.io via Homebrew","os":["darwin"]}]},"hermes":{"tags":["drawio","diagram","flowchart","architecture","visualization","uml"],"category":"design","requires_tools":["draw.io"],"related_skills":["mermaid","excalidraw","plantuml"]},"author":"Agents365-ai","version":"1.5.2"}
+metadata: {"openclaw":{"requires":{"anyBins":["draw.io","drawio"]},"emoji":"📐","os":["darwin","linux","win32"],"install":[{"id":"brew-drawio","kind":"brew","formula":"drawio","bins":["drawio"],"label":"Install draw.io via Homebrew","os":["darwin"]}]},"hermes":{"tags":["drawio","diagram","flowchart","architecture","visualization","uml"],"category":"design","requires_tools":["drawio","draw.io"],"related_skills":["mermaid","excalidraw","plantuml"]},"author":"Agents365-ai","version":"1.5.3"}
 ---
 
 # Draw.io Diagrams
@@ -36,7 +36,7 @@ When the workflow references one of these, read it on demand — none of them ne
 
 The draw.io desktop app must be installed and the CLI accessible:
 
-**macOS sandbox / sandbox isolation note (e.g., codex.app):** In some sandboxed macOS environments, invoking the draw.io desktop CLI (even `draw.io --version`) can crash the draw.io process or produce no output. If that happens, treat the CLI as **unavailable in this sandbox isolation** — do not keep retrying inside the sandbox. Prefer a **non-sandboxed host environment** (outside sandbox isolation) for any CLI export work, or use the browser fallback / XML-only outputs.
+**macOS sandbox / sandbox isolation note (e.g., codex.app):** In some sandboxed macOS environments, invoking the draw.io desktop CLI (even `drawio --version`) can crash the draw.io process or produce no output. If that happens, treat the CLI as **unavailable in this sandbox isolation** — do not keep retrying inside the sandbox. Prefer a **non-sandboxed host environment** (outside sandbox isolation) for any CLI export work, or use the browser fallback / XML-only outputs.
 
 ```bash
 # macOS (Homebrew — recommended; CLI binary is `drawio`, not `draw.io`)
@@ -50,7 +50,7 @@ drawio --version
 "C:\Program Files\draw.io\draw.io.exe" --version
 
 # Linux
-draw.io --version
+drawio --version
 ```
 
 Install draw.io desktop if missing:
@@ -78,15 +78,15 @@ Load the preset JSON from `~/.drawio-skill/styles/<name>.json`, falling back to 
 
 When a preset loads successfully, mention it in the first line of the reply: *"Using preset `<name>` (confidence: `<level>`)."* See the **Applying a preset** subsection below for how the preset changes color/shape/edge/font decisions.
 
-1. **Check deps** — verify `draw.io --version` succeeds; note platform for correct CLI path
+1. **Check deps** — **resolve which name the binary has on this system** and use that name verbatim in every subsequent command in this workflow. Try in order: (a) `drawio --version` (the canonical name for Homebrew cask, jgraph `.deb`/`.rpm`, Arch AUR), (b) `draw.io --version` (older builds, some custom symlinks, some distro packages), (c) macOS `.app` direct: `/Applications/draw.io.app/Contents/MacOS/draw.io --version`, (d) Windows: `"C:\Program Files\draw.io\draw.io.exe" --version`. The first one that prints a version is your binary; remember the exact path/name and substitute it for `drawio` in every export command below. **Do not copy the example commands verbatim if your binary is named differently** — the examples use `drawio` only because it's the most common. On macOS-Homebrew, `drawio` is just a thin wrapper script that execs `/Applications/draw.io.app/Contents/MacOS/draw.io` — they run the same engine, so candidate (c) is only needed when the `drawio` wrapper is absent (e.g. the app was installed by drag-and-drop without the cask).
 2. **Plan** — identify shapes, relationships, layout (LR or TB), group by tier/layer
 3. **Generate** — write `.drawio` XML file to disk. Default output dir is the user's working dir; if the user specified an output path or directory (e.g. `./artifacts/`, `docs/images/`), use that instead — `mkdir -p` the target dir first. Apply the same dir choice to PNG/SVG/PDF exports in steps 4 and 7.
-4. **Export draft** — run CLI to produce a preview PNG. **Do NOT pass `-e`** at this step — the embedded `zTXt mxGraphModel` chunk it adds causes vision APIs (Claude included) to return 400 "Could not process image" in step 5. Save the clean preview as `<name>.png` (single extension). Embedding is for the final export only (step 7).
+4. **Export draft** — run CLI to produce a preview PNG. **Do NOT pass `-e`** at this step — the embedded `zTXt mxGraphModel` chunk it adds causes vision APIs (Claude included) to return 400 "Could not process image" in step 5. **Cap the preview width with `--width 2000` (not `-s 2`)** — Claude's vision API rejects images larger than 2576×2576px with "Unable to resize image — dimensions exceed the 2576x2576px limit", and `-s 2` on a medium-or-larger diagram easily overshoots that ceiling. Save the clean preview as `<name>.png` (single extension). Embedding and full-resolution scale are for the final export only (step 7).
 5. **Self-check** — use the agent's built-in vision capability to read the exported PNG, catch obvious issues, auto-fix before showing user (requires a vision-enabled model such as Claude Sonnet/Opus). If reading the PNG returns a 400 / "Could not process image" error, you almost certainly exported with `-e` by mistake — re-export without `-e` and retry once. If it still fails, skip self-check and continue to step 6.
 6. **Review loop** — show image to user, collect feedback, apply targeted XML edits, re-export, repeat until approved
 7. **Final export** — re-export the approved version to all requested formats. Use `-e` here (PNG/SVG/PDF) so the deliverable stays editable in draw.io; save as `<name>.drawio.png` to signal embedded XML. **For PNG with `-e`, run `python3 <this-skill-dir>/scripts/repair_png.py <name>.drawio.png` immediately after** — draw.io's CLI truncates the IEND chunk in `-e` PNG output (8 bytes missing), producing a corrupt file that vision APIs and strict PNG decoders reject (issue #8). Report file paths.
 
-**If `draw.io --version` crashes or prints nothing (common in restricted macOS sandbox isolation like codex.app):**
+**If `drawio --version` crashes or prints nothing (common in restricted macOS sandbox isolation like codex.app):**
 - Do not keep retrying CLI invocations inside the sandbox.
 - Skip steps 4, 5, 6, and 7 (CLI export + PNG-based review) and use **Browser fallback** (`scripts/encode_drawio_url.py`) or deliver the `.drawio` XML only.
 - If the user needs PNG/SVG/PDF outputs, ask them to run the export commands in a **non-sandboxed host environment** (outside sandbox isolation) and share the resulting files.
@@ -150,7 +150,7 @@ Once the user approves:
 
 A **style preset** is a named JSON file capturing a user's visual preferences (palette, shapes, font, edges). When active, it fully replaces the built-in color/shape conventions in this skill.
 
-**Lookup order** when SKILL.md's step 0.5 resolves a preset name:
+**Lookup order** when SKILL.md's Step 0 resolves a preset name:
 1. `~/.drawio-skill/styles/<name>.json` — user presets (survive `git pull`)
 2. `<this-skill-dir>/styles/built-in/<name>.json` — shipped built-ins (`default`, `corporate`, `handdrawn`)
 
@@ -346,15 +346,17 @@ There are **two** export modes:
 - **Preview / self-check** (step 4 of the workflow) — no `-e`. Output `diagram.png`. Required for vision self-check; using `-e` here triggers a 400 "Could not process image" error from the vision API (issue #8).
 - **Final / deliverable** (step 7) — pass `-e`. Output `diagram.drawio.png`. The embedded XML keeps the file editable in draw.io.
 
+> All commands below write `drawio` as a placeholder for the binary you resolved in Step 1. If your binary is on PATH as `draw.io` (with dot — some older or distro-packaged installs), substitute `draw.io` throughout. If only the macOS `.app` or Windows `.exe` is available, use the full path variant shown a few lines down.
+
 ```bash
-# Preview PNG (use this in step 4, before self-check) — NO -e
-draw.io -x -f png -s 2 -o diagram.png input.drawio
+# Preview PNG (use this in step 4, before self-check) — NO -e, width-capped to stay under vision's 2576px ceiling
+drawio -x -f png --width 2000 -o diagram.png input.drawio
 
 # Final PNG (step 7, after user approval) — WITH -e, double extension
-draw.io -x -f png -e -s 2 -o diagram.drawio.png input.drawio
+drawio -x -f png -e -s 2 -o diagram.drawio.png input.drawio
 
 # macOS — full path (if not in PATH); preview / final variants
-/Applications/draw.io.app/Contents/MacOS/draw.io -x -f png -s 2 -o diagram.png input.drawio
+/Applications/draw.io.app/Contents/MacOS/draw.io -x -f png --width 2000 -o diagram.png input.drawio
 /Applications/draw.io.app/Contents/MacOS/draw.io -x -f png -e -s 2 -o diagram.drawio.png input.drawio
 
 # Windows
@@ -363,17 +365,17 @@ draw.io -x -f png -e -s 2 -o diagram.drawio.png input.drawio
 # Linux (headless — requires xvfb-run; on servers add HOME and --disable-gpu)
 export HOME=${HOME:-/tmp}
 xvfb-run -a --server-args="-screen 0 1280x1024x24" \
-  draw.io -x -f png -e -s 2 -o diagram.drawio.png input.drawio --disable-gpu
+  drawio -x -f png -e -s 2 -o diagram.drawio.png input.drawio --disable-gpu
 # Running as root (CI / Docker)? Append --no-sandbox AT THE END (placing it earlier makes drawio treat it as the input filename)
 
 # SVG export (final — -e is safe; SVG is text)
-draw.io -x -f svg -e -o diagram.svg input.drawio
+drawio -x -f svg -e -o diagram.svg input.drawio
 
 # PDF export (final)
-draw.io -x -f pdf -e -o diagram.pdf input.drawio
+drawio -x -f pdf -e -o diagram.pdf input.drawio
 
 # Custom output directory (e.g. CI artifacts dir) — create if missing, then export there
-mkdir -p ./artifacts && draw.io -x -f png -e -s 2 -o ./artifacts/diagram.drawio.png input.drawio
+mkdir -p ./artifacts && drawio -x -f png -e -s 2 -o ./artifacts/diagram.drawio.png input.drawio
 ```
 
 ### Post-export PNG repair (required after `-e` PNG export)
@@ -392,7 +394,8 @@ The script's `endswith(IEND)` guard makes it a no-op once draw.io fixes the bug 
 - `-x` — export mode (required)
 - `-f` — format: `png`, `svg`, `pdf`, `jpg`
 - `-e` — embed diagram XML in output (PNG, SVG, PDF) — exported file remains editable in draw.io. **Skip for the preview PNG used in step 5 self-check** — `-e` PNGs have a truncated IEND chunk that vision APIs reject (issue #8). For final PNG export, keep `-e` and run `scripts/repair_png.py` (see Post-export PNG repair). SVG/PDF unaffected.
-- `-s` — scale: `1`, `2`, `3` (2 recommended for PNG)
+- `-s` — scale: `1`, `2`, `3` (2 recommended for final PNG; do NOT use for the step-4 preview — see `--width`)
+- `--width <px>` — target width in pixels (no short form; `-w` does **not** exist and silently breaks the input-file parser). Use `--width 2000` for the step-4 preview to keep the PNG under Claude's 2576×2576 vision ceiling. There's also a `--height <px>` flag for tall-narrow diagrams. Don't combine `--width` with `-s`.
 - `-o` — output file path; accepts any directory (e.g. `./artifacts/diagram.drawio.png`) — `mkdir -p` the target dir first. Use `.drawio.png` double extension when embedding.
 - `-b` — border width around diagram (default: 0, recommend 10)
 - `-t` — transparent background (PNG only)
@@ -421,16 +424,20 @@ When tools are unavailable, degrade gracefully:
 | Export fails (Chromium/display issues) | On Linux, retry with `xvfb-run -a`; if still failing, deliver `.drawio` XML and suggest manual export |
 | Export fails on Linux server (headless) | Try in order: (1) `xvfb-run -a`, (2) append `--no-sandbox` at the very end if root, (3) add `--disable-gpu`, (4) `export HOME=/tmp`, (5) install apt deps (`libgtk-3-0 libnotify4 libnss3 libgbm1 libasound2t64` etc.), (6) fall back to [tomkludy/drawio-renderer](https://hub.docker.com/r/tomkludy/drawio-renderer) Docker (REST API for headless export) |
 
-### Checking if draw.io is in PATH
+### Checking if drawio is in PATH
 
 ```bash
-# Try short command first
-if command -v draw.io &>/dev/null; then
+# Prefer the Homebrew / Linux-package binary name (no dot)
+if command -v drawio &>/dev/null; then
+  DRAWIO="drawio"
+# Fall back to the dot-named binary (older installs, manual symlinks)
+elif command -v draw.io &>/dev/null; then
   DRAWIO="draw.io"
+# Final fallback: macOS .app bundle (binary inside the bundle keeps the dot)
 elif [ -f "/Applications/draw.io.app/Contents/MacOS/draw.io" ]; then
   DRAWIO="/Applications/draw.io.app/Contents/MacOS/draw.io"
 else
-  echo "draw.io not found — install from https://github.com/jgraph/drawio-desktop/releases"
+  echo "drawio not found — install from https://github.com/jgraph/drawio-desktop/releases (Homebrew: brew install --cask drawio)"
 fi
 ```
 

@@ -95,9 +95,10 @@ The edge style is built as:
 ### Rendering the sample
 
 1. Write the filled XML to `/tmp/drawio-preset-<name>.drawio`.
-2. Run the same `draw.io -x -f png -e -s 2 -o <preset-name>-sample.png <tmp>.drawio` command the main workflow uses.
-3. Save the PNG as `./preset-<name>-sample.png` (the user's working directory).
-4. Show the user: preset summary table + PNG path + provenance/confidence line.
+2. Run the same `drawio -x -f png -e -s 2 -o <preset-name>-sample.png <tmp>.drawio` command the main workflow uses (substitute the binary name you resolved in SKILL.md Step 1 if it isn't `drawio`).
+3. Repair the IEND chunk: `python3 <this-skill-dir>/scripts/repair_png.py <preset-name>-sample.png` — the `-e` flag truncates the PNG the same way the main workflow's step 7 does, so the sample needs the same fix to be readable.
+4. Save the PNG as `./preset-<name>-sample.png` (the user's working directory).
+5. Show the user: preset summary table + PNG path + provenance/confidence line.
 
 ### Approval loop
 

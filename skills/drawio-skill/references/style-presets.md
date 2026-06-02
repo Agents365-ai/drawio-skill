@@ -5,7 +5,7 @@ A **style preset** is a named JSON file capturing a user's visual preferences �
 Read this file when:
 - The user asks to "learn", "save", "remember", or "extract" a style from a file
 - The user wants to manage existing presets (list, set default, delete, rename)
-- You've resolved an active preset in step 0.5 and need the application rules
+- You've resolved an active preset in Step 0 and need the application rules
 - You need to validate a preset file before loading it
 
 ## Locations and lookup order
@@ -21,7 +21,7 @@ Only user presets can have `"default": true`. When the user says *"make `<built-
 
 ## Applying a preset
 
-When SKILL.md's step 0.5 identified a preset, it fully replaces the built-in palette, shape keywords, edge defaults, and font for this diagram — do not mix values from the built-in color table.
+When SKILL.md's Step 0 identified a preset, it fully replaces the built-in palette, shape keywords, edge defaults, and font for this diagram — do not mix values from the built-in color table.
 
 **Color lookup.** For each role a shape plays (service / database / queue / gateway / error / external / security), resolve `preset.roles[role]` to a slot name, then `preset.palette[<slot>]` to the `(fillColor, strokeColor)` pair. If `roles[role]` is unset or the resolved slot is `null`, follow this fallback ladder:
 
@@ -58,7 +58,7 @@ When SKILL.md's step 0.5 identified a preset, it fully replaces the built-in pal
 1. **Load the extraction reference.** Read `references/style-extraction.md` into context.
 2. **Extract** following the XML path or image path procedure in the reference.
 3. **Normalize and build candidate.** Convert the user-provided preset name to lowercase. Use this normalized name for ALL file paths in this flow. Build the candidate preset JSON and write it to `/tmp/drawio-preset-<name>.json` (where `<name>` is the already-normalized name). Do **not** save to `~/.drawio-skill/styles/<name>.json` yet.
-4. **Render a sample** using the sample-diagram skeleton in `references/style-extraction.md`, parameterized by the candidate preset. Export PNG to `./preset-<name>-sample.png` using the same `draw.io -x -f png -e -s 2 -o ./preset-<name>-sample.png /tmp/drawio-preset-<name>.drawio` command the main workflow uses.
+4. **Render a sample** using the sample-diagram skeleton in `references/style-extraction.md`, parameterized by the candidate preset. Export PNG to `./preset-<name>-sample.png` using the same `drawio -x -f png -e -s 2 -o ./preset-<name>-sample.png /tmp/drawio-preset-<name>.drawio` command the main workflow uses, then run `repair_png.py` on it (see the Rendering the sample steps in `style-extraction.md`).
 5. **Show the user:**
    - Preset summary table (palette hex values, shapes per role, font, edge style, extras).
    - The sample PNG path (and embed the image if the environment supports it).
