@@ -6,10 +6,13 @@ matching palette shapes so a diagram can use the real draw.io `style=` string
 instead of a hand-guessed one. Covers AWS / Azure / GCP / Cisco / Kubernetes /
 UML / BPMN / P&ID / electrical / flowchart / network / general shape sets.
 
-Port of the search in jgraph/drawio-mcp (Apache-2.0): tag map with exact +
-Soundex matching, strict AND first, scored OR fallback. The bundled index
-(data/shape-index.json.gz) is the upstream draw.io shape data — see
-data/SHAPE-INDEX-NOTICE.md.
+Based on the search in jgraph/drawio-mcp (Apache-2.0): tag map with exact +
+Soundex matching, strict AND first, scored OR fallback. The matched set is
+identical to upstream; the one addition is a tiebreaker that, among shapes with
+the same tag score, prefers ones whose title contains the query terms verbatim
+(so "dynamodb" returns the shape titled "DynamoDB", not a neighbor merely tagged
+with it). The bundled index (data/shape-index.json.gz) is the upstream draw.io
+shape data — see data/SHAPE-INDEX-NOTICE.md.
 
 Usage:
   python3 shapesearch.py "aws lambda" [--limit N] [--json]
@@ -115,9 +118,20 @@ def search(shapes, tag_map, query, limit):
             if (pool is None or idx in pool) and idx not in exact:
                 scores[idx] = scores.get(idx, 0) + 0.5
 
-    # Rank by score desc, then title (casefold ~ JS localeCompare), then index —
-    # the trailing index makes ties deterministic and matches upstream ordering.
-    ranked = sorted(scores, key=lambda i: (-scores[i], shapes[i].get("title", "").casefold(), i))
+    # Rank by tag score desc, then by how many query terms appear verbatim in the
+    # title, then casefolded title, then index. The title-hit tiebreak (our one
+    # addition over upstream) only reorders *within* an equal tag-score group, so
+    # e.g. the shape literally titled "DynamoDB" ranks above a neighbor that is
+    # merely tagged `dynamodb` (like "Attribute"). The trailing index keeps ties
+    # deterministic.
+    term_set = set(terms)
+
+    def title_hits(idx):
+        toks = set(re.split(r"[^a-z0-9]+", shapes[idx].get("title", "").casefold()))
+        return len(term_set & toks)
+
+    ranked = sorted(scores, key=lambda i: (-scores[i], -title_hits(i),
+                                           shapes[i].get("title", "").casefold(), i))
     return [{"style": shapes[i]["style"], "w": shapes[i]["w"],
              "h": shapes[i]["h"], "title": shapes[i]["title"]} for i in ranked[:limit]]
 

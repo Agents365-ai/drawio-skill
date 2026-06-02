@@ -28,10 +28,11 @@ python3 <this-skill-dir>/scripts/shapesearch.py "uml actor" --json
   `--json`, emits `[{style,w,h,title}]` for programmatic use.
 - Copy the `style` verbatim into an `mxCell`, and use the reported `w`/`h` as the
   `mxGeometry` width/height (vendor icons are drawn at a fixed aspect ratio).
-- **Scan the top results by title — don't blind-grab #1.** Ranking is by tag
-  relevance, so a closely-tagged neighbor can outrank the exact shape (e.g.
-  `dynamodb` surfaces *Attribute* above *DynamoDB*). Run with `--limit 5` and
-  pick the row whose title matches what you actually want.
+- Results are ranked by tag relevance, with shapes whose **title** contains the
+  query terms bubbled to the top of each score tier. Ranking is still a
+  heuristic, though, and many shapes share a title (three `Lambda` variants:
+  `aws3`/`aws4`/`aws3d`) — so run with `--limit 5` and pick the row whose title
+  and size match what you actually want rather than blindly taking #1.
 
 ```xml
 <mxCell id="2" value="Lambda" style="<paste the searched style here>" vertex="1" parent="1">
