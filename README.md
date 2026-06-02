@@ -24,6 +24,7 @@ A skill that turns natural-language descriptions into `.drawio` XML and exports 
 
 - **6 diagram type presets** — ERD, UML Class, Sequence, Architecture, ML/Deep Learning, Flowchart
 - **Visualize a codebase** — extract and auto-lay-out the structure of a Python / JS-TS / Go / Rust project (import graphs) or a Python class hierarchy — Graphviz placement, transitive reduction, nested module containers
+- **Search 10,000+ official shapes** — resolve the exact AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN icon style instead of guessing (no more blank-box `shape=mxgraph.*` typos)
 - **Self-check + auto-fix** — reads its own PNG output and auto-fixes overlaps, clipped labels, stacked edges, and more (up to 2 rounds)
 - **Iterative feedback loop** — up to 5 rounds of targeted refinement
 - **Style presets** — capture your visual style from a `.drawio` file or image, reuse on demand
@@ -76,7 +77,7 @@ Full walkthrough in [docs/USAGE.md](docs/USAGE.md).
 | **Windows** | [Download installer](https://github.com/jgraph/drawio-desktop/releases) |
 | **Linux** | `.deb`/`.rpm` from [releases](https://github.com/jgraph/drawio-desktop/releases); `sudo apt install xvfb` for headless |
 
-Verify with `drawio --version`. Full recipes in [docs/INSTALL_CLI.md](docs/INSTALL_CLI.md).
+Verify with `drawio --version`. On **WSL2** the CLI is the Windows desktop exe reached via `/mnt/c` — the skill detects this automatically (see [troubleshooting](skills/drawio-skill/references/troubleshooting.md)). Full recipes in [docs/INSTALL_CLI.md](docs/INSTALL_CLI.md).
 
 ### 2. Install the skill
 
@@ -163,6 +164,20 @@ Layout needs Graphviz (`brew install graphviz` / `apt install graphviz`) — opt
 | Data | ER diagrams, data flow diagrams (DFD) | Table containers, PK/FK notation |
 | Other | org charts, mind maps, wireframes | — |
 
+## 🔍 Shape Search
+
+Need a real AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN icon? The skill searches **10,000+ official draw.io shapes** for the exact style string — so vendor icons render correctly instead of falling back to a blank box from a guessed `shape=mxgraph.*` name.
+
+> *"Add an AWS Lambda wired to an S3 bucket"* · *"Use the real Kubernetes pod icon"*
+
+```bash
+python3 scripts/shapesearch.py "aws lambda" --limit 5
+# → Lambda (77x93)
+#   outlineConnect=0;...;shape=mxgraph.aws3.lambda;fillColor=#F58534;...
+```
+
+Covers AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN / ER / electrical / P&ID and the general shape sets. Hand-writable style cheatsheet + search usage in [references/shapes.md](skills/drawio-skill/references/shapes.md).
+
 ## 🎨 Style Presets
 
 Capture a visual style once, reuse it everywhere. Three presets are built in — `default`, `corporate`, `handdrawn` — and you can teach the skill your own style from a `.drawio` file or a flat image:
@@ -197,6 +212,7 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 | Visualize a codebase | ❌ | ✅ import graphs (Py/JS/Go/Rust) + class diagrams |
 | Auto-layout for large graphs | ❌ hand-places, overlaps | ✅ Graphviz placement, ortho routing, nested containers |
 | Structural validation | ❌ | ✅ deterministic `.drawio` linter |
+| Official shape search | ❌ guesses, blank boxes | ✅ exact style for 10k+ AWS/Azure/GCP/UML shapes |
 | Grid-aligned layout | ❌ | ✅ 10px snap, routing corridors |
 | Color palette | random / inconsistent | ✅ 7-color semantic system |
 | Style presets | ❌ | ✅ learn from `.drawio` file or image |
@@ -213,7 +229,8 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 | **Diagram presets** | ✅ 6 types | ❌ | ✅ paper-mode classifier | ❌ |
 | **ML/DL diagrams** | ✅ tensor shapes, layer colors | ❌ | ❌ | ❌ |
 | **Color system** | ✅ 7-color semantic | ❌ | ✅ 6 themes | ❌ |
-| **Browser fallback** | ✅ diagrams.net URL | ❌ inline preview only | ✅ via optional MCP | ✅ diagrams.net viewer (primary) |
+| **Official shape search** | ✅ 10k+ shapes (local) | ✅ 10k+ shapes (MCP) | ❌ | ❌ |
+| **Browser fallback** | ✅ diagrams.net URL (viewer + editable) | ❌ inline preview only | ✅ via optional MCP | ✅ diagrams.net viewer (primary) |
 | **Zero-config** | ✅ copy `skills/drawio-skill/` | ✅ | ✅ desktop-only mode | ❌ needs plugin install |
 
 Full comparison + key-advantages summary in [docs/COMPARISON.md](docs/COMPARISON.md) (with audit timestamp).
