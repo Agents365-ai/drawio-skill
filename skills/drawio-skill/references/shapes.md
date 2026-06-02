@@ -68,6 +68,12 @@ python3 <this-skill-dir>/scripts/aiicons.py --list                  # all brands
   once and inline it as a data URI (portable, renders offline, larger XML).
 - Logos are trademarks of their respective owners, referenced for identification
   only — the same basis on which draw.io ships AWS/Azure icons.
+- **Data stores** common in RAG/LLM apps that lobe lacks (Qdrant, Redis,
+  Postgres, Mongo, Elasticsearch, Milvus, Supabase, Neo4j, ClickHouse, Kafka,
+  Snowflake, Databricks, …) resolve via the [simple-icons](https://simpleicons.org)
+  CDN (CC0) as an automatic fallback — same command, same output shape. A brand
+  in neither set has no logo; use a cylinder (`shape=cylinder3;`, see below) or
+  `scripts/shapesearch.py "<name> database"`.
 
 ## Cheatsheet — hand-writable styles
 
