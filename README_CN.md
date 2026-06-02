@@ -14,7 +14,7 @@
 
 [English](README.md) · **中文** · [📖 在线文档](https://agents365-ai.github.io/drawio-skill/)
 
-一个把自然语言描述变成 `.drawio` XML，并通过 draw.io 桌面版原生 CLI 导出 PNG / SVG / PDF / JPG 的技能。支持 **Claude Code、Cursor、Copilot、OpenClaw、Codex、Hermes** 等任何兼容 [Agent Skills](https://agentskills.io) 规范的 agent。
+一个把自然语言描述变成 `.drawio` XML，并通过 draw.io 桌面版原生 CLI 导出 PNG / SVG / PDF / JPG 的技能。它还能把**现有代码库**（Python / JS-TS / Go / Rust）转成自动布局的结构图。支持 **Claude Code、Cursor、Copilot、OpenClaw、Codex、Hermes** 等任何兼容 [Agent Skills](https://agentskills.io) 规范的 agent。
 
 <p align="center">
   <img src="assets/microservices-example.png" width="900" alt="微服务架构图 —— 来自一条自然语言提示词">
@@ -23,6 +23,7 @@
 ## ✨ 核心亮点
 
 - **6 种图表类型预设** —— ER 图、UML 类图、序列图、架构图、ML/深度学习、流程图
+- **可视化代码库** —— 提取并自动布局一个 Python / JS-TS / Go / Rust 项目的结构（导入关系图）或 Python 类继承层级 —— Graphviz 布点、传递约简、按子包嵌套的容器
 - **自检 + 自动修复** —— 读取自己导出的 PNG，自动修复重叠、截断标签、连线堆叠等问题（最多 2 轮）
 - **迭代反馈循环** —— 最多 5 轮定向优化
 - **样式预设** —— 用 `.drawio` 文件或图片"教会"Skill 你的风格，命名保存后随时复用
@@ -111,6 +112,44 @@ git clone https://github.com/Agents365-ai/drawio-skill.git \
 
 Skill 会自动规划布局、生成 `.drawio` XML、导出为你选择的格式、自检结果，并支持后续迭代。
 
+## 🗺️ 可视化代码库
+
+除了手写图表，Skill 还能把**现有代码变成结构图** —— 无需手动摆坐标。直接说：
+
+> *"可视化这个 Python 项目的模块结构"* · *"画出 `mypackage` 的类继承层级"*
+
+<p align="center">
+  <img src="assets/code-structure-example.png" width="900" alt="Python logging 包的类继承层级 —— 模块自动分框，继承箭头自动解析">
+</p>
+
+<sub>↑ Python <code>logging</code> 包的类继承层级 —— 一条命令生成，模块自动分框，每条继承边都被解析。</sub>
+
+幕后是一条 提取器 → 自动布局 → 校验 的流水线：
+
+```bash
+# 导入关系图 —— Python / JS-TS / Go / Rust
+python3 scripts/pyimports.py   myproject --group -o graph.json
+python3 scripts/jsimports.py   ./src     --group -o graph.json
+python3 scripts/goimports.py   ./module  --group -o graph.json
+python3 scripts/rustimports.py ./crate   --group -o graph.json
+
+# Python 类继承层级
+python3 scripts/pyclasses.py   mypackage --group -o graph.json
+
+# 任一提取器 → 自动布局 → 可编辑的 .drawio
+python3 scripts/autolayout.py  graph.json -o diagram.drawio
+```
+
+| 组件 | 作用 |
+|---|---|
+| **5 个提取器** | **Python · JS/TS · Go · Rust** 的导入关系图，外加 **Python 类继承** |
+| **自动布局** | Graphviz 自动布点，正交连线**绕开**节点 —— 大图不再需要手动摆坐标 |
+| **传递约简** | 删掉被更长路径蕴含的边，把密集的"毛线团"变成可读图（asyncio：149 → 46 条边） |
+| **嵌套容器** | `--group` 按子包给模块分框，深层包树自动嵌套 |
+| **确定性校验器** | `validate.py` 在视觉自检前先做结构 lint（悬空边、重复 id、重叠） |
+
+布局需要 Graphviz（`brew install graphviz` / `apt install graphviz`）—— 可选，其余功能无需它。完整格式与参数见 [references/autolayout.md](skills/drawio-skill/references/autolayout.md)。
+
 ## 🧩 支持的图表类型
 
 | 类别 | 示例 | 特色 |
@@ -153,6 +192,9 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 | 导出后自检 | ❌ | ✅ 读取 PNG 自动修复 6 类问题 |
 | 迭代审查循环 | ❌ 需手动重新提问 | ✅ 定向编辑，5 轮安全阀 |
 | 图表类型预设 | ❌ | ✅ 6 种（ERD、UML、序列、架构、ML、流程） |
+| 可视化代码库 | ❌ | ✅ 导入关系图（Py/JS/Go/Rust）+ 类图 |
+| 大图自动布局 | ❌ 手动摆放、易重叠 | ✅ Graphviz 布点、正交路由、嵌套容器 |
+| 结构校验 | ❌ | ✅ 确定性 `.drawio` linter |
 | 网格对齐布局 | ❌ | ✅ 10px 对齐、路由走廊 |
 | 配色方案 | 随机 / 不一致 | ✅ 7 色语义系统 |
 | 样式预设 | ❌ | ✅ 从 `.drawio` 文件或图片学习 |

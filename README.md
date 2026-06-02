@@ -14,7 +14,7 @@
 
 **English** · [中文](README_CN.md) · [📖 Online Docs](https://agents365-ai.github.io/drawio-skill/)
 
-A skill that turns natural-language descriptions into `.drawio` XML and exports them to PNG / SVG / PDF / JPG via the native draw.io desktop CLI. Works with **Claude Code, Cursor, Copilot, OpenClaw, Codex, Hermes**, and any agent compatible with the [Agent Skills](https://agentskills.io) format.
+A skill that turns natural-language descriptions into `.drawio` XML and exports them to PNG / SVG / PDF / JPG via the native draw.io desktop CLI. It can also turn an **existing codebase** (Python / JS-TS / Go / Rust) into an auto-laid-out structure diagram. Works with **Claude Code, Cursor, Copilot, OpenClaw, Codex, Hermes**, and any agent compatible with the [Agent Skills](https://agentskills.io) format.
 
 <p align="center">
   <img src="assets/microservices-example.png" width="900" alt="Microservices Architecture — generated from a single natural-language prompt">
@@ -23,6 +23,7 @@ A skill that turns natural-language descriptions into `.drawio` XML and exports 
 ## ✨ Highlights
 
 - **6 diagram type presets** — ERD, UML Class, Sequence, Architecture, ML/Deep Learning, Flowchart
+- **Visualize a codebase** — extract and auto-lay-out the structure of a Python / JS-TS / Go / Rust project (import graphs) or a Python class hierarchy — Graphviz placement, transitive reduction, nested module containers
 - **Self-check + auto-fix** — reads its own PNG output and auto-fixes overlaps, clipped labels, stacked edges, and more (up to 2 rounds)
 - **Iterative feedback loop** — up to 5 rounds of targeted refinement
 - **Style presets** — capture your visual style from a `.drawio` file or image, reuse on demand
@@ -113,6 +114,44 @@ Annotate tensor shapes between layers and color-code by layer type.
 
 The skill plans the layout, generates the `.drawio` XML, exports to your chosen format, self-checks the result, and lets you iterate.
 
+## 🗺️ Visualize a Codebase
+
+Beyond hand-authored diagrams, the skill turns **existing code into structure diagrams** — no manual coordinates. Just ask:
+
+> *"Visualize the module structure of this Python project"* · *"Draw the class hierarchy of `mypackage`"*
+
+<p align="center">
+  <img src="assets/code-structure-example.png" width="900" alt="Auto-generated class hierarchy of Python's logging package — modules boxed, inheritance arrows resolved">
+</p>
+
+<sub>↑ Python's <code>logging</code> package as a class hierarchy — one command, modules auto-boxed, every inheritance edge resolved.</sub>
+
+Under the hood it runs a bundled extractor → auto-layout → validate pipeline:
+
+```bash
+# Import graph — Python / JS-TS / Go / Rust
+python3 scripts/pyimports.py   myproject --group -o graph.json
+python3 scripts/jsimports.py   ./src     --group -o graph.json
+python3 scripts/goimports.py   ./module  --group -o graph.json
+python3 scripts/rustimports.py ./crate   --group -o graph.json
+
+# Python class-inheritance hierarchy
+python3 scripts/pyclasses.py   mypackage --group -o graph.json
+
+# any extractor → auto-layout → editable .drawio
+python3 scripts/autolayout.py  graph.json -o diagram.drawio
+```
+
+| Piece | What it does |
+|---|---|
+| **5 extractors** | import graphs for **Python · JS/TS · Go · Rust**, plus **Python class inheritance** |
+| **Auto-layout** | Graphviz places nodes and routes orthogonal edges *around* them — removes the manual-coordinate ceiling for large graphs |
+| **Transitive reduction** | drops edges implied by a longer path, turning a dense hairball into a traceable graph (asyncio: 149 → 46 edges) |
+| **Nested containers** | `--group` boxes modules by sub-package, nested for deep package trees |
+| **Deterministic validator** | `validate.py` lints the `.drawio` (dangling edges, duplicate ids, overlaps) before the visual self-check |
+
+Layout needs Graphviz (`brew install graphviz` / `apt install graphviz`) — optional; everything else works without it. Full format + flag reference in [references/autolayout.md](skills/drawio-skill/references/autolayout.md).
+
 ## 🧩 Supported Diagram Types
 
 | Category | Examples | Notable features |
@@ -155,6 +194,9 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 | Self-check after export | ❌ | ✅ reads PNG, auto-fixes 6 issue types |
 | Iterative review loop | ❌ manual re-prompt | ✅ targeted edits, 5-round safety valve |
 | Diagram type presets | ❌ | ✅ 6 presets (ERD, UML, Seq, Arch, ML, Flow) |
+| Visualize a codebase | ❌ | ✅ import graphs (Py/JS/Go/Rust) + class diagrams |
+| Auto-layout for large graphs | ❌ hand-places, overlaps | ✅ Graphviz placement, ortho routing, nested containers |
+| Structural validation | ❌ | ✅ deterministic `.drawio` linter |
 | Grid-aligned layout | ❌ | ✅ 10px snap, routing corridors |
 | Color palette | random / inconsistent | ✅ 7-color semantic system |
 | Style presets | ❌ | ✅ learn from `.drawio` file or image |
