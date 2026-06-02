@@ -62,8 +62,26 @@ It prints `wrote diagram.drawio (N nodes, M edges)` to stderr and writes a norma
 - Edges use `splines=ortho`: dot's orthogonal route is replayed as draw.io waypoints, so edges go **around** nodes instead of through them.
 - Apply the active style preset by setting each node's `style` to the preset's role/shape values before calling the script — the script does not know about presets.
 
+## Importers — visualize code structure
+
+`scripts/pyimports.py` turns a **Python project/package** into a graph JSON ready for autolayout, so "visualize this codebase" is a two-step pipeline:
+
+```bash
+python3 <this-skill-dir>/scripts/pyimports.py myproject -o graph.json
+python3 <this-skill-dir>/scripts/autolayout.py graph.json -o diagram.drawio
+```
+
+It walks the directory, parses each module with `ast`, and builds the **intra-project** module-import edges (third-party/stdlib imports are ignored). If the directory is itself a package (`__init__.py` present), module names are package-qualified so the project's own absolute imports resolve; nested subpackages (`pkg.sub.mod`) are handled.
+
+**Density reduction is on by default** — this is the key to a readable result. Real import graphs are dense (asyncio: 33 modules / ~149 edges); without reduction they render as a hairball. `pyimports.py` applies **transitive reduction** (Graphviz `tred` — drops edges already implied by a longer path), which on asyncio cuts ~149 edges to ~46 and turns the hairball into a clean, traceable diagram. Pass `--no-reduce` to keep every edge.
+
+Flags: `--direction TB|LR` (default `TB`), `--no-reduce`. Node labels are shortened (the shared package prefix is dropped); ids stay fully qualified.
+
+For other languages, produce the same graph JSON from any analyzer (e.g. `dependency-cruiser` for JS/TS, `go-callvis` for Go) and feed it to autolayout the same way.
+
 ## Limitations
 
 - **Placement is topological, not semantic** — dot minimises edge crossings, which may put a node in a different column than you'd choose by hand. Re-export with the other `direction`, or hand-tune the produced XML afterwards (it's a normal `.drawio`).
+- **`pyimports.py` is module-level** — it maps module→module imports, not function/class call graphs, and resolves static `import`/`from` statements (not dynamic `importlib` calls).
 - **Parallel edges** between the same `(source, target)` pair share one route.
 - **No containers/swimlanes** — this MVP lays out a flat node/edge graph. For nested architecture diagrams, hand-place containers (see SKILL.md "Containers and groups").
