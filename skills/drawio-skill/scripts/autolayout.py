@@ -35,7 +35,10 @@ NODE_STYLE = "rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c
 EDGE_STYLE = "html=1;rounded=0;"
 GROUP_STYLE = ("rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;"
                "verticalAlign=top;fontStyle=2;dashed=1;")
-GROUP_PAD, GROUP_TOP = 16, 24                            # padding, and title strip on top
+# Uniform container padding; the title sits in the top pad (verticalAlign=top).
+# dot's cluster margin is set to this same value so each container box equals
+# dot's cluster box — which dot guarantees never overlaps, at any nesting depth.
+GROUP_PAD = 24
 
 
 def attr(value):
@@ -47,24 +50,55 @@ def snap(value, grid=10):
     return int(round(value / grid) * grid)
 
 
+def group_tree(nodes):
+    """Parse hierarchical `group` paths ("a/b") into a container tree.
+
+    Returns (gpath, direct, children, ordered):
+      gpath[node_id] = tuple of path segments (the node's deepest container)
+      direct[path]   = node ids whose group is exactly this path
+      children[path] = child container paths
+      ordered        = all container paths, shallow-to-deep (stable)
+    """
+    gpath, direct, paths = {}, {}, set()
+    for node in nodes:
+        g = node.get("group")
+        if g is None or str(g).strip("/") == "":
+            continue
+        t = tuple(str(g).strip("/").split("/"))
+        gpath[node["id"]] = t
+        direct.setdefault(t, []).append(node["id"])
+        for k in range(1, len(t) + 1):
+            paths.add(t[:k])
+    children = {}
+    for p in sorted(paths):
+        if len(p) > 1:
+            children.setdefault(p[:-1], []).append(p)
+    ordered = sorted(paths, key=lambda p: (len(p), p))
+    return gpath, direct, children, ordered
+
+
 def build_dot(graph):
     rankdir = "LR" if str(graph.get("direction", "TB")).upper() == "LR" else "TB"
     # splines=ortho makes dot route edges as orthogonal polylines; we replay
     # those bends as draw.io waypoints so edges go around nodes, not through them.
     lines = [f"digraph G {{ rankdir={rankdir}; splines=ortho; node [shape=box fixedsize=true];"]
-    # Group nodes into clusters so dot keeps each group together; a node's first
-    # appearance fixes its cluster, so list members before the size attributes.
-    members = {}
-    for node in graph["nodes"]:
-        g = node.get("group")
-        if g is not None:
-            members.setdefault(str(g), []).append(node["id"])
-    for i, ms in enumerate(members.values()):
-        # margin matches GROUP_PAD so dot separates clusters enough that the
-        # padded container boxes we draw below do not overlap each other.
-        lines.append(f"subgraph cluster_{i} {{ margin={GROUP_PAD};")
-        lines += [f'"{m}";' for m in ms]
-        lines.append("}")
+    # Group nodes into (possibly nested) clusters so dot keeps each group
+    # together; a node's first appearance fixes its cluster, so list members
+    # before the size attributes. The cluster margin reserves room for the
+    # padded container boxes we draw below (extra on Y for the title strip) so
+    # neighbouring boxes do not overlap.
+    _, direct, children, ordered = group_tree(graph["nodes"])
+    cidx = {p: i for i, p in enumerate(ordered)}
+
+    def emit_cluster(p, pad):
+        lines.append(f'{pad}subgraph cluster_{cidx[p]} {{ margin={GROUP_PAD};')
+        for c in children.get(p, []):
+            emit_cluster(c, pad + "  ")
+        lines.extend(f'{pad}  "{m}";' for m in direct.get(p, []))
+        lines.append(pad + "}")
+
+    for root in [p for p in ordered if len(p) == 1]:
+        emit_cluster(root, "")
     for node in graph["nodes"]:
         # Pass our pixel sizes to dot as inches so it lays out at the real size.
         w = node.get("width", DEFAULT_W) / 72.0
@@ -121,58 +155,71 @@ def to_drawio(graph, height, pos, edge_pts):
         x = snap(xc * 72 - w / 2)
         y = snap((height - yc) * 72 - h / 2)             # flip: dot origin is bottom-left
         rects[nid] = (x, y, w, h)
-    # Group membership -> container id + bounding box (members + padding + title strip).
-    members, glabel = {}, {}
-    for node in nodes:
-        g = node.get("group")
-        if g is None or node["id"] not in rects:
-            continue
-        members.setdefault(str(g), []).append(node["id"])
-        glabel.setdefault(str(g), str(node.get("groupLabel", g)))
+    # Parse the (possibly nested) group tree and assign each container a
+    # collision-free id and a title (the path's last segment, or a member's groupLabel).
+    gpath, direct, children, ordered = group_tree(nodes)
     used = {n["id"] for n in nodes}
-    gid, gbox = {}, {}
-    for i, (g, ms) in enumerate(members.items()):
+    label_override = {}
+    for node in nodes:
+        if node["id"] in gpath and "groupLabel" in node:
+            label_override.setdefault(gpath[node["id"]], str(node["groupLabel"]))
+    gid, glabel = {}, {}
+    for i, p in enumerate(ordered):
         cid = f"group_{i}"
         while cid in used:                               # never collide with a node id
             cid += "_"
         used.add(cid)
-        gid[g] = cid
-        x0 = min(rects[m][0] for m in ms) - GROUP_PAD
-        y0 = min(rects[m][1] for m in ms) - GROUP_PAD - GROUP_TOP
-        x1 = max(rects[m][0] + rects[m][2] for m in ms) + GROUP_PAD
-        y1 = max(rects[m][1] + rects[m][3] for m in ms) + GROUP_PAD
-        gbox[g] = (x0, y0, x1 - x0, y1 - y0)
+        gid[p] = cid
+        glabel[p] = label_override.get(p, p[-1])
+    # Container bounding box (members + nested children + uniform padding),
+    # computed deepest-first so a parent can wrap its already-sized children.
+    gbox = {}
+    for p in sorted(ordered, key=len, reverse=True):
+        xs = [(rects[m][0], rects[m][1], rects[m][0] + rects[m][2], rects[m][1] + rects[m][3])
+              for m in direct.get(p, []) if m in rects]
+        xs += [(gbox[c][0], gbox[c][1], gbox[c][0] + gbox[c][2], gbox[c][1] + gbox[c][3])
+               for c in children.get(p, []) if c in gbox]
+        if not xs:
+            continue
+        x0 = min(b[0] for b in xs) - GROUP_PAD
+        y0 = min(b[1] for b in xs) - GROUP_PAD
+        x1 = max(b[2] for b in xs) + GROUP_PAD
+        y1 = max(b[3] for b in xs) + GROUP_PAD
+        gbox[p] = (x0, y0, x1 - x0, y1 - y0)
 
-    # Shift everything positive: a container's title strip can push its top edge
+    # Shift everything positive: a container's top padding can push its top edge
     # above the page origin. Only translates when something would be negative.
     absx = [r[0] for r in rects.values()] + [b[0] for b in gbox.values()]
     absy = [r[1] for r in rects.values()] + [b[1] for b in gbox.values()]
     dx = GROUP_PAD - min(absx) if absx and min(absx) < 0 else 0
     dy = GROUP_PAD - min(absy) if absy and min(absy) < 0 else 0
 
+    def rebase(x, y, parent_path):
+        """Absolute -> coordinates relative to parent_path's box (or shifted if top-level)."""
+        if parent_path is None:
+            return x + dx, y + dy, "1"
+        px, py, _, _ = gbox[parent_path]
+        return x - px, y - py, gid[parent_path]
+
     cells = []
-    # Containers first so they render behind their children.
-    for g, (gx, gy, gw, gh) in gbox.items():
+    # Containers shallow-first so each parent precedes its children.
+    for p in ordered:
+        if p not in gbox:
+            continue
+        gx, gy, gw, gh = gbox[p]
+        x, y, parent = rebase(gx, gy, p[:-1] if len(p) > 1 else None)
         cells.append(
-            f'        <mxCell id="{attr(gid[g])}" value="{attr(glabel[g])}" '
-            f'style="{GROUP_STYLE}" vertex="1" parent="1">\n'
-            f'          <mxGeometry x="{gx + dx}" y="{gy + dy}" width="{gw}" height="{gh}" as="geometry"/>\n'
+            f'        <mxCell id="{attr(gid[p])}" value="{attr(glabel[p])}" '
+            f'style="{GROUP_STYLE}" vertex="1" parent="{attr(parent)}">\n'
+            f'          <mxGeometry x="{x}" y="{y}" width="{gw}" height="{gh}" as="geometry"/>\n'
             f"        </mxCell>"
         )
-    node_group = {n["id"]: str(n["group"]) for n in nodes
-                  if n.get("group") is not None and n["id"] in rects}
     for node in nodes:
         nid = node["id"]
         if nid not in rects:
             continue
-        x, y, w, h = rects[nid]
-        parent = "1"
-        if nid in node_group:                            # rebase into its container
-            g = node_group[nid]
-            gx, gy = gbox[g][0], gbox[g][1]
-            parent, x, y = gid[g], x - gx, y - gy        # relative; shift cancels
-        else:
-            x, y = x + dx, y + dy
+        rx, ry, w, h = rects[nid]
+        x, y, parent = rebase(rx, ry, gpath.get(nid) if gpath.get(nid) in gbox else None)
         style = node.get("style", NODE_STYLE)
         cells.append(
             f'        <mxCell id="{attr(nid)}" value="{attr(node.get("label", nid))}" '
