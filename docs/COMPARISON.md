@@ -13,6 +13,11 @@
 | Layout guidelines | None — varies by run | Complexity-scaled spacing, routing corridors, hub placement |
 | Grid alignment | No | Yes — all coordinates snap to 10px multiples |
 | Diagram type presets | No | Yes — 6 presets (ERD, UML, Sequence, Architecture, ML/DL, Flowchart) |
+| Visualize a codebase | No | Yes — import graphs (Py/JS/Go/Rust) + class diagrams |
+| Auto-layout for large graphs | No — hand-places, overlaps | Yes — Graphviz placement, ortho routing, nested containers |
+| Structural validation | No | Yes — deterministic `.drawio` linter |
+| Official shape search | No — guesses, blank boxes | Yes — exact style for 10k+ AWS/Azure/GCP/UML shapes |
+| AI/LLM brand logos | No — none | Yes — 321 logos (OpenAI/Claude/Gemini/…) via aiicons.py |
 | Animated connectors | No | Yes — `flowAnimation=1` for data-flow visualization |
 | ML model diagrams | No | Yes — tensor shape annotations, layer-type color coding |
 | Color palette | Random/inconsistent | 7-color semantic system (blue=services, green=DB, purple=auth...) |
@@ -36,6 +41,8 @@
 | **Animated edges** | ✅ `flowAnimation=1` | ❌ | ❌ | ❌ |
 | **ML/DL diagrams** | ✅ tensor shapes, layer colors | ❌ | ❌ | ❌ |
 | **Color system** | ✅ 7-color semantic | ❌ | ✅ 6 themes | ❌ |
+| **Official shape search** | ✅ 10k+ shapes (local) | ✅ 10k+ shapes (MCP) | ❌ | ❌ |
+| **AI/LLM brand logos** | ✅ 321 (lobe-icons) | ❌ | ❌ | ❌ |
 | **Container/group** | ✅ swimlane + group | ✅ detailed | ❌ | ❌ |
 | **Embed diagram** | ✅ `--embed-diagram` | ✅ | ❌ | ❌ |
 | **Edge routing** | ✅ corridors + waypoints | ✅ arrowhead rules | ❌ | ❌ |
