@@ -22,12 +22,19 @@ RESERVED = {"0", "1"}
 
 
 def rect(cell):
-    """Return (x, y, w, h) floats for a cell's geometry, or None if absent/bad."""
+    """Return (x, y, w, h) floats for a cell's geometry, or None if absent/bad.
+
+    x/y default to 0 when omitted: draw.io treats a missing position as the
+    origin, and container-managed children (table rows, swimlane/UML-class
+    lines under tableLayout) legitimately omit x/y while keeping width/height.
+    Only width/height are required to be present and numeric.
+    """
     g = cell.find("mxGeometry")
     if g is None:
         return None
     try:
-        return tuple(float(g.get(k, "nan")) for k in ("x", "y", "width", "height"))
+        return (float(g.get("x", "0")), float(g.get("y", "0")),
+                float(g.get("width", "nan")), float(g.get("height", "nan")))
     except ValueError:
         return None
 
