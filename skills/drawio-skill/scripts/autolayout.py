@@ -52,7 +52,8 @@ def load_palette():
     """Ordered (fill, stroke) list from the default preset's palette; fall back
     to the same colours inline if the preset file can't be read."""
     try:
-        pal = json.load(open(_PALETTE_FILE, encoding="utf-8"))["palette"]
+        with open(_PALETTE_FILE, encoding="utf-8") as fh:
+            pal = json.load(fh)["palette"]
         colors = [(pal[r]["fillColor"], pal[r]["strokeColor"]) for r in _PALETTE_ORDER if r in pal]
         if colors:
             return colors

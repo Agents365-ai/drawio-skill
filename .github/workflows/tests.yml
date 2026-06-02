@@ -1,0 +1,29 @@
+name: tests
+
+on:
+  push:
+    paths:
+      - "skills/drawio-skill/scripts/**"
+      - "skills/drawio-skill/data/**"
+      - "skills/drawio-skill/styles/**"
+      - "tests/**"
+      - ".github/workflows/tests.yml"
+  pull_request:
+    paths:
+      - "skills/drawio-skill/scripts/**"
+      - "skills/drawio-skill/data/**"
+      - "skills/drawio-skill/styles/**"
+      - "tests/**"
+
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Graphviz (for importer transitive reduction)
+        run: sudo apt-get update && sudo apt-get install -y graphviz
+      - name: Run tests
+        run: python3 -W error::ResourceWarning -m unittest discover -s tests -v
