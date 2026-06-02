@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>drawio-skill — 从文本到专业图表</title>
-  <meta name="description" content="Claude Code skill，通过自然语言生成专业 draw.io 图表。6 种图表预设、ML/DL 支持、自检循环、动画连接线。">
+  <meta name="description" content="Claude Code skill，通过自然语言生成专业 draw.io 图表：6 种预设、ML/DL 支持、代码库可视化、10,000+ 官方形状、321 个 AI/LLM 品牌图标、自检循环。导出 PNG/SVG/PDF/JPG。">
   <meta name="theme-color" content="#0d1117">
   <link rel="canonical" href="https://agents365-ai.github.io/drawio-skill/zh.html">
   <link rel="alternate" hreflang="zh" href="https://agents365-ai.github.io/drawio-skill/zh.html">
   <link rel="alternate" hreflang="en" href="https://agents365-ai.github.io/drawio-skill/">
   <meta property="og:title" content="drawio-skill — 从文本到专业图表">
-  <meta property="og:description" content="Claude Code skill，通过自然语言生成专业 draw.io 图表。6 种图表预设、ML/DL 支持、自检循环。">
+  <meta property="og:description" content="通过自然语言生成专业 draw.io 图表：6 种预设、代码库可视化、10,000+ 官方形状、321 个 AI/LLM 品牌图标、自检循环。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://agents365-ai.github.io/drawio-skill/zh.html">
   <meta property="og:image" content="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/demo-star-cn.png">
@@ -202,9 +202,9 @@
   <!-- Hero -->
   <div class="hero">
     <div class="container">
-      <div class="hero-badge">v1.5.2 &mdash; 插件市场 + 模块化 SKILL.md</div>
+      <div class="hero-badge">v1.13.0 &mdash; 代码库可视化、形状搜索 &amp; AI 图标</div>
       <h1>drawio-<span>skill</span></h1>
-      <p>从文本到专业图表。通过自然语言生成 draw.io 文件，支持自检、迭代优化和 ML 模型图。</p>
+      <p>从文本到专业图表。通过自然语言生成 draw.io 文件 &mdash; 也能把现有代码库变成结构图 &mdash; 支持自检、迭代优化、10,000+ 官方形状和 AI/LLM 品牌图标。</p>
       <div class="hero-install">
         <code id="install-cmd">/plugin marketplace add Agents365-ai/365-skills</code>
         <button class="copy-btn" onclick="copyInstall()">复制</button>
@@ -231,6 +231,21 @@
       <h2 class="section-title">为什么选择这个 Skill</h2>
       <p class="section-sub">唯一能自动读取输出并在展示前自动修复的纯 SKILL.md 方案。</p>
       <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F5FA;&#xFE0F;</div>
+          <h3>可视化代码库</h3>
+          <p>把 Python / JS-TS / Go / Rust 项目（导入关系图）或 Python 类继承层级变成自动布局的结构图 &mdash; Graphviz 布点、传递约简、按模块配色的容器。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F50D;</div>
+          <h3>10,000+ 官方形状</h3>
+          <p>搜索真实的 draw.io 形状库（AWS、Azure、GCP、Cisco、Kubernetes、UML、BPMN、P&amp;ID&hellip;）拿到精确 style，不靠猜 &mdash; 杜绝空白框。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F916;</div>
+          <h3>AI / LLM 品牌图标</h3>
+          <p>321 个 draw.io 自身没有的 logo（OpenAI、Claude、Gemini、Mistral、Llama、Ollama、LangChain&hellip;）&mdash; 专为 LLM 应用架构图准备。</p>
+        </div>
         <div class="feature-card">
           <div class="feature-icon">&#x1F4CB;</div>
           <h3>6 种图表预设</h3>
@@ -291,6 +306,21 @@
           <h4>环形 / 循环</h4>
           <p>8 个节点 &mdash; CI/CD 流水线，含闭合回路和分支</p>
         </div>
+        <div class="demo-item">
+          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/code-structure-example.png" alt="按模块配色的类继承层级">
+          <h4>可视化代码库</h4>
+          <p>Python <code>logging</code> 类继承层级 &mdash; 38 个类自动布局，按模块配色</p>
+        </div>
+        <div class="demo-item">
+          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/shape-search-example.png" alt="用官方形状搭建的 AWS 无服务器架构">
+          <h4>官方形状搜索</h4>
+          <p>AWS 无服务器架构 &mdash; 每个图标都由 <code>shapesearch.py</code> 解析</p>
+        </div>
+        <div class="demo-item">
+          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/ai-logos-example.png" alt="带 AI 品牌图标的多供应商 LLM 应用">
+          <h4>AI / LLM 品牌图标</h4>
+          <p>多供应商 LLM 应用 &mdash; OpenAI、Claude、Gemini&hellip; 经 <code>aiicons.py</code></p>
+        </div>
       </div>
     </div>
   </section>
@@ -316,6 +346,11 @@
           <tr><td>配色方案</td><td class="cross">随机</td><td class="check">&#x2713; 7 色语义系统</td></tr>
           <tr><td>连线路由规则</td><td class="cross">基础</td><td class="check">&#x2713; 走廊 + waypoints + 分布</td></tr>
           <tr><td>容器/分组</td><td class="cross">&#x2717;</td><td class="check">&#x2713; Swimlane + group + 自定义</td></tr>
+          <tr><td>可视化代码库</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 导入关系图（Py/JS/Go/Rust）+ 类图</td></tr>
+          <tr><td>大图自动布局</td><td class="cross">&#x2717;</td><td class="check">&#x2713; Graphviz 布点、正交路由、嵌套容器</td></tr>
+          <tr><td>结构校验</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 确定性 .drawio linter</td></tr>
+          <tr><td>官方形状搜索</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 1 万+ AWS/Azure/GCP/UML 样式</td></tr>
+          <tr><td>AI/LLM 品牌图标</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 321 个 logo（OpenAI/Claude/Gemini&hellip;）</td></tr>
           <tr><td>嵌入式导出</td><td class="cross">&#x2717;</td><td class="check">&#x2713; --embed-diagram</td></tr>
           <tr><td>浏览器降级</td><td class="cross">&#x2717;</td><td class="check">&#x2713; diagrams.net URL</td></tr>
           <tr><td>自动启动桌面版</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 导出后打开 .drawio</td></tr>

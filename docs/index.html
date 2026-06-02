@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>drawio-skill — From Text to Professional Diagrams</title>
-  <meta name="description" content="Claude Code skill for generating professional draw.io diagrams from natural language. 6 diagram presets, ML/DL support, self-check loop, animated connectors.">
+  <meta name="description" content="Claude Code skill for professional draw.io diagrams from natural language: 6 presets, ML/DL support, codebase visualization, 10,000+ official shapes, 321 AI/LLM brand logos, self-check loop. Exports PNG/SVG/PDF/JPG.">
   <meta name="theme-color" content="#0d1117">
   <link rel="canonical" href="https://agents365-ai.github.io/drawio-skill/">
   <link rel="alternate" hreflang="zh" href="https://agents365-ai.github.io/drawio-skill/zh.html">
   <link rel="alternate" hreflang="en" href="https://agents365-ai.github.io/drawio-skill/">
   <meta property="og:title" content="drawio-skill — From Text to Professional Diagrams">
-  <meta property="og:description" content="Claude Code skill for generating professional draw.io diagrams from natural language. 6 diagram presets, ML/DL support, self-check loop.">
+  <meta property="og:description" content="Professional draw.io diagrams from natural language: 6 presets, codebase visualization, 10,000+ official shapes, 321 AI/LLM brand logos, self-check loop.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://agents365-ai.github.io/drawio-skill/">
   <meta property="og:image" content="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/demo-star.png">
@@ -214,9 +214,9 @@
   <!-- Hero -->
   <div class="hero">
     <div class="container">
-      <div class="hero-badge">v1.5.2 &mdash; Plugin Marketplace + Modular SKILL.md</div>
+      <div class="hero-badge">v1.13.0 &mdash; Codebase Visualization, Shape Search &amp; AI Logos</div>
       <h1>drawio-<span>skill</span></h1>
-      <p>From text to professional diagrams. Generate draw.io files from natural language with self-check, iterative refinement, and ML model support.</p>
+      <p>From text to professional diagrams. Generate draw.io files from natural language &mdash; or turn an existing codebase into a structure diagram &mdash; with self-check, iterative refinement, 10,000+ official shapes, and AI/LLM brand logos.</p>
       <div class="hero-install">
         <code id="install-cmd">/plugin marketplace add Agents365-ai/365-skills</code>
         <button class="copy-btn" onclick="copyInstall()">Copy</button>
@@ -242,6 +242,21 @@
       <h2 class="section-title">Why This Skill</h2>
       <p class="section-sub">The only pure-SKILL.md solution that reads its own output and auto-fixes before showing you.</p>
       <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F5FA;&#xFE0F;</div>
+          <h3>Visualize a Codebase</h3>
+          <p>Turn a Python / JS-TS / Go / Rust project (import graphs) or a Python class hierarchy into an auto-laid-out diagram &mdash; Graphviz placement, transitive reduction, colour-by-module containers.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F50D;</div>
+          <h3>10,000+ Official Shapes</h3>
+          <p>Search the real draw.io shape library (AWS, Azure, GCP, Cisco, Kubernetes, UML, BPMN, P&amp;ID&hellip;) for the exact style instead of guessing &mdash; no blank-box typos.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F916;</div>
+          <h3>AI / LLM Brand Logos</h3>
+          <p>321 logos (OpenAI, Claude, Gemini, Mistral, Llama, Ollama, LangChain&hellip;) that draw.io has none of &mdash; for LLM-app architecture diagrams.</p>
+        </div>
         <div class="feature-card">
           <div class="feature-icon">&#x1F4CB;</div>
           <h3>6 Diagram Presets</h3>
@@ -302,6 +317,21 @@
           <h4>Ring / Cycle</h4>
           <p>8 nodes &mdash; CI/CD pipeline with closed loop and spur branches</p>
         </div>
+        <div class="demo-item">
+          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/code-structure-example.png" alt="Auto-generated class hierarchy coloured by module">
+          <h4>Visualize a Codebase</h4>
+          <p>Python <code>logging</code> class hierarchy &mdash; 38 classes auto-laid-out, coloured by module</p>
+        </div>
+        <div class="demo-item">
+          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/shape-search-example.png" alt="Serverless AWS architecture from official shapes">
+          <h4>Official Shape Search</h4>
+          <p>Serverless AWS architecture &mdash; every icon resolved by <code>shapesearch.py</code></p>
+        </div>
+        <div class="demo-item">
+          <img src="https://raw.githubusercontent.com/Agents365-ai/drawio-skill/main/assets/ai-logos-example.png" alt="Multi-provider LLM app with AI brand logos">
+          <h4>AI / LLM Brand Logos</h4>
+          <p>Multi-provider LLM app &mdash; OpenAI, Claude, Gemini&hellip; via <code>aiicons.py</code></p>
+        </div>
       </div>
     </div>
   </section>
@@ -327,6 +357,11 @@
           <tr><td>Color palette</td><td class="cross">Random</td><td class="check">&#x2713; 7-color semantic system</td></tr>
           <tr><td>Edge routing rules</td><td class="cross">Basic</td><td class="check">&#x2713; Corridors + waypoints + distribution</td></tr>
           <tr><td>Container/group nesting</td><td class="cross">&#x2717;</td><td class="check">&#x2713; Swimlane + group + custom</td></tr>
+          <tr><td>Visualize a codebase</td><td class="cross">&#x2717;</td><td class="check">&#x2713; import graphs (Py/JS/Go/Rust) + class diagrams</td></tr>
+          <tr><td>Auto-layout for large graphs</td><td class="cross">&#x2717;</td><td class="check">&#x2713; Graphviz placement, ortho routing, nested containers</td></tr>
+          <tr><td>Structural validation</td><td class="cross">&#x2717;</td><td class="check">&#x2713; deterministic .drawio linter</td></tr>
+          <tr><td>Official shape search</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 10,000+ AWS/Azure/GCP/UML styles</td></tr>
+          <tr><td>AI/LLM brand logos</td><td class="cross">&#x2717;</td><td class="check">&#x2713; 321 logos (OpenAI/Claude/Gemini&hellip;)</td></tr>
           <tr><td>Embed diagram in export</td><td class="cross">&#x2717;</td><td class="check">&#x2713; --embed-diagram</td></tr>
           <tr><td>Browser fallback</td><td class="cross">&#x2717;</td><td class="check">&#x2713; diagrams.net URL</td></tr>
           <tr><td>Auto-launch desktop app</td><td class="cross">&#x2717;</td><td class="check">&#x2713; Opens .drawio for fine-tuning</td></tr>
