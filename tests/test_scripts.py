@@ -220,6 +220,52 @@ class TestImportersCli(unittest.TestCase):
             # No hard-coded colour anymore (coloured by group in autolayout).
             self.assertNotIn("style", graph["nodes"][0])
 
+    def test_jsimports_edge(self):
+        # Node ids are the module basename without extension: a, b.
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "a.js"), "import './b.js';\n")
+            self._write(os.path.join(d, "b.js"), "export const x = 1;\n")
+            r = run("jsimports.py", d)
+            graph = json.loads(r.stdout)
+            ids = {n["id"] for n in graph["nodes"]}
+            self.assertEqual(len(graph["nodes"]), 2)
+            self.assertEqual(ids, {"a", "b"})
+            self.assertEqual(len(graph["edges"]), 1)
+            self.assertEqual(graph["edges"][0], {"source": "a", "target": "b"})
+
+    def test_goimports_edge(self):
+        # Node ids are full import paths: example.com/m/<pkg>.
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "go.mod"), "module example.com/m\n\ngo 1.21\n")
+            os.mkdir(os.path.join(d, "a"))
+            os.mkdir(os.path.join(d, "b"))
+            self._write(os.path.join(d, "a", "a.go"),
+                        'package a\n\nimport _ "example.com/m/b"\n')
+            self._write(os.path.join(d, "b", "b.go"), "package b\n")
+            r = run("goimports.py", d)
+            graph = json.loads(r.stdout)
+            ids = {n["id"] for n in graph["nodes"]}
+            self.assertEqual(len(graph["nodes"]), 2)
+            self.assertEqual(ids, {"example.com/m/a", "example.com/m/b"})
+            self.assertEqual(len(graph["edges"]), 1)
+            self.assertEqual(graph["edges"][0],
+                             {"source": "example.com/m/a", "target": "example.com/m/b"})
+
+    def test_rustimports_edge(self):
+        # Node ids are module paths (no crate-root file, so just a, b).
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "Cargo.toml"), '[package]\nname = "m"\n')
+            os.mkdir(os.path.join(d, "src"))
+            self._write(os.path.join(d, "src", "a.rs"), "use crate::b;\n")
+            self._write(os.path.join(d, "src", "b.rs"), "pub fn f() {}\n")
+            r = run("rustimports.py", d)
+            graph = json.loads(r.stdout)
+            ids = {n["id"] for n in graph["nodes"]}
+            self.assertEqual(len(graph["nodes"]), 2)
+            self.assertEqual(ids, {"a", "b"})
+            self.assertEqual(len(graph["edges"]), 1)
+            self.assertEqual(graph["edges"][0], {"source": "a", "target": "b"})
+
 
 if __name__ == "__main__":
     unittest.main()
