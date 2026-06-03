@@ -19,6 +19,15 @@ Generate `.drawio` XML files and export to PNG/SVG/PDF/JPG locally using the nat
 
 PNG, SVG, and PDF exports support `--embed-diagram` (`-e`) — the exported file contains the full diagram XML, so opening it in draw.io recovers the editable diagram. Use double extensions (`name.drawio.png`) to signal embedded XML.
 
+## When to use / when NOT to use
+
+**Use this skill for:** polished, precise diagrams (architecture, network, strict UML, ERD), anything needing solid opaque fills, 10,000+ stock/branded shapes, swimlanes, or custom geometry, exported as editable PNG/SVG/PDF.
+
+**Do NOT use it — route elsewhere — for:**
+- A casual hand-drawn / whiteboard look → **excalidraw** or **tldraw**.
+- Diagrams-as-code that live in git / render in Markdown → **mermaid** (general) or **plantuml** (UML).
+- Freeform infinite-canvas sketching or freehand strokes → **tldraw**.
+
 ## Bundled resources
 
 When the workflow references one of these, read it on demand — none of them need to be in context up front.

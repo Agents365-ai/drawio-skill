@@ -259,6 +259,18 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 
 Full comparison + key-advantages summary in [docs/COMPARISON.md](docs/COMPARISON.md) (with audit timestamp).
 
+## 🎯 When to use (and when not to)
+
+**Good fit:**
+- Polished, precise diagrams — stakeholder decks, architecture, network topology, strict UML, ER diagrams
+- Solid opaque fills, 10,000+ official shapes, branded icons (AWS / Azure / GCP / Cisco / Kubernetes + AI/LLM logos), swimlanes, and custom geometry
+- Anything you'll export to PNG / SVG / PDF and keep editable
+
+**Reach for a sibling skill instead when you need:**
+- **A casual, hand-drawn / whiteboard look** → [excalidraw-skill](https://github.com/Agents365-ai/excalidraw-skill) or [tldraw-skill](https://github.com/Agents365-ai/tldraw-skill)
+- **Diagrams-as-code that live in git and render in Markdown** → [mermaid-skill](https://github.com/Agents365-ai/mermaid-skill) (general) or [plantuml-skill](https://github.com/Agents365-ai/plantuml-skill) (UML)
+- **Freeform infinite-canvas sketching / freehand strokes** → [tldraw-skill](https://github.com/Agents365-ai/tldraw-skill)
+
 ## 🔗 Related Skills
 
 Part of the [Agents365-ai diagram-skill family](https://github.com/Agents365-ai) — pick the right tool for the job:

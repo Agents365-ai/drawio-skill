@@ -257,6 +257,18 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 
 完整对比 + 核心优势总结见 [docs/COMPARISON_CN.md](docs/COMPARISON_CN.md)（含核查时间戳）。
 
+## 🎯 何时用(以及何时别用)
+
+**适合:**
+- 精致、精确的图 —— 汇报/决策用图、架构图、网络拓扑、严格 UML、ER 图
+- 不透明实色填充、10,000+ 官方图形、品牌图标(AWS / Azure / GCP / Cisco / Kubernetes + AI/LLM logo)、泳道、自定义几何
+- 需要导出 PNG / SVG / PDF 且保持可编辑的场景
+
+**这些情况请改用同系列的其它 skill:**
+- **随性的手绘 / 白板观感** → [excalidraw-skill](https://github.com/Agents365-ai/excalidraw-skill) 或 [tldraw-skill](https://github.com/Agents365-ai/tldraw-skill)
+- **以代码形式存进 git、在 Markdown 里渲染的图** → [mermaid-skill](https://github.com/Agents365-ai/mermaid-skill)(通用)或 [plantuml-skill](https://github.com/Agents365-ai/plantuml-skill)(UML)
+- **无限画布自由涂鸦 / 自由笔迹** → [tldraw-skill](https://github.com/Agents365-ai/tldraw-skill)
+
 ## 🔗 相关 Skill
 
 [Agents365-ai 图表 skill 家族](https://github.com/Agents365-ai) 一员 —— 按场景挑工具：
