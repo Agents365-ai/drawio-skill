@@ -157,6 +157,23 @@ class TestAutolayoutColor(unittest.TestCase):
         self.assertNotIn("fillColor=#d5e8d4", out)  # no group tint
         self.assertIn("fillColor=#ff0000", out)     # explicit style still wins
 
+    def test_escapes_special_chars(self):
+        # Ids/edges with a quote or backslash must be escaped in the DOT input
+        # (else they corrupt the Graphviz source); a style with a quote must be
+        # XML-escaped in the emitted mxCell.
+        dot = self.m.build_dot({
+            "nodes": [{"id": 'a"x'}, {"id": "b\\y"}],
+            "edges": [{"source": 'a"x', "target": "b\\y"}],
+        })
+        self.assertIn(r'"a\"x"', dot)
+        self.assertIn(r'"b\\y"', dot)
+        out = self.m.to_drawio(
+            {"direction": "TB",
+             "nodes": [{"id": "n", "label": "L", "style": 'fillColor="#fff";'}],
+             "edges": []},
+            5, {"n": (1, 1)}, {}, color=True)
+        self.assertIn("&quot;", out)
+
 
 class TestValidateCli(unittest.TestCase):
     GOOD = ('<mxfile><diagram name="P1"><mxGraphModel><root>'

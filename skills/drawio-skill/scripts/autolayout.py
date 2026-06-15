@@ -73,6 +73,12 @@ def attr(value):
     return escape(str(value), {'"': "&quot;"})
 
 
+def dot_quote(value):
+    # Wrap as a DOT double-quoted string, escaping backslash and quote so ids
+    # with those characters can't corrupt the Graphviz input.
+    return '"' + str(value).replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
 def snap(value, grid=10):
     # Align to the grid the skill uses everywhere (multiples of 10).
     return int(round(value / grid) * grid)
@@ -122,7 +128,7 @@ def build_dot(graph):
         lines.append(f'{pad}subgraph cluster_{cidx[p]} {{ margin={GROUP_PAD};')
         for c in children.get(p, []):
             emit_cluster(c, pad + "  ")
-        lines.extend(f'{pad}  "{m}";' for m in direct.get(p, []))
+        lines.extend(f'{pad}  {dot_quote(m)};' for m in direct.get(p, []))
         lines.append(pad + "}")
 
     for root in [p for p in ordered if len(p) == 1]:
@@ -131,9 +137,9 @@ def build_dot(graph):
         # Pass our pixel sizes to dot as inches so it lays out at the real size.
         w = node.get("width", DEFAULT_W) / 72.0
         h = node.get("height", DEFAULT_H) / 72.0
-        lines.append(f'"{node["id"]}" [width={w:.4f} height={h:.4f}];')
+        lines.append(f'{dot_quote(node["id"])} [width={w:.4f} height={h:.4f}];')
     for edge in graph.get("edges", []):
-        lines.append(f'"{edge["source"]}" -> "{edge["target"]}";')
+        lines.append(f'{dot_quote(edge["source"])} -> {dot_quote(edge["target"])};')
     lines.append("}")
     return "\n".join(lines)
 
@@ -274,7 +280,7 @@ def to_drawio(graph, height, pos, edge_pts, color=True):
             style = NODE_STYLE
         cells.append(
             f'        <mxCell id="{attr(nid)}" value="{attr(node.get("label", nid))}" '
-            f'style="{style}" vertex="1" parent="{attr(parent)}">\n'
+            f'style="{attr(style)}" vertex="1" parent="{attr(parent)}">\n'
             f'          <mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry"/>\n'
             f"        </mxCell>"
         )
