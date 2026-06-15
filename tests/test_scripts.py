@@ -175,6 +175,20 @@ class TestValidateCli(unittest.TestCase):
            '<mxCell id="4" edge="1" parent="1" source="2" target="nope">'
            '<mxGeometry relative="1" as="geometry"/></mxCell>'
            '</root></mxGraphModel></diagram></mxfile>')
+    # Edge label: a relative-positioned vertex that legitimately omits width/height.
+    EDGE_LABEL = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
+                  '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+                  '<mxCell id="2" value="A" vertex="1" parent="1">'
+                  '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+                  '<mxCell id="3" value="B" vertex="1" parent="1">'
+                  '<mxGeometry x="200" y="0" width="80" height="40" as="geometry"/></mxCell>'
+                  '<mxCell id="4" edge="1" parent="1" source="2" target="3">'
+                  '<mxGeometry relative="1" as="geometry"/></mxCell>'
+                  '<mxCell id="5" value="lbl" style="edgeLabel;html=1;" vertex="1" '
+                  'connectable="0" parent="1">'
+                  '<mxGeometry x="0.5" y="0" relative="1" as="geometry">'
+                  '<mxPoint as="offset"/></mxGeometry></mxCell>'
+                  '</root></mxGraphModel></diagram></mxfile>')
 
     def _check(self, xml):
         with tempfile.NamedTemporaryFile("w", suffix=".drawio", delete=False) as f:
@@ -192,6 +206,13 @@ class TestValidateCli(unittest.TestCase):
         r = self._check(self.BAD)
         self.assertEqual(r.returncode, 1)
         self.assertIn("error", r.stdout)
+
+    def test_edge_label_passes(self):
+        # edgeLabel vertices have no width/height; they must not be flagged
+        # as missing/invalid geometry (issue #35).
+        r = self._check(self.EDGE_LABEL)
+        self.assertEqual(r.returncode, 0)
+        self.assertNotIn("error:", r.stdout)
 
 
 class TestImportersCli(unittest.TestCase):

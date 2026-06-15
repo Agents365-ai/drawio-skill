@@ -39,6 +39,19 @@ def rect(cell):
         return None
 
 
+def is_edge_label(cell):
+    """True for a draw.io edge label / relative-positioned child vertex.
+
+    These legitimately omit width/height: their position is given relative to a
+    parent edge (style ``edgeLabel``) or via ``relative="1"`` geometry. Treating
+    them as normal vertices wrongly flags them as missing/invalid geometry.
+    """
+    if "edgeLabel" in (cell.get("style") or ""):
+        return True
+    g = cell.find("mxGeometry")
+    return g is not None and g.get("relative") == "1"
+
+
 def overlap(a, b):
     ax, ay, aw, ah = a
     bx, by, bw, bh = b
@@ -74,7 +87,7 @@ def check_page(diagram):
                 errors.append(f"edge {cid!r} {end} {ref!r} does not exist")
         if (is_v or is_e) and cid in RESERVED:
             errors.append(f"cell {cid!r} reuses reserved id 0/1")
-        if is_v:
+        if is_v and not is_edge_label(c):
             r = rect(c)
             if r is None or any(v != v for v in r):       # None or NaN
                 errors.append(f"vertex {cid!r} has missing/invalid geometry")
