@@ -232,6 +232,120 @@ class TestValidateCli(unittest.TestCase):
         self.assertNotIn("error:", r.stdout)
 
 
+class TestValidateGeometry(unittest.TestCase):
+    """Edge routing geometry checks (waypointed edges only)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.m = load("validate")
+
+    @staticmethod
+    def _ids(xml):
+        import xml.etree.ElementTree as ET
+        root = ET.fromstring(xml)
+        return {c.get("id"): c for c in root.iter("mxCell")}
+
+    # --- pure-function unit tests ---
+    def test_segments_cross(self):
+        c = self.m.segments_cross
+        self.assertTrue(c((0, 0), (10, 10), (0, 10), (10, 0)))     # an X
+        self.assertFalse(c((0, 0), (10, 0), (0, 5), (10, 5)))      # parallel
+        self.assertFalse(c((0, 0), (10, 0), (10, 0), (10, 10)))    # touch at endpoint
+
+    def test_route_hits_rect(self):
+        h = self.m.route_hits_rect
+        self.assertTrue(h([(0, 50), (100, 50)], (40, 40, 20, 20)))   # cuts through
+        self.assertFalse(h([(0, 0), (100, 0)], (40, 40, 20, 20)))    # clear of box
+
+    def test_abs_rect_resolves_container_offset(self):
+        ids = self._ids(
+            '<root>'
+            '<mxCell id="c" vertex="1" parent="1">'
+            '<mxGeometry x="100" y="100" width="200" height="200" as="geometry"/></mxCell>'
+            '<mxCell id="ch" vertex="1" parent="c">'
+            '<mxGeometry x="10" y="10" width="40" height="40" as="geometry"/></mxCell>'
+            '</root>')
+        self.assertEqual(self.m.abs_rect(ids["ch"], ids), (110, 110, 40, 40))
+
+    def test_endpoint_honours_exit_point(self):
+        ids = self._ids(
+            '<root>'
+            '<mxCell id="s" vertex="1" parent="1">'
+            '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+            '<mxCell id="e" edge="1" parent="1" source="s" target="s" '
+            'style="exitX=1;exitY=0.5;"><mxGeometry relative="1" as="geometry"/></mxCell>'
+            '</root>')
+        self.assertEqual(self.m.endpoint(ids["e"], "source", ids), (80, 20))
+
+    # --- CLI integration tests ---
+    def _check(self, xml):
+        with tempfile.NamedTemporaryFile("w", suffix=".drawio", delete=False) as f:
+            f.write(xml)
+            path = f.name
+        try:
+            return run("validate.py", path)
+        finally:
+            os.unlink(path)
+
+    # Two waypointed edges forming an X that crosses at (300,300).
+    CROSS = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
+             '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+             '<mxCell id="n1" vertex="1" parent="1"><mxGeometry x="80" y="80" width="40" height="40" as="geometry"/></mxCell>'
+             '<mxCell id="n2" vertex="1" parent="1"><mxGeometry x="80" y="480" width="40" height="40" as="geometry"/></mxCell>'
+             '<mxCell id="n3" vertex="1" parent="1"><mxGeometry x="480" y="80" width="40" height="40" as="geometry"/></mxCell>'
+             '<mxCell id="n4" vertex="1" parent="1"><mxGeometry x="480" y="480" width="40" height="40" as="geometry"/></mxCell>'
+             '<mxCell id="e1" edge="1" parent="1" source="n1" target="n4"><mxGeometry relative="1" as="geometry">'
+             '<Array as="points"><mxPoint x="200" y="200"/></Array></mxGeometry></mxCell>'
+             '<mxCell id="e2" edge="1" parent="1" source="n2" target="n3"><mxGeometry relative="1" as="geometry">'
+             '<Array as="points"><mxPoint x="200" y="400"/></Array></mxGeometry></mxCell>'
+             '</root></mxGraphModel></diagram></mxfile>')
+
+    # A waypointed edge whose route passes straight through obstacle vertex 'v'.
+    THROUGH = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
+               '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+               '<mxCell id="n1" vertex="1" parent="1"><mxGeometry x="80" y="80" width="40" height="40" as="geometry"/></mxCell>'
+               '<mxCell id="n2" vertex="1" parent="1"><mxGeometry x="480" y="80" width="40" height="40" as="geometry"/></mxCell>'
+               '<mxCell id="v" vertex="1" parent="1"><mxGeometry x="280" y="80" width="40" height="40" as="geometry"/></mxCell>'
+               '<mxCell id="e" edge="1" parent="1" source="n1" target="n2"><mxGeometry relative="1" as="geometry">'
+               '<Array as="points"><mxPoint x="300" y="100"/></Array></mxGeometry></mxCell>'
+               '</root></mxGraphModel></diagram></mxfile>')
+
+    # Same geometry as THROUGH but the edge has NO waypoints — auto-routed, so
+    # its path is unknown and must NOT be geometry-checked (no false positive).
+    AUTOROUTE = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
+                 '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+                 '<mxCell id="n1" vertex="1" parent="1"><mxGeometry x="80" y="80" width="40" height="40" as="geometry"/></mxCell>'
+                 '<mxCell id="n2" vertex="1" parent="1"><mxGeometry x="480" y="80" width="40" height="40" as="geometry"/></mxCell>'
+                 '<mxCell id="v" vertex="1" parent="1"><mxGeometry x="280" y="80" width="40" height="40" as="geometry"/></mxCell>'
+                 '<mxCell id="e" edge="1" parent="1" source="n1" target="n2">'
+                 '<mxGeometry relative="1" as="geometry"/></mxCell>'
+                 '</root></mxGraphModel></diagram></mxfile>')
+
+    def test_edge_crossing_warns(self):
+        r = self._check(self.CROSS)
+        self.assertIn("edges 'e1' and 'e2' cross", r.stdout)
+        self.assertEqual(r.returncode, 0)            # warning, not error
+
+    def test_edge_crossing_strict_fails(self):
+        with tempfile.NamedTemporaryFile("w", suffix=".drawio", delete=False) as f:
+            f.write(self.CROSS)
+            path = f.name
+        try:
+            self.assertEqual(run("validate.py", path, "--strict").returncode, 1)
+        finally:
+            os.unlink(path)
+
+    def test_edge_through_vertex_warns(self):
+        r = self._check(self.THROUGH)
+        self.assertIn("edge 'e' routes through vertex 'v'", r.stdout)
+
+    def test_autorouted_edge_not_checked(self):
+        # No waypoints -> path unknown -> no geometry warning (FP-free).
+        r = self._check(self.AUTOROUTE)
+        self.assertNotIn("routes through", r.stdout)
+        self.assertEqual(r.returncode, 0)
+
+
 class TestImportersCli(unittest.TestCase):
     @staticmethod
     def _write(path, text):
