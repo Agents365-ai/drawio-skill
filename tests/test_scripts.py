@@ -84,16 +84,31 @@ class TestAiIcons(unittest.TestCase):
     def test_families_group_variants(self):
         self.assertIn("claude", self.fam)
         self.assertIn("claude-color", self.fam["claude"])
+        self.assertIn("googlecloud-brand", self.fam["googlecloud"])
+        self.assertIn("alibabacloud-text-cn", self.fam["alibabacloud"])
+        self.assertNotIn("googlecloud-brand", self.fam)
+        self.assertNotIn("alibabacloud-text-cn", self.fam)
 
     def test_search_matches_brand(self):
         self.assertEqual(self.m.search(self.fam, "claude", 1)[0], "claude")
         # token matching: a brand word inside a phrase still matches
         self.assertEqual(self.m.search(self.fam, "use the openai logo", 1)[0], "openai")
+        self.assertEqual(self.m.search(self.fam, "Atlas Cloud", 1)[0], "atlascloud")
+
+    def test_search_does_not_return_variant_brands(self):
+        matches = self.m.search(self.fam, "google cloud", 8)
+        self.assertIn("googlecloud", matches)
+        self.assertNotIn("googlecloud-brand", matches)
+        matches = self.m.search(self.fam, "alibaba cloud", 8)
+        self.assertIn("alibabacloud", matches)
+        self.assertNotIn("alibabacloud-text-cn", matches)
 
     def test_variant_preference(self):
         # claude has a colour variant; openai is mono-only -> falls back.
         self.assertEqual(self.m.pick_variant("claude", self.fam["claude"], "color"), "claude-color")
         self.assertEqual(self.m.pick_variant("openai", self.fam["openai"], "color"), "openai")
+        self.assertEqual(self.m.pick_variant("googlecloud", self.fam["googlecloud"], "text"),
+                         "googlecloud-brand")
 
     def test_unknown_brand(self):
         self.assertEqual(self.m.search(self.fam, "definitelynotabrand", 3), [])

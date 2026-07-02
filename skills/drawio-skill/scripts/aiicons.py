@@ -33,7 +33,7 @@ import urllib.request
 MANIFEST = os.path.join(os.path.dirname(__file__), "..", "data", "lobe-icons.json")
 STYLE = ("shape=image;html=1;imageAspect=0;aspect=fixed;"
          "verticalLabelPosition=bottom;verticalAlign=top;image=")
-_VARIANT = re.compile(r"-(color|text)$")
+_VARIANT = re.compile(r"-(?:color|text(?:-[a-z]{2})?|brand(?:-color)?)$")
 
 # Common RAG/LLM data stores that lobe-icons lacks, mapped to simple-icons
 # slugs (https://simpleicons.org, CC0). Served from the simple-icons CDN. Each
@@ -114,9 +114,9 @@ def search_supplement(query):
 
 
 def pick_variant(base, variants, prefer):
-    order = {"color": ["-color", "", "-text"],
-             "mono":  ["", "-color", "-text"],
-             "text":  ["-text", "-color", ""]}[prefer]
+    order = {"color": ["-color", "-brand-color", "", "-brand", "-text", "-text-cn"],
+             "mono":  ["", "-brand", "-color", "-brand-color", "-text", "-text-cn"],
+             "text":  ["-text", "-text-cn", "-brand", "-brand-color", "-color", ""]}[prefer]
     for suffix in order:
         cand = base + suffix
         if cand in variants:
