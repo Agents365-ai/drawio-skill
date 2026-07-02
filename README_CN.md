@@ -24,6 +24,7 @@
 
 - **6 种图表类型预设** —— ER 图、UML 类图、序列图、架构图、ML/深度学习、流程图
 - **可视化代码库** —— 提取并自动布局一个 Python / JS-TS / Go / Rust 项目的结构（导入关系图）或 Python 类继承层级 —— Graphviz 布点、传递约简、按子包嵌套的容器
+- **IaC → 架构图** —— 把 **Terraform** 配置或 **Kubernetes** manifest 直接变成架构图，每个资源渲染为**官方 AWS / Azure / GCP / K8s 图标**，连线来自真实引用（role ARN、selector、volume 挂载）
 - **搜索 10,000+ 个官方形状** —— 直接拿到 AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN 图标的精确 style，不靠猜（杜绝 `shape=mxgraph.*` 拼错变空白框）
 - **AI / LLM 品牌图标** —— 321 个 draw.io 自身没有的 logo（OpenAI、Claude、Gemini、Mistral、Llama、Ollama、LangChain……），专为 LLM 应用架构图准备
 - **自检 + 自动修复** —— 读取自己导出的 PNG，自动修复重叠、截断标签、连线堆叠等问题（最多 2 轮）
@@ -138,13 +139,17 @@ python3 scripts/rustimports.py ./crate   --group -o graph.json
 # Python 类继承层级
 python3 scripts/pyclasses.py   mypackage --group -o graph.json
 
+# 基础设施即代码 —— 自动解析官方云图标
+python3 scripts/tfimports.py   ./infra      -o graph.json   # Terraform → AWS/Azure/GCP 图标
+python3 scripts/k8simports.py  ./manifests  -o graph.json   # K8s YAML/JSON → kind 图标
+
 # 任一提取器 → 自动布局 → 可编辑的 .drawio
 python3 scripts/autolayout.py  graph.json -o diagram.drawio
 ```
 
 | 组件 | 作用 |
 |---|---|
-| **5 个提取器** | **Python · JS/TS · Go · Rust** 的导入关系图，外加 **Python 类继承** |
+| **7 个提取器** | **Python · JS/TS · Go · Rust** 的导入关系图、**Python 类继承**，外加 **Terraform** 和 **Kubernetes** 资源图（自动配官方云图标） |
 | **自动布局** | Graphviz 自动布点，正交连线**绕开**节点 —— 大图不再需要手动摆坐标 |
 | **传递约简** | 删掉被更长路径蕴含的边，把密集的"毛线团"变成可读图（asyncio：149 → 46 条边） |
 | **嵌套容器** | `--group` 按子包给模块分框，深层包树自动嵌套 |
@@ -230,6 +235,7 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 | 迭代审查循环 | ❌ 需手动重新提问 | ✅ 定向编辑，5 轮安全阀 |
 | 图表类型预设 | ❌ | ✅ 6 种（ERD、UML、序列、架构、ML、流程） |
 | 可视化代码库 | ❌ | ✅ 导入关系图（Py/JS/Go/Rust）+ 类图 |
+| IaC → 架构图 | ❌ | ✅ Terraform / K8s manifest → 官方云图标 |
 | 大图自动布局 | ❌ 手动摆放、易重叠 | ✅ Graphviz 布点、正交路由、嵌套容器 |
 | 结构校验 | ❌ | ✅ 确定性 `.drawio` linter |
 | 官方形状搜索 | ❌ 靠猜、变空白框 | ✅ 1 万+ AWS/Azure/GCP/UML 形状的精确 style |

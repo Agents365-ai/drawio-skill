@@ -172,6 +172,20 @@ class TestAutolayoutColor(unittest.TestCase):
         self.assertNotIn("fillColor=#d5e8d4", out)  # no group tint
         self.assertIn("fillColor=#ff0000", out)     # explicit style still wins
 
+    def test_graph_level_spacing(self):
+        # Importers emitting icon nodes ask for extra separation (labels render
+        # below the shape); the keys pass straight through to dot.
+        dot = self.m.build_dot({"nodes": [{"id": "a"}], "edges": [],
+                                "ranksep": 0.7, "nodesep": 0.6})
+        self.assertIn("ranksep=0.70;", dot)
+        self.assertIn("nodesep=0.60;", dot)
+
+    def test_label_newline_becomes_entity(self):
+        out = self.m.to_drawio(
+            {"direction": "TB", "nodes": [{"id": "n", "label": "one\ntwo"}],
+             "edges": []}, 5, {"n": (1, 1)}, {}, color=True)
+        self.assertIn("one&#xa;two", out)
+
     def test_escapes_special_chars(self):
         # Ids/edges with a quote or backslash must be escaped in the DOT input
         # (else they corrupt the Graphviz source); a style with a quote must be
@@ -417,6 +431,70 @@ class TestImportersCli(unittest.TestCase):
             self.assertEqual(len(graph["edges"]), 1)
             self.assertEqual(graph["edges"][0],
                              {"source": "example.com/m/a", "target": "example.com/m/b"})
+
+    def test_tfimports_edge_and_icons(self):
+        # Node ids are type.name; the lambda resolves to an official aws4 icon
+        # and the referenced role becomes an edge.
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "main.tf"),
+                        'resource "aws_lambda_function" "fn" {\n'
+                        '  role = aws_iam_role.exec.arn  # comment\n'
+                        '}\n'
+                        'resource "aws_iam_role" "exec" {\n'
+                        '  name = "exec"\n'
+                        '}\n')
+            r = run("tfimports.py", d, "--no-reduce")
+            graph = json.loads(r.stdout)
+            ids = {n["id"] for n in graph["nodes"]}
+            self.assertEqual(ids, {"aws_lambda_function.fn", "aws_iam_role.exec"})
+            self.assertEqual(graph["edges"], [{"source": "aws_lambda_function.fn",
+                                               "target": "aws_iam_role.exec"}])
+            fn = next(n for n in graph["nodes"] if n["id"] == "aws_lambda_function.fn")
+            self.assertIn("mxgraph.aws4", fn["style"])
+            self.assertEqual(graph["ranksep"], 0.7)   # icon labels need spacing
+
+    def test_tfimports_no_icons(self):
+        # Without icons the type stays visible on the box (two-line label).
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "main.tf"),
+                        'resource "aws_s3_bucket" "logs" {}\n')
+            graph = json.loads(run("tfimports.py", d, "--no-icons").stdout)
+            self.assertEqual(graph["nodes"][0]["label"], "logs\naws_s3_bucket")
+            self.assertNotIn("style", graph["nodes"][0])
+
+    K8S_LIST = {"kind": "List", "items": [
+        {"apiVersion": "v1", "kind": "Service",
+         "metadata": {"name": "web", "namespace": "shop"},
+         "spec": {"selector": {"app": "web"}}},
+        {"apiVersion": "apps/v1", "kind": "Deployment",
+         "metadata": {"name": "web", "namespace": "shop"},
+         "spec": {"template": {"metadata": {"labels": {"app": "web", "tier": "fe"}},
+                  "spec": {"containers": [
+                      {"name": "web", "image": "nginx",
+                       "envFrom": [{"configMapRef": {"name": "cfg"}}]}]}}}},
+        {"apiVersion": "v1", "kind": "ConfigMap",
+         "metadata": {"name": "cfg", "namespace": "shop"}},
+    ]}
+
+    def test_k8simports_json(self):
+        # JSON input needs no PyYAML; selector match and configMap ref -> edges.
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "all.json"), json.dumps(self.K8S_LIST))
+            graph = json.loads(run("k8simports.py", d).stdout)
+            ids = {n["id"] for n in graph["nodes"]}
+            self.assertEqual(ids, {"shop/Service/web", "shop/Deployment/web",
+                                   "shop/ConfigMap/cfg"})
+            edges = {(e["source"], e["target"]) for e in graph["edges"]}
+            self.assertEqual(edges, {("shop/Service/web", "shop/Deployment/web"),
+                                     ("shop/Deployment/web", "shop/ConfigMap/cfg")})
+            svc = next(n for n in graph["nodes"] if n["id"] == "shop/Service/web")
+            self.assertIn("mxgraph.kubernetes", svc["style"])
+
+    def test_k8simports_group_by_namespace(self):
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "all.json"), json.dumps(self.K8S_LIST))
+            graph = json.loads(run("k8simports.py", d, "--group").stdout)
+            self.assertTrue(all(n["group"] == "shop" for n in graph["nodes"]))
 
     def test_rustimports_edge(self):
         # Node ids are module paths (no crate-root file, so just a, b).

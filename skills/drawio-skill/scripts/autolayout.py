@@ -70,7 +70,9 @@ GROUP_PAD = 24
 
 
 def attr(value):
-    return escape(str(value), {'"': "&quot;"})
+    # Newlines in labels become &#xa; so draw.io renders a line break (a raw
+    # newline inside an XML attribute is normalized to a space by parsers).
+    return escape(str(value), {'"': "&quot;", "\n": "&#xa;"})
 
 
 def dot_quote(value):
@@ -113,9 +115,12 @@ def group_tree(nodes):
 
 def build_dot(graph):
     rankdir = "LR" if str(graph.get("direction", "TB")).upper() == "LR" else "TB"
+    # Optional graph-level spacing (inches). Icon nodes render their label below
+    # the shape, so importers emitting icons ask for extra rank/node separation.
+    sep = "".join(f" {k}={float(graph[k]):.2f};" for k in ("ranksep", "nodesep") if k in graph)
     # splines=ortho makes dot route edges as orthogonal polylines; we replay
     # those bends as draw.io waypoints so edges go around nodes, not through them.
-    lines = [f"digraph G {{ rankdir={rankdir}; splines=ortho; node [shape=box fixedsize=true];"]
+    lines = [f"digraph G {{ rankdir={rankdir};{sep} splines=ortho; node [shape=box fixedsize=true];"]
     # Group nodes into (possibly nested) clusters so dot keeps each group
     # together; a node's first appearance fixes its cluster, so list members
     # before the size attributes. The cluster margin reserves room for the

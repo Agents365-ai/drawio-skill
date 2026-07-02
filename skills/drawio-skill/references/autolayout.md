@@ -86,30 +86,36 @@ python3 <this-skill-dir>/scripts/validate.py diagram.drawio
 
 It catches dangling edge endpoints, duplicate/reserved ids, broken parent references (errors), plus off-grid/negative geometry and overlapping sibling nodes (warnings) — without launching draw.io. Exit status is non-zero on any error (or any warning with `--strict`), so it can gate the workflow. Auto-layout output should always pass clean; a failure means a malformed input graph (e.g. an edge referencing a missing node id).
 
-## Importers — visualize code structure
+## Importers — visualize code & infrastructure
 
-Bundled importers turn a codebase into a graph JSON ready for autolayout, so "visualize this project" is a two-step pipeline:
+Bundled importers turn a codebase or an IaC configuration into a graph JSON ready for autolayout, so "visualize this project" is a two-step pipeline:
 
-| Language | Script | Node = | Edge = |
+| Source | Script | Node = | Edge = |
 |---|---|---|---|
 | Python | `scripts/pyimports.py <dir>` | module / package (`ast`) | intra-project `import` / `from` |
 | JS / TS | `scripts/jsimports.py <dir>` | source file (`.ts/.tsx/.js/.jsx/.mjs/.cjs`) | resolved relative `import`/`export from`/`require()`/`import()` |
 | Go | `scripts/goimports.py <dir>` | package (directory, via `go.mod`) | intra-module package import |
 | Rust | `scripts/rustimports.py <dir>` | module (`.rs` file / `mod`) | intra-crate `use crate::` / `super::` / `self::` |
 | Python (classes) | `scripts/pyclasses.py <dir>` | class (`ast`) | subclass → base (inheritance) |
+| Terraform | `scripts/tfimports.py <dir>` | `resource` / `module` block, rendered as its **official AWS/Azure/GCP icon** | cross-resource reference (`aws_iam_role.x.arn`, `${...}`, `depends_on`) |
+| Kubernetes | `scripts/k8simports.py <dir>` | manifest object (kind/name), rendered as its **official K8s kind icon** | Ingress→Service, Service→workload (selector), workload→ConfigMap/Secret/PVC, HPA→target |
 
 ```bash
 python3 <this-skill-dir>/scripts/pyimports.py myproject -o graph.json
 python3 <this-skill-dir>/scripts/autolayout.py graph.json -o diagram.drawio
 ```
 
-Each keeps only **intra-project** edges (third-party/stdlib imports are ignored), shortens node labels (drops the shared package/module/directory prefix; ids stay fully qualified), and shares the same flags: `--direction TB|LR` (default `TB`), `--group`, `--no-reduce`.
+Each code importer keeps only **intra-project** edges (third-party/stdlib imports are ignored), shortens node labels (drops the shared package/module/directory prefix; ids stay fully qualified), and shares the same flags: `--direction TB|LR` (default `TB`), `--group`, `--no-reduce`. The IaC importers share `--direction` and `--group` and add `--no-icons`.
 
 - **Python** (`pyimports.py`): if the directory is itself a package (`__init__.py` present), module names are package-qualified so the project's own absolute imports resolve; nested subpackages (`pkg.sub.mod`) are handled.
 - **JS/TS** (`jsimports.py`): resolution is path-based (tries the source extensions and directory `index` files); `node_modules` and bare specifiers are skipped. Scanning is regex-based, not a full parser.
 - **Go** (`goimports.py`): reads the `module` path from `go.mod`; each directory of `.go` files is one package; `*_test.go` and `vendor/` are skipped.
 - **Rust** (`rustimports.py`): each `.rs` file is a module (`mod.rs`/`main.rs`/`lib.rs` name the enclosing module); edges come from `use` paths rooted at `crate::`/`super::`/`self::` (brace groups expanded). `std`/external crates and `target/` are skipped. Regex-based — inline `mod { … }` blocks aren't split out, and 2015-edition bare intra-crate paths aren't resolved.
 - **Python classes** (`pyclasses.py`): a finer granularity — one node per class, edges from each subclass to the project base classes it extends, so the result is an auto-generated class hierarchy. Bases are matched by name (preferring the same module); external bases (`object`, third-party) are ignored. With `--group`, classes are boxed by their module, so a deep package tree nests naturally. Inheritance only — function-level call graphs are out of scope (static call resolution in Python is unreliable).
+- **Terraform** (`tfimports.py`): parses `.tf` files directly (regex + brace matching, no HCL library). Each resource type is resolved to its official icon through the bundled shape index — AWS `aws4` set, Azure `azure2` set, GCP icon set — with a curated query table for the ~45 most common types and strict tag-AND matching so a partial match never lands on the wrong vendor's icon; unresolvable types fall back to a plain box labeled `name` + type (`--no-icons` forces boxes for all). `--group` boxes resources by service (`aws_s3_* → s3`). Data sources, variables, locals and providers are ignored; heredocs with unbalanced braces are the known parse limit.
+- **Kubernetes** (`k8simports.py`): accepts one or more manifest files or a directory. JSON (including `kind: List`, i.e. `kubectl get ... -o json` output) parses with the stdlib alone; `.yaml`/`.yml` needs PyYAML. Kind icons come from the official `mxgraph.kubernetes` set (25 kinds mapped). Edges land only on objects present in the manifest set, matched within the same namespace. `--group` boxes objects by namespace. No `--no-reduce` flag — reference edges are sparse and never reduced.
+
+Both IaC importers emit `ranksep`/`nodesep` in the graph JSON automatically (icon labels render *below* the shape, so rows need extra separation).
 
 **Density reduction is on by default** — this is the key to a readable result. Real import graphs are dense (asyncio: 33 modules / ~149 edges); without reduction they render as a hairball. Every importer applies **transitive reduction** (Graphviz `tred` — drops edges already implied by a longer path), which on asyncio cuts ~149 edges to ~46 and turns the hairball into a clean, traceable diagram. Pass `--no-reduce` to keep every edge.
 

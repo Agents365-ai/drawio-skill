@@ -4,6 +4,26 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.15.0] — 2026-07-02
+### Added
+- **IaC → architecture diagram.** Two new importers feed autolayout:
+  - `tfimports.py` parses Terraform `.tf` files (regex + brace matching, no
+    HCL dependency) into a resource-reference graph. Each resource type is
+    resolved to its **official cloud icon** via the bundled shape index —
+    AWS `aws4`, Azure `azure2`, GCP icon sets — with a ~45-entry curated
+    query table and strict tag-AND matching (a partial match falls back to a
+    plain box rather than another vendor's icon). `--group` boxes resources
+    by service; `--no-icons` for plain boxes.
+  - `k8simports.py` parses Kubernetes manifests (JSON incl. `kind: List`
+    stdlib-only; YAML via PyYAML) and derives Ingress→Service,
+    Service→workload (selector match), workload→ConfigMap/Secret/PVC and
+    HPA→target edges, with official `mxgraph.kubernetes` kind icons
+    (25 kinds). `--group` boxes objects by namespace.
+- `autolayout.py`: graph-level `ranksep`/`nodesep` passthrough (icon labels
+  render below the shape and need wider spacing — the IaC importers emit
+  these automatically) and `\n` in labels now renders as a line break.
+- Test coverage for both importers and the autolayout additions (suite now 38).
+
 ## [1.14.0] — 2026-06-03
 ### Added
 - `aiicons.py` resolves common RAG/LLM **data-store brands** (Qdrant, Redis,

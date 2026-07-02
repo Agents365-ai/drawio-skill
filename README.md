@@ -24,6 +24,7 @@ A skill that turns natural-language descriptions into `.drawio` XML and exports 
 
 - **6 diagram type presets** — ERD, UML Class, Sequence, Architecture, ML/Deep Learning, Flowchart
 - **Visualize a codebase** — extract and auto-lay-out the structure of a Python / JS-TS / Go / Rust project (import graphs) or a Python class hierarchy — Graphviz placement, transitive reduction, nested module containers
+- **IaC → architecture diagram** — turn **Terraform** configs or **Kubernetes** manifests into an architecture diagram where every resource renders as its **official AWS / Azure / GCP / K8s icon**, edges derived from actual references (role ARNs, selectors, volume mounts)
 - **Search 10,000+ official shapes** — resolve the exact AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN icon style instead of guessing (no more blank-box `shape=mxgraph.*` typos)
 - **AI / LLM brand logos** — 321 logos (OpenAI, Claude, Gemini, Mistral, Llama, Ollama, LangChain…) that draw.io has none of, for LLM-app architecture diagrams
 - **Self-check + auto-fix** — reads its own PNG output and auto-fixes overlaps, clipped labels, stacked edges, and more (up to 2 rounds)
@@ -140,13 +141,17 @@ python3 scripts/rustimports.py ./crate   --group -o graph.json
 # Python class-inheritance hierarchy
 python3 scripts/pyclasses.py   mypackage --group -o graph.json
 
+# Infrastructure as Code — official cloud icons resolved automatically
+python3 scripts/tfimports.py   ./infra      -o graph.json   # Terraform → AWS/Azure/GCP icons
+python3 scripts/k8simports.py  ./manifests  -o graph.json   # K8s YAML/JSON → kind icons
+
 # any extractor → auto-layout → editable .drawio
 python3 scripts/autolayout.py  graph.json -o diagram.drawio
 ```
 
 | Piece | What it does |
 |---|---|
-| **5 extractors** | import graphs for **Python · JS/TS · Go · Rust**, plus **Python class inheritance** |
+| **7 extractors** | import graphs for **Python · JS/TS · Go · Rust**, **Python class inheritance**, plus **Terraform** and **Kubernetes** resource graphs with official cloud icons |
 | **Auto-layout** | Graphviz places nodes and routes orthogonal edges *around* them — removes the manual-coordinate ceiling for large graphs |
 | **Transitive reduction** | drops edges implied by a longer path, turning a dense hairball into a traceable graph (asyncio: 149 → 46 edges) |
 | **Nested containers** | `--group` boxes modules by sub-package, nested for deep package trees |
@@ -232,6 +237,7 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 | Iterative review loop | ❌ manual re-prompt | ✅ targeted edits, 5-round safety valve |
 | Diagram type presets | ❌ | ✅ 6 presets (ERD, UML, Seq, Arch, ML, Flow) |
 | Visualize a codebase | ❌ | ✅ import graphs (Py/JS/Go/Rust) + class diagrams |
+| IaC → architecture diagram | ❌ | ✅ Terraform / K8s manifests → official cloud icons |
 | Auto-layout for large graphs | ❌ hand-places, overlaps | ✅ Graphviz placement, ortho routing, nested containers |
 | Structural validation | ❌ | ✅ deterministic `.drawio` linter |
 | Official shape search | ❌ guesses, blank boxes | ✅ exact style for 10k+ AWS/Azure/GCP/UML shapes |
