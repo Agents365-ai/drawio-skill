@@ -144,7 +144,15 @@ python3 scripts/pyclasses.py   mypackage --group -o graph.json
 # Infrastructure as Code — official cloud icons resolved automatically
 python3 scripts/tfimports.py   ./infra      -o graph.json   # Terraform → AWS/Azure/GCP icons
 python3 scripts/k8simports.py  ./manifests  -o graph.json   # K8s YAML/JSON → kind icons
+```
 
+<p align="center">
+  <img src="assets/demo-terraform.png" width="820" alt="Serverless architecture diagram generated from Terraform — every resource rendered as its official AWS icon">
+</p>
+
+<sub>↑ A serverless stack straight from <a href="assets/demo-terraform-input.tf"><code>main.tf</code></a> — API Gateway, Lambdas, DynamoDB, SQS, S3, CloudFront and IAM all resolved to their official AWS icons, edges from real resource references. <a href="assets/demo-k8s.png">K8s manifests work the same way →</a></sub>
+
+```bash
 # any extractor → auto-layout → editable .drawio
 python3 scripts/autolayout.py  graph.json -o diagram.drawio
 ```

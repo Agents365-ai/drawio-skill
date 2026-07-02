@@ -1,0 +1,73 @@
+<mxfile>
+  <diagram id="autolayout" name="Page-1">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="group_0" value="shop" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#6c8ebf;fontColor=#6c8ebf;verticalAlign=top;fontStyle=2;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="6" y="6" width="378" height="396" as="geometry"/>
+        </mxCell>
+        <mxCell id="shop/Ingress/web" value="web" style="aspect=fixed;sketch=0;html=1;dashed=0;whitespace=wrap;verticalLabelPosition=bottom;verticalAlign=top;fillColor=#2875E2;strokeColor=#ffffff;points=[[0.005,0.63,0],[0.1,0.2,0],[0.9,0.2,0],[0.5,0,0],[0.995,0.63,0],[0.72,0.99,0],[0.5,1,0],[0.28,0.99,0]];shape=mxgraph.kubernetes.icon2;prIcon=ing" vertex="1" parent="group_0">
+          <mxGeometry x="164" y="24" width="50" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="shop/Service/web" value="web" style="aspect=fixed;sketch=0;html=1;dashed=0;whitespace=wrap;verticalLabelPosition=bottom;verticalAlign=top;fillColor=#2875E2;strokeColor=#ffffff;points=[[0.005,0.63,0],[0.1,0.2,0],[0.9,0.2,0],[0.5,0,0],[0.995,0.63,0],[0.72,0.99,0],[0.5,1,0],[0.28,0.99,0]];shape=mxgraph.kubernetes.icon2;prIcon=svc" vertex="1" parent="group_0">
+          <mxGeometry x="114" y="124" width="50" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="shop/Service/api" value="api" style="aspect=fixed;sketch=0;html=1;dashed=0;whitespace=wrap;verticalLabelPosition=bottom;verticalAlign=top;fillColor=#2875E2;strokeColor=#ffffff;points=[[0.005,0.63,0],[0.1,0.2,0],[0.9,0.2,0],[0.5,0,0],[0.995,0.63,0],[0.72,0.99,0],[0.5,1,0],[0.28,0.99,0]];shape=mxgraph.kubernetes.icon2;prIcon=svc" vertex="1" parent="group_0">
+          <mxGeometry x="214" y="124" width="50" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="shop/Deployment/web" value="web" style="aspect=fixed;sketch=0;html=1;dashed=0;whitespace=wrap;verticalLabelPosition=bottom;verticalAlign=top;fillColor=#2875E2;strokeColor=#ffffff;points=[[0.005,0.63,0],[0.1,0.2,0],[0.9,0.2,0],[0.5,0,0],[0.995,0.63,0],[0.72,0.99,0],[0.5,1,0],[0.28,0.99,0]];shape=mxgraph.kubernetes.icon2;prIcon=deploy" vertex="1" parent="group_0">
+          <mxGeometry x="114" y="224" width="50" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="shop/Deployment/api" value="api" style="aspect=fixed;sketch=0;html=1;dashed=0;whitespace=wrap;verticalLabelPosition=bottom;verticalAlign=top;fillColor=#2875E2;strokeColor=#ffffff;points=[[0.005,0.63,0],[0.1,0.2,0],[0.9,0.2,0],[0.5,0,0],[0.995,0.63,0],[0.72,0.99,0],[0.5,1,0],[0.28,0.99,0]];shape=mxgraph.kubernetes.icon2;prIcon=deploy" vertex="1" parent="group_0">
+          <mxGeometry x="254" y="224" width="50" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="shop/StatefulSet/postgres" value="postgres" style="aspect=fixed;sketch=0;html=1;dashed=0;whitespace=wrap;verticalLabelPosition=bottom;verticalAlign=top;fillColor=#2875E2;strokeColor=#ffffff;points=[[0.005,0.63,0],[0.1,0.2,0],[0.9,0.2,0],[0.5,0,0],[0.995,0.63,0],[0.72,0.99,0],[0.5,1,0],[0.28,0.99,0]];shape=mxgraph.kubernetes.icon2;prIcon=sts" vertex="1" parent="group_0">
+          <mxGeometry x="24" y="124" width="50" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="shop/Service/postgres" value="postgres" style="aspect=fixed;sketch=0;html=1;dashed=0;whitespace=wrap;verticalLabelPosition=bottom;verticalAlign=top;fillColor=#2875E2;strokeColor=#ffffff;points=[[0.005,0.63,0],[0.1,0.2,0],[0.9,0.2,0],[0.5,0,0],[0.995,0.63,0],[0.72,0.99,0],[0.5,1,0],[0.28,0.99,0]];shape=mxgraph.kubernetes.icon2;prIcon=svc" vertex="1" parent="group_0">
+          <mxGeometry x="24" y="24" width="50" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="shop/ConfigMap/web-config" value="web-config" style="aspect=fixed;sketch=0;html=1;dashed=0;whitespace=wrap;verticalLabelPosition=bottom;verticalAlign=top;fillColor=#2875E2;strokeColor=#ffffff;points=[[0.005,0.63,0],[0.1,0.2,0],[0.9,0.2,0],[0.5,0,0],[0.995,0.63,0],[0.72,0.99,0],[0.5,1,0],[0.28,0.99,0]];shape=mxgraph.kubernetes.icon2;prIcon=cm" vertex="1" parent="group_0">
+          <mxGeometry x="114" y="324" width="50" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="shop/Secret/db-creds" value="db-creds" style="aspect=fixed;sketch=0;html=1;dashed=0;whitespace=wrap;verticalLabelPosition=bottom;verticalAlign=top;fillColor=#2875E2;strokeColor=#ffffff;points=[[0.005,0.63,0],[0.1,0.2,0],[0.9,0.2,0],[0.5,0,0],[0.995,0.63,0],[0.72,0.99,0],[0.5,1,0],[0.28,0.99,0]];shape=mxgraph.kubernetes.icon2;prIcon=secret" vertex="1" parent="group_0">
+          <mxGeometry x="254" y="324" width="50" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="shop/PersistentVolumeClaim/pg-data" value="pg-data" style="aspect=fixed;sketch=0;html=1;dashed=0;whitespace=wrap;verticalLabelPosition=bottom;verticalAlign=top;fillColor=#2875E2;strokeColor=#ffffff;points=[[0.005,0.63,0],[0.1,0.2,0],[0.9,0.2,0],[0.5,0,0],[0.995,0.63,0],[0.72,0.99,0],[0.5,1,0],[0.28,0.99,0]];shape=mxgraph.kubernetes.icon2;prIcon=pvc" vertex="1" parent="group_0">
+          <mxGeometry x="24" y="224" width="50" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="shop/HorizontalPodAutoscaler/api" value="api" style="aspect=fixed;sketch=0;html=1;dashed=0;whitespace=wrap;verticalLabelPosition=bottom;verticalAlign=top;fillColor=#2875E2;strokeColor=#ffffff;points=[[0.005,0.63,0],[0.1,0.2,0],[0.9,0.2,0],[0.5,0,0],[0.995,0.63,0],[0.72,0.99,0],[0.5,1,0],[0.28,0.99,0]];shape=mxgraph.kubernetes.icon2;prIcon=hpa" vertex="1" parent="group_0">
+          <mxGeometry x="304" y="124" width="50" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="e0" value="" style="html=1;rounded=0;" edge="1" parent="1" source="shop/Deployment/api" target="shop/Secret/db-creds">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="290" y="280"/><mxPoint x="290" y="310"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e1" value="" style="html=1;rounded=0;" edge="1" parent="1" source="shop/Deployment/web" target="shop/ConfigMap/web-config">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="150" y="280"/><mxPoint x="150" y="310"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="" style="html=1;rounded=0;" edge="1" parent="1" source="shop/HorizontalPodAutoscaler/api" target="shop/Deployment/api">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="300" y="150"/><mxPoint x="300" y="150"/><mxPoint x="300" y="150"/><mxPoint x="300" y="150"/><mxPoint x="300" y="220"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e3" value="" style="html=1;rounded=0;" edge="1" parent="1" source="shop/Ingress/web" target="shop/Service/api">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="200" y="110"/><mxPoint x="200" y="160"/><mxPoint x="200" y="160"/><mxPoint x="200" y="160"/><mxPoint x="210" y="160"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e4" value="" style="html=1;rounded=0;" edge="1" parent="1" source="shop/Ingress/web" target="shop/Service/web">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="190" y="110"/><mxPoint x="190" y="150"/><mxPoint x="190" y="150"/><mxPoint x="190" y="150"/><mxPoint x="190" y="150"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e5" value="" style="html=1;rounded=0;" edge="1" parent="1" source="shop/Service/api" target="shop/Deployment/api">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="280" y="160"/><mxPoint x="280" y="160"/><mxPoint x="280" y="160"/><mxPoint x="280" y="160"/><mxPoint x="280" y="220"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e6" value="" style="html=1;rounded=0;" edge="1" parent="1" source="shop/Service/postgres" target="shop/StatefulSet/postgres">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="60" y="80"/><mxPoint x="60" y="120"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e7" value="" style="html=1;rounded=0;" edge="1" parent="1" source="shop/Service/web" target="shop/Deployment/web">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="150" y="180"/><mxPoint x="150" y="220"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e8" value="" style="html=1;rounded=0;" edge="1" parent="1" source="shop/StatefulSet/postgres" target="shop/PersistentVolumeClaim/pg-data">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="60" y="180"/><mxPoint x="60" y="220"/></Array></mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

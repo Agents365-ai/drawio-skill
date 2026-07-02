@@ -142,7 +142,15 @@ python3 scripts/pyclasses.py   mypackage --group -o graph.json
 # 基础设施即代码 —— 自动解析官方云图标
 python3 scripts/tfimports.py   ./infra      -o graph.json   # Terraform → AWS/Azure/GCP 图标
 python3 scripts/k8simports.py  ./manifests  -o graph.json   # K8s YAML/JSON → kind 图标
+```
 
+<p align="center">
+  <img src="assets/demo-terraform.png" width="820" alt="由 Terraform 直接生成的 serverless 架构图 —— 每个资源渲染为官方 AWS 图标">
+</p>
+
+<sub>↑ 直接从 <a href="assets/demo-terraform-input.tf"><code>main.tf</code></a> 生成的 serverless 架构 —— API Gateway、Lambda、DynamoDB、SQS、S3、CloudFront、IAM 全部解析为官方 AWS 图标，连线来自真实资源引用。<a href="assets/demo-k8s.png">K8s manifest 同理 →</a></sub>
+
+```bash
 # 任一提取器 → 自动布局 → 可编辑的 .drawio
 python3 scripts/autolayout.py  graph.json -o diagram.drawio
 ```
