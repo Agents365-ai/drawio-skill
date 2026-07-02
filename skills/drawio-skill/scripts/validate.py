@@ -294,6 +294,9 @@ def main():
     ap = argparse.ArgumentParser(description="Lint a .drawio file for structural errors.")
     ap.add_argument("file")
     ap.add_argument("--strict", action="store_true", help="treat warnings as failure too")
+    ap.add_argument("--score", action="store_true",
+                    help="also print a readability score (lower is better) — "
+                         "useful for comparing layout variants of the same graph")
     args = ap.parse_args()
     try:
         tree = ET.parse(args.file)
@@ -310,6 +313,14 @@ def main():
     for e in errors:
         print(f"error: {e}")
     print(f"{len(errors)} error(s), {len(warns)} warning(s)")
+    if args.score:
+        # Weighted by how badly each defect hurts readability. Comparable only
+        # across variants of the SAME graph (same nodes/edges).
+        through = sum(1 for w in warns if "routes through" in w)
+        cross = sum(1 for w in warns if " cross" in w)
+        olap = sum(1 for w in warns if " overlap" in w)
+        print(f"score: {20 * through + 10 * cross + 5 * olap} "
+              f"({through} through-vertex, {cross} crossings, {olap} overlaps)")
     if errors or (args.strict and warns):
         sys.exit(1)
 

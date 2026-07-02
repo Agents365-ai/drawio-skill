@@ -180,6 +180,14 @@ class TestAutolayoutColor(unittest.TestCase):
         self.assertIn("ranksep=0.70;", dot)
         self.assertIn("nodesep=0.60;", dot)
 
+    def test_edge_style_passthrough(self):
+        out = self.m.to_drawio(
+            {"direction": "TB",
+             "nodes": [{"id": "a"}, {"id": "b"}],
+             "edges": [{"source": "a", "target": "b", "style": "endArrow=ERone;"}]},
+            5, {"a": (1, 1), "b": (3, 1)}, {}, color=True)
+        self.assertIn("endArrow=ERone;", out)
+
     def test_label_newline_becomes_entity(self):
         out = self.m.to_drawio(
             {"direction": "TB", "nodes": [{"id": "n", "label": "one\ntwo"}],
@@ -495,6 +503,70 @@ class TestImportersCli(unittest.TestCase):
             self._write(os.path.join(d, "all.json"), json.dumps(self.K8S_LIST))
             graph = json.loads(run("k8simports.py", d, "--group").stdout)
             self.assertTrue(all(n["group"] == "shop" for n in graph["nodes"]))
+
+    def test_composeimports_edges(self):
+        try:
+            import yaml  # noqa: F401
+        except ImportError:
+            self.skipTest("PyYAML not installed")
+        compose = ("services:\n"
+                   "  api:\n    image: api:1\n    depends_on: [db]\n"
+                   "    volumes: ['uploads:/data', './src:/app']\n"
+                   "  db:\n    image: postgres:16\n"
+                   "volumes:\n  uploads:\n")
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "docker-compose.yml"), compose)
+            graph = json.loads(run("composeimports.py", d).stdout)
+            ids = {n["id"] for n in graph["nodes"]}
+            self.assertEqual(ids, {"api", "db", "vol:uploads"})
+            edges = {(e["source"], e["target"]) for e in graph["edges"]}
+            # bind mount ./src is not a named volume -> no node, no edge
+            self.assertEqual(edges, {("api", "db"), ("api", "vol:uploads")})
+            api = next(n for n in graph["nodes"] if n["id"] == "api")
+            self.assertEqual(api["label"], "api\napi:1")
+
+    SQL = ("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(255));\n"
+           "CREATE TABLE orders (\n"
+           "  id INT,\n"
+           "  user_id INT NOT NULL REFERENCES users(id),\n"
+           "  PRIMARY KEY (id),\n"
+           "  CONSTRAINT fk FOREIGN KEY (user_id) REFERENCES users (id)\n"
+           ");\n")
+
+    def test_sqlerd_tables_and_fks(self):
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "schema.sql"), self.SQL)
+            graph = json.loads(run("sqlerd.py", d).stdout)
+            ids = {n["id"] for n in graph["nodes"]}
+            self.assertEqual(ids, {"users", "orders"})
+            orders = next(n for n in graph["nodes"] if n["id"] == "orders")
+            self.assertIn("PK id: INT", orders["label"])
+            self.assertIn("FK user_id: INT", orders["label"])
+            # inline REFERENCES + the equivalent named constraint -> 2 edges
+            for e in graph["edges"]:
+                self.assertEqual((e["source"], e["target"]), ("orders", "users"))
+                self.assertIn("ERmany", e["style"])   # crow's foot at the FK side
+
+    def test_seqlayout_geometry(self):
+        spec = {"participants": [{"id": "a", "label": "A", "actor": True},
+                                 {"id": "b", "label": "B"}],
+                "messages": [{"from": "a", "to": "b", "label": "call"},
+                             {"from": "b", "to": "b", "label": "work"},
+                             {"from": "b", "to": "a", "label": "done", "return": True}]}
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "seq.json")
+            self._write(path, json.dumps(spec))
+            out = os.path.join(d, "seq.drawio")
+            r = run("seqlayout.py", path, "-o", out)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            xml = open(out, encoding="utf-8").read()
+            self.assertIn("umlActor", xml)                       # actor header
+            self.assertIn('parent="b"', xml)                     # activation bar on b
+            self.assertIn("endArrow=block", xml)                 # sync arrow
+            self.assertIn("strokeColor=#999999", xml)            # return arrow
+            # the generated file passes the structural linter
+            v = run("validate.py", out)
+            self.assertEqual(v.returncode, 0, v.stdout)
 
     def test_rustimports_edge(self):
         # Node ids are module paths (no crate-root file, so just a, b).

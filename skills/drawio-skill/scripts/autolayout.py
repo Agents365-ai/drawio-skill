@@ -304,7 +304,7 @@ def to_drawio(graph, height, pos, edge_pts, color=True):
             geom = '<mxGeometry relative="1" as="geometry"/>'
         cells.append(
             f'        <mxCell id="e{i}" value="{attr(edge.get("label", ""))}" '
-            f'style="{EDGE_STYLE}" edge="1" parent="1" '
+            f'style="{attr(edge.get("style", EDGE_STYLE))}" edge="1" parent="1" '
             f'source="{attr(edge["source"])}" target="{attr(edge["target"])}">\n'
             f"          {geom}\n"
             f"        </mxCell>"
@@ -322,16 +322,60 @@ def to_drawio(graph, height, pos, edge_pts, color=True):
     )
 
 
+def route_score(graph, height, pos, edge_pts):
+    """Readability score for one dot layout (lower is better): weighted count
+    of edge-through-vertex hits and edge-edge crossings, with total edge length
+    as a tiebreak. Uses the same geometry predicates as validate.py."""
+    import importlib.util
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "validate.py")
+    spec = importlib.util.spec_from_file_location("validate", path)
+    v = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(v)
+    rects = {}
+    for node in graph["nodes"]:
+        if node["id"] in pos:
+            w, h = node.get("width", DEFAULT_W), node.get("height", DEFAULT_H)
+            xc, yc = pos[node["id"]]
+            rects[node["id"]] = (xc * 72 - w / 2, (height - yc) * 72 - h / 2, w, h)
+    routes = []
+    for edge in graph.get("edges", []):
+        pts = edge_pts.get((edge["source"], edge["target"]))
+        if pts:
+            routes.append(([(x * 72, (height - y) * 72) for x, y in pts],
+                           {edge["source"], edge["target"]}))
+    through = sum(1 for pts, ends in routes for nid, box in rects.items()
+                  if nid not in ends and v.route_hits_rect(pts, box))
+    cross = sum(1 for i in range(len(routes)) for j in range(i + 1, len(routes))
+                if v.routes_cross(routes[i][0], routes[j][0]))
+    length = sum(abs(b[0] - a[0]) + abs(b[1] - a[1])
+                 for pts, _ in routes for a, b in zip(pts, pts[1:]))
+    return 20 * through + 10 * cross + length / 100000
+
+
 def main():
     ap = argparse.ArgumentParser(description="Auto-layout a graph JSON into draw.io XML.")
     ap.add_argument("input", help="graph JSON file")
     ap.add_argument("-o", "--output", help="output .drawio path (default: stdout)")
     ap.add_argument("--mono", action="store_true",
                     help="don't colour groups by palette (monochrome boxes)")
+    ap.add_argument("--tune", action="store_true",
+                    help="lay out in both directions (TB and LR), keep the more "
+                         "readable one (fewer crossings / through-vertex routes)")
     args = ap.parse_args()
     with open(args.input, encoding="utf-8") as f:
         graph = json.load(f)
-    height, pos, edge_pts = layout(build_dot(graph))
+    if args.tune:
+        best = None
+        for d in ("TB", "LR"):
+            cand = dict(graph, direction=d)
+            h, p, ep = layout(build_dot(cand))
+            s = route_score(cand, h, p, ep)
+            if best is None or s < best[0]:
+                best = (s, d, h, p, ep)
+        _, d, height, pos, edge_pts = best
+        print(f"tuned: direction={d} (score {best[0]:.2f})", file=sys.stderr)
+    else:
+        height, pos, edge_pts = layout(build_dot(graph))
     xml = to_drawio(graph, height, pos, edge_pts, color=not args.mono)
     if args.output:
         with open(args.output, "w", encoding="utf-8") as f:

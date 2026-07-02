@@ -8,6 +8,8 @@ Read this file when:
 
 ## ERD (Entity-Relationship Diagram)
 
+**From SQL DDL, don't hand-build**: `python3 scripts/sqlerd.py schema.sql -o graph.json` parses `CREATE TABLE` into per-table nodes (PK/FK-marked column lists) + crow's-foot FK edges for autolayout. Hand-build with the styles below when there's no DDL to parse.
+
 | Element | Style | Notes |
 |---------|-------|-------|
 | Table | `shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;strokeColor=#6c8ebf;fillColor=#dae8fc;` | Each table is a container |
@@ -29,6 +31,8 @@ Read this file when:
 | Layout | TB, classes 250px apart | Interfaces above implementations |
 
 ## Sequence Diagram
+
+**Don't hand-place sequence geometry** — `python3 scripts/seqlayout.py seq.json -o out.drawio` computes all lifeline/activation-bar/arrow coordinates deterministically from a participants + messages JSON (schema in the script docstring), using exactly the styles below. Hand-edit the output only for fragments (alt/loop frames), which are out of its scope.
 
 | Element | Style | Notes |
 |---------|-------|-------|

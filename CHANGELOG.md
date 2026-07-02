@@ -4,6 +4,33 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.16.0] — 2026-07-02
+### Added
+- **`seqlayout.py` — deterministic sequence diagrams.** Participants +
+  messages JSON in, finished `.drawio` out: lifeline, activation-bar and
+  arrow geometry are computed (not hand-placed), with automatic activation
+  tracking (sync opens a bar on the target, return closes the sender's),
+  self-messages, notes, actor lifelines, and the official umlLifeline styles
+  from `diagram-types.md`. No Graphviz needed.
+- **`composeimports.py`** — docker-compose → autolayout graph: services as
+  name+image boxes, named volumes as cylinders; edges from `depends_on` /
+  `links` / `volumes_from` / volume mounts. `--group` by network.
+- **`sqlerd.py`** — SQL DDL → ER diagram: parses `CREATE TABLE` (inline and
+  table-level PK/FK, quoted identifiers, schema prefixes) into per-table
+  nodes with PK/FK-marked column lists and crow's-foot FK edges.
+- **Layout auto-tuning.** `autolayout.py --tune` lays out in both directions
+  and keeps the more readable one; `validate.py --score` prints the matching
+  readability score (through-vertex ×20, crossings ×10, overlaps ×5).
+- `autolayout.py` honours per-edge `style` in the graph JSON (used by
+  sqlerd's ER edges).
+### Changed
+- **SKILL.md slimmed 488 → 313 lines**: the XML-authoring tutorial (skeleton,
+  shape/edge cells, containers, connection distribution, palette, layout
+  tips) moved to `references/xml-authoring.md`, read on demand before
+  hand-writing XML — generator-driven flows no longer pay for it.
+- Tests: 42 (new coverage for seqlayout, composeimports, sqlerd, edge-style
+  passthrough).
+
 ## [1.15.0] — 2026-07-02
 ### Added
 - **IaC → architecture diagram.** Two new importers feed autolayout:

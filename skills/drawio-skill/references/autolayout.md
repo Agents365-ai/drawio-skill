@@ -99,6 +99,8 @@ Bundled importers turn a codebase or an IaC configuration into a graph JSON read
 | Python (classes) | `scripts/pyclasses.py <dir>` | class (`ast`) | subclass → base (inheritance) |
 | Terraform | `scripts/tfimports.py <dir>` | `resource` / `module` block, rendered as its **official AWS/Azure/GCP icon** | cross-resource reference (`aws_iam_role.x.arn`, `${...}`, `depends_on`) |
 | Kubernetes | `scripts/k8simports.py <dir>` | manifest object (kind/name), rendered as its **official K8s kind icon** | Ingress→Service, Service→workload (selector), workload→ConfigMap/Secret/PVC, HPA→target |
+| docker-compose | `scripts/composeimports.py <file-or-dir>` | service (name + image box) / named volume (cylinder) | `depends_on` / `links` / `volumes_from` / named-volume mounts |
+| SQL DDL | `scripts/sqlerd.py <file-or-dir>` | table (column list with PK/FK markers) | foreign key (crow's-foot, labeled with the FK column) |
 
 ```bash
 python3 <this-skill-dir>/scripts/pyimports.py myproject -o graph.json
@@ -114,8 +116,12 @@ Each code importer keeps only **intra-project** edges (third-party/stdlib import
 - **Python classes** (`pyclasses.py`): a finer granularity — one node per class, edges from each subclass to the project base classes it extends, so the result is an auto-generated class hierarchy. Bases are matched by name (preferring the same module); external bases (`object`, third-party) are ignored. With `--group`, classes are boxed by their module, so a deep package tree nests naturally. Inheritance only — function-level call graphs are out of scope (static call resolution in Python is unreliable).
 - **Terraform** (`tfimports.py`): parses `.tf` files directly (regex + brace matching, no HCL library). Each resource type is resolved to its official icon through the bundled shape index — AWS `aws4` set, Azure `azure2` set, GCP icon set — with a curated query table for the ~45 most common types and strict tag-AND matching so a partial match never lands on the wrong vendor's icon; unresolvable types fall back to a plain box labeled `name` + type (`--no-icons` forces boxes for all). `--group` boxes resources by service (`aws_s3_* → s3`). Data sources, variables, locals and providers are ignored; heredocs with unbalanced braces are the known parse limit.
 - **Kubernetes** (`k8simports.py`): accepts one or more manifest files or a directory. JSON (including `kind: List`, i.e. `kubectl get ... -o json` output) parses with the stdlib alone; `.yaml`/`.yml` needs PyYAML. Kind icons come from the official `mxgraph.kubernetes` set (25 kinds mapped). Edges land only on objects present in the manifest set, matched within the same namespace. `--group` boxes objects by namespace. No `--no-reduce` flag — reference edges are sparse and never reduced.
+- **docker-compose** (`composeimports.py`): needs PyYAML. Services become rounded boxes labeled `name` + image (or `build:` context); named volumes declared in the top-level `volumes:` section become cylinders. `--group` boxes services by their first network.
+- **SQL DDL** (`sqlerd.py`): regex + paren matching, no SQL library. Handles inline and table-level `PRIMARY KEY`/`FOREIGN KEY ... REFERENCES`, quoted identifiers, `schema.table` prefixes (`--group` boxes by schema). Column lines carry `PK`/`FK` markers and types (`--no-types` to hide). Unknown dialect clauses are skipped, never mis-parsed into edges.
 
-Both IaC importers emit `ranksep`/`nodesep` in the graph JSON automatically (icon labels render *below* the shape, so rows need extra separation).
+The tf/k8s importers emit `ranksep`/`nodesep` in the graph JSON automatically (icon labels render *below* the shape, so rows need extra separation).
+
+**`--tune` (autolayout flag)**: lays the graph out in both directions (TB and LR), scores each (through-vertex routes ×20 + edge crossings ×10 + total edge length as tiebreak), and keeps the better one — report on stderr. `validate.py --score` prints the same style of readability score for a finished `.drawio`, for comparing variants.
 
 **Density reduction is on by default** — this is the key to a readable result. Real import graphs are dense (asyncio: 33 modules / ~149 edges); without reduction they render as a hairball. Every importer applies **transitive reduction** (Graphviz `tred` — drops edges already implied by a longer path), which on asyncio cuts ~149 edges to ~46 and turns the hairball into a clean, traceable diagram. Pass `--no-reduce` to keep every edge.
 
@@ -128,4 +134,4 @@ For any other language, produce the same graph JSON from any analyzer (e.g. `dep
 - **Placement is topological, not semantic** — dot minimises edge crossings, which may put a node in a different column than you'd choose by hand. Re-export with the other `direction`, or hand-tune the produced XML afterwards (it's a normal `.drawio`).
 - **Import edges are static** — `pyimports`/`jsimports`/`goimports` read static import statements (not dynamic `importlib`, runtime `require`, or reflection); `pyclasses` resolves inheritance only, not method-level calls.
 - **Parallel edges** between the same `(source, target)` pair share one route.
-- **Containers don't add edges** — `group`/nesting only boxes nodes for layout; edges remain node→node. For hand-built swimlane/architecture containers with their own connections, see SKILL.md "Containers and groups".
+- **Containers don't add edges** — `group`/nesting only boxes nodes for layout; edges remain node→node. For hand-built swimlane/architecture containers with their own connections, see `references/xml-authoring.md` "Containers and groups".
