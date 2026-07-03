@@ -164,30 +164,7 @@ python3 scripts/composeimports.py compose.yml -o graph.json # services + named v
 python3 scripts/sqlerd.py      schema.sql   -o graph.json   # SQL DDL → ER diagram
 python3 scripts/seqlayout.py   seq.json  -o sequence.drawio # sequence diagram, direct to .drawio
 python3 scripts/c4.py          c4.json   -o c4.drawio       # C4 model, multi-page + drill-down
-```
 
-<table>
-  <tr>
-    <td align="center" width="50%">
-      <img src="assets/demo-c4-context.png" alt="C4 System Context" width="100%"><br>
-      <b>C4 Level 1</b> · System Context<br>
-      <sub>Clicking the blue system box in draw.io drills down to…</sub>
-    </td>
-    <td align="center" width="50%">
-      <img src="assets/demo-c4-containers.png" alt="C4 Containers" width="100%"><br>
-      <b>C4 Level 2</b> · Containers<br>
-      <sub>…the Containers page — one <a href="assets/demo-c4-input.json">JSON</a>, one multi-page <a href="assets/demo-c4.drawio">.drawio</a>.</sub>
-    </td>
-  </tr>
-</table>
-
-<p align="center">
-  <img src="assets/demo-terraform.png" width="820" alt="Serverless architecture diagram generated from Terraform — every resource rendered as its official AWS icon">
-</p>
-
-<sub>↑ A serverless stack straight from <a href="assets/demo-terraform-input.tf"><code>main.tf</code></a> — API Gateway, Lambdas, DynamoDB, SQS, S3, CloudFront and IAM all resolved to their official AWS icons, edges from real resource references. <a href="assets/demo-k8s.png">K8s manifests work the same way →</a></sub>
-
-```bash
 # any extractor → auto-layout → editable .drawio
 python3 scripts/autolayout.py  graph.json -o diagram.drawio
 ```

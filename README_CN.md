@@ -162,30 +162,7 @@ python3 scripts/composeimports.py compose.yml -o graph.json # 服务 + 命名卷
 python3 scripts/sqlerd.py      schema.sql   -o graph.json   # SQL DDL → ER 图
 python3 scripts/seqlayout.py   seq.json  -o sequence.drawio # 时序图，直接生成 .drawio
 python3 scripts/c4.py          c4.json   -o c4.drawio       # C4 模型，多页 + 下钻
-```
 
-<table>
-  <tr>
-    <td align="center" width="50%">
-      <img src="assets/demo-c4-context.png" alt="C4 系统上下文" width="100%"><br>
-      <b>C4 第 1 层</b> · System Context<br>
-      <sub>在 draw.io 里点击蓝色系统框即可下钻到……</sub>
-    </td>
-    <td align="center" width="50%">
-      <img src="assets/demo-c4-containers.png" alt="C4 容器层" width="100%"><br>
-      <b>C4 第 2 层</b> · Containers<br>
-      <sub>……容器层页面 —— 一份 <a href="assets/demo-c4-input.json">JSON</a>，一个多页 <a href="assets/demo-c4.drawio">.drawio</a>。</sub>
-    </td>
-  </tr>
-</table>
-
-<p align="center">
-  <img src="assets/demo-terraform.png" width="820" alt="由 Terraform 直接生成的 serverless 架构图 —— 每个资源渲染为官方 AWS 图标">
-</p>
-
-<sub>↑ 直接从 <a href="assets/demo-terraform-input.tf"><code>main.tf</code></a> 生成的 serverless 架构 —— API Gateway、Lambda、DynamoDB、SQS、S3、CloudFront、IAM 全部解析为官方 AWS 图标，连线来自真实资源引用。<a href="assets/demo-k8s.png">K8s manifest 同理 →</a></sub>
-
-```bash
 # 任一提取器 → 自动布局 → 可编辑的 .drawio
 python3 scripts/autolayout.py  graph.json -o diagram.drawio
 ```
