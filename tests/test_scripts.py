@@ -848,6 +848,41 @@ class TestImportersCli(unittest.TestCase):
         out, _ = sf.animate(self.FLOW_SVG, 2, "8 2", reverse=True)
         self.assertIn("stroke-dashoffset:10", out)               # +(8+2), toward source
 
+    def test_drawio2mermaid_flowchart(self):
+        # Reuses EXPLAIN_PAGE: container "Tier" with A/B, cylinder DB, edge a->c "reads".
+        doc = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
+               + self.EXPLAIN_PAGE + "</root></mxGraphModel></diagram></mxfile>")
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "arch.drawio")
+            self._write(path, doc)
+            mmd = run("drawio2mermaid.py", path, "--direction", "TD").stdout
+            self.assertTrue(mmd.startswith("flowchart TD"))
+            self.assertIn("subgraph", mmd)
+            self.assertIn('["Tier"]', mmd)                       # container -> subgraph title
+            self.assertIn('["A"]', mmd)
+            self.assertIn('[("DB")]', mmd)                       # cylinder -> database shape
+            self.assertIn('-->|"reads"|', mmd)                   # labeled edge
+
+    def test_drawio2mermaid_multipage_fenced(self):
+        doc = ('<mxfile>'
+               '<diagram name="P1"><mxGraphModel><root>'
+               '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+               '<mxCell id="x" value="Solo" vertex="1" parent="1" style="rounded=1;">'
+               '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+               '</root></mxGraphModel></diagram>'
+               '<diagram name="P2"><mxGraphModel><root>'
+               '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+               '<mxCell id="y" value="Two" vertex="1" parent="1" style="rounded=1;">'
+               '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+               '</root></mxGraphModel></diagram></mxfile>')
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "multi.drawio")
+            self._write(path, doc)
+            mmd = run("drawio2mermaid.py", path, "--fenced").stdout
+            self.assertEqual(mmd.count("```mermaid"), 2)          # one fence per page
+            self.assertIn("%% Page 2: P2", mmd)
+            self.assertIn('["Solo"]', mmd)
+
     SQL = ("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(255));\n"
            "CREATE TABLE orders (\n"
            "  id INT,\n"

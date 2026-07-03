@@ -185,6 +185,9 @@ python3 scripts/drawio2pptx.py c4.drawio -o c4.pptx   # needs: pip install pytho
 # Animated data-flow SVG — edges "flow" (marching ants); renders on GitHub
 python3 scripts/svgflow.py    architecture.drawio -o flow.svg
 
+# Reverse: .drawio → Mermaid flowchart (diagrams-as-code GitHub renders)
+python3 scripts/drawio2mermaid.py architecture.drawio --fenced -o arch.md
+
 # any extractor → auto-layout → editable .drawio
 python3 scripts/autolayout.py  graph.json -o diagram.drawio
 ```
@@ -197,6 +200,7 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 | **Diagram → Markdown** | `explain.py` reverses a `.drawio` into a structured description — components by tier, relations, per-page for C4 — for dropping an architecture summary into a README or PR |
 | **Diagram → PowerPoint** | `drawio2pptx.py` turns a multi-page diagram into a 16:9 deck (one page per slide, page name as title) — a C4 model becomes a ready-to-present slideshow |
 | **Animated data-flow** | `svgflow.py` makes a diagram's edges *flow* (marching-ants animation along each arrow) — a self-contained looping SVG that renders on GitHub, in docs, or as a slide background |
+| **Diagram → Mermaid** | `drawio2mermaid.py` converts a `.drawio` into a Mermaid `flowchart` (containers → subgraphs, edge labels kept) — paste it into Markdown as diagrams-as-code that GitHub renders natively |
 | **Sequence engine** | `seqlayout.py` computes lifeline / activation-bar / arrow geometry from a message list — no Graphviz, no hand placement |
 | **Auto-layout** | Graphviz places nodes and routes orthogonal edges *around* them — removes the manual-coordinate ceiling for large graphs. `--tune` tries both directions and keeps the more readable one |
 | **Transitive reduction** | drops edges implied by a longer path, turning a dense hairball into a traceable graph (asyncio: 149 → 46 edges) |

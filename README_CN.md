@@ -183,6 +183,9 @@ python3 scripts/drawio2pptx.py c4.drawio -o c4.pptx   # 需要: pip install pyth
 # 数据流动画 SVG —— 让边「流动」起来（marching ants）；GitHub 可直接渲染
 python3 scripts/svgflow.py    architecture.drawio -o flow.svg
 
+# 反向：.drawio → Mermaid 流程图（GitHub 原生渲染的 diagrams-as-code）
+python3 scripts/drawio2mermaid.py architecture.drawio --fenced -o arch.md
+
 # 任一提取器 → 自动布局 → 可编辑的 .drawio
 python3 scripts/autolayout.py  graph.json -o diagram.drawio
 ```
@@ -195,6 +198,7 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 | **图 → Markdown** | `explain.py` 把一张 `.drawio` 反向描述成结构化文档 —— 按层级列出组件、关系、C4 多页分节 —— 方便把架构摘要塞进 README 或 PR |
 | **图 → PowerPoint** | `drawio2pptx.py` 把多页图变成 16:9 幻灯片（每页一张、页名当标题）—— C4 模型一键变成可演示的 slideshow |
 | **数据流动画** | `svgflow.py` 让图里的边「流动」起来（沿箭头方向的 marching-ants 动画）—— 自包含循环 SVG，可在 GitHub、文档或幻灯片背景里直接播放 |
+| **图 → Mermaid** | `drawio2mermaid.py` 把 `.drawio` 转成 Mermaid `flowchart`（容器变 subgraph、保留边标签）—— 粘进 Markdown 就是 GitHub 原生渲染的 diagrams-as-code |
 | **时序图引擎** | `seqlayout.py` 从消息列表直接算出 lifeline / 激活条 / 箭头几何 —— 不需要 Graphviz，不需要手摆 |
 | **自动布局** | Graphviz 自动布点，正交连线**绕开**节点 —— 大图不再需要手动摆坐标。`--tune` 双向各排一次取更可读的 |
 | **传递约简** | 删掉被更长路径蕴含的边，把密集的"毛线团"变成可读图（asyncio：149 → 46 条边） |
