@@ -14,7 +14,7 @@
 
 **English** · [中文](README_CN.md) · [📖 Online Docs](https://agents365-ai.github.io/drawio-skill/)
 
-A skill that turns natural-language descriptions into `.drawio` XML and exports them to PNG / SVG / PDF / JPG via the native draw.io desktop CLI. It can also turn an **existing codebase** (Python / JS-TS / Go / Rust) into an auto-laid-out structure diagram. Works with **Claude Code, Cursor, Copilot, OpenClaw, Codex, Hermes**, and any agent compatible with the [Agent Skills](https://agentskills.io) format.
+A skill that turns natural-language descriptions into `.drawio` XML and exports them to PNG / SVG / PDF / JPG via the native draw.io desktop CLI. It can also turn an **existing codebase** (Python / JS-TS / Go / Rust) into an auto-laid-out structure diagram. Works with **Claude Code, Cursor, Copilot, OpenClaw, Codex, Autohand Code, Hermes**, and any agent compatible with the [Agent Skills](https://agentskills.io) format.
 
 <p align="center">
   <img src="assets/microservices-example.png" width="900" alt="Microservices Architecture — generated from a single natural-language prompt">
@@ -101,7 +101,17 @@ npx skills add Agents365-ai/365-skills -g
 # Manual install
 git clone https://github.com/Agents365-ai/drawio-skill.git \
   ~/.claude/skills/drawio-skill
+
+# Autohand Code global install
+git clone https://github.com/Agents365-ai/drawio-skill.git \
+  ~/.autohand/skills/drawio-skill
+
+# Autohand Code project-level install
+git clone https://github.com/Agents365-ai/drawio-skill.git \
+  .autohand/skills/drawio-skill
 ```
+
+Autohand Code also supports `autohand --skill-install` for cataloged skills, with `--project` for workspace-level installs. Until this skill is listed there, use the direct clone path above.
 
 Also indexed on [SkillsMP](https://skillsmp.com/skills/agents365-ai-drawio-skill-skills-drawio-skill-skill-md) and [ClawHub](https://clawhub.ai/agents365-ai/drawio-pro-skill).
 

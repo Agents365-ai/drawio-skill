@@ -14,7 +14,7 @@
 
 [English](README.md) · **中文** · [📖 在线文档](https://agents365-ai.github.io/drawio-skill/)
 
-一个把自然语言描述变成 `.drawio` XML，并通过 draw.io 桌面版原生 CLI 导出 PNG / SVG / PDF / JPG 的技能。它还能把**现有代码库**（Python / JS-TS / Go / Rust）转成自动布局的结构图。支持 **Claude Code、Cursor、Copilot、OpenClaw、Codex、Hermes** 等任何兼容 [Agent Skills](https://agentskills.io) 规范的 agent。
+一个把自然语言描述变成 `.drawio` XML，并通过 draw.io 桌面版原生 CLI 导出 PNG / SVG / PDF / JPG 的技能。它还能把**现有代码库**（Python / JS-TS / Go / Rust）转成自动布局的结构图。支持 **Claude Code、Cursor、Copilot、OpenClaw、Codex、Autohand Code、Hermes** 等任何兼容 [Agent Skills](https://agentskills.io) 规范的 agent。
 
 <p align="center">
   <img src="assets/microservices-example.png" width="900" alt="微服务架构图 —— 来自一条自然语言提示词">
@@ -100,7 +100,17 @@ npx skills add Agents365-ai/365-skills -g
 # 手动安装
 git clone https://github.com/Agents365-ai/drawio-skill.git \
   ~/.claude/skills/drawio-skill
+
+# Autohand Code 全局安装
+git clone https://github.com/Agents365-ai/drawio-skill.git \
+  ~/.autohand/skills/drawio-skill
+
+# Autohand Code 项目级安装
+git clone https://github.com/Agents365-ai/drawio-skill.git \
+  .autohand/skills/drawio-skill
 ```
+
+Autohand Code 也支持通过 `autohand --skill-install` 安装已收录在 Autohand catalog 中的 skill，并可通过 `--project` 安装到当前项目。在该 skill 收录前，请使用上面的直接克隆方式。
 
 同时索引于 [SkillsMP](https://skillsmp.com/skills/agents365-ai-drawio-skill-skills-drawio-skill-skill-md) 与 [ClawHub](https://clawhub.ai/agents365-ai/drawio-pro-skill)。
 
