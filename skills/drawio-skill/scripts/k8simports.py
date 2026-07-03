@@ -21,9 +21,10 @@ feeds autolayout.py:
 
 JSON input (single object, or a `kind: List` as produced by
 `kubectl get ... -o json`) parses with the stdlib alone; .yaml/.yml files
-need PyYAML (`pip install pyyaml`).
+need PyYAML (`pip install pyyaml`). Pass `-` to read a live cluster snapshot
+from stdin: `kubectl get all,ing,cm,secret,pvc -o json | k8simports.py -`.
 
-Usage: python3 k8simports.py <dir-or-manifest...> [-o graph.json]
+Usage: python3 k8simports.py <dir-or-manifest...|-> [-o graph.json]
        [--direction TB|LR] [--group] [--no-icons]
 """
 import argparse
@@ -76,11 +77,14 @@ def load_manifests(paths):
             files.append(p)
     objs = []
     for path in sorted(set(files)):
-        with open(path, encoding="utf-8") as f:
-            text = f.read()
-        if path.endswith(".json"):
-            docs = [json.loads(text)]
+        if path == "-":                                  # `kubectl get ... -o json | k8simports.py -`
+            docs = [json.loads(sys.stdin.read())]
+        elif path.endswith(".json"):
+            with open(path, encoding="utf-8") as f:
+                docs = [json.loads(f.read())]
         else:
+            with open(path, encoding="utf-8") as f:
+                text = f.read()
             try:
                 import yaml
             except ImportError:

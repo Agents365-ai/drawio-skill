@@ -158,6 +158,11 @@ python3 scripts/tfimports.py   ./infra      -o graph.json   # Terraform → AWS/
 python3 scripts/k8simports.py  ./manifests  -o graph.json   # K8s YAML/JSON → kind 图标
 python3 scripts/composeimports.py compose.yml -o graph.json # 服务 + 命名卷
 
+# 实时基础设施 —— 画「真正在运行 / 已部署」的东西
+terraform show -json          | python3 scripts/tfstate.py -      -o graph.json  # 已部署的云资源
+docker inspect $(docker ps -q)| python3 scripts/dockerimports.py -  -o graph.json  # 正在运行的容器
+kubectl get all,ing,cm,secret,pvc -o json | python3 scripts/k8simports.py - -o graph.json  # 实时集群
+
 # 数据与交互
 python3 scripts/sqlerd.py      schema.sql   -o graph.json   # SQL DDL → ER 图
 python3 scripts/seqlayout.py   seq.json  -o sequence.drawio # 时序图，直接生成 .drawio
@@ -169,7 +174,7 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 
 | 组件 | 作用 |
 |---|---|
-| **9 个提取器** | **Python · JS/TS · Go · Rust** 的导入关系图、**Python 类继承**、**Terraform / Kubernetes / docker-compose** 资源图（自动配官方云图标），以及 **SQL DDL → ER 图** |
+| **11 个提取器** | **Python · JS/TS · Go · Rust** 的导入关系图、**Python 类继承**、**Terraform / Kubernetes / docker-compose** 资源图（自动配官方云图标）、**SQL DDL → ER 图**，以及从 `terraform show -json` / `docker inspect` / `kubectl get -o json` 提取的**实时**基础设施（画出真正已部署的样子） |
 | **时序图引擎** | `seqlayout.py` 从消息列表直接算出 lifeline / 激活条 / 箭头几何 —— 不需要 Graphviz，不需要手摆 |
 | **自动布局** | Graphviz 自动布点，正交连线**绕开**节点 —— 大图不再需要手动摆坐标。`--tune` 双向各排一次取更可读的 |
 | **传递约简** | 删掉被更长路径蕴含的边，把密集的"毛线团"变成可读图（asyncio：149 → 46 条边） |

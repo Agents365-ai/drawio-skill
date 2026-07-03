@@ -579,6 +579,78 @@ class TestImportersCli(unittest.TestCase):
             api = next(n for n in graph["nodes"] if n["id"] == "api")
             self.assertEqual(api["label"], "api\napi:1")
 
+    DOCKER = [
+        {"Id": "a1", "Name": "/shop-web-1",
+         "Config": {"Image": "nginx:1.27", "Labels": {
+             "com.docker.compose.project": "shop", "com.docker.compose.service": "web",
+             "com.docker.compose.depends_on": "db:service_healthy:false"}},
+         "NetworkSettings": {"Networks": {"shop_net": {}, "bridge": {}}}, "Mounts": []},
+        {"Id": "a2", "Name": "/shop-db-1",
+         "Config": {"Image": "postgres:16", "Labels": {
+             "com.docker.compose.project": "shop", "com.docker.compose.service": "db"}},
+         "NetworkSettings": {"Networks": {"shop_net": {}}},
+         "Mounts": [{"Type": "volume", "Name": "pgdata", "Destination": "/data"},
+                    {"Type": "bind", "Source": "/etc/hosts", "Destination": "/etc/hosts"}]},
+    ]
+
+    def test_dockerimports_live(self):
+        # `docker inspect` array on stdin (-): depends_on resolves service->container;
+        # built-in `bridge` network and the bind mount are dropped as noise.
+        graph = json.loads(run("dockerimports.py", "-",
+                               input=json.dumps(self.DOCKER)).stdout)
+        ids = {n["id"] for n in graph["nodes"]}
+        self.assertEqual(ids, {"shop-web-1", "shop-db-1", "net:shop_net", "vol:pgdata"})
+        edges = {(e["source"], e["target"]) for e in graph["edges"]}
+        self.assertEqual(edges, {("shop-web-1", "shop-db-1"),
+                                 ("shop-web-1", "net:shop_net"),
+                                 ("shop-db-1", "net:shop_net"),
+                                 ("shop-db-1", "vol:pgdata")})
+        web = next(n for n in graph["nodes"] if n["id"] == "shop-web-1")
+        self.assertEqual(web["label"], "shop-web-1\nnginx:1.27")
+
+    def test_dockerimports_group_by_project(self):
+        graph = json.loads(run("dockerimports.py", "-", "--group",
+                               input=json.dumps(self.DOCKER)).stdout)
+        containers = [n for n in graph["nodes"] if not n["id"].startswith(("net:", "vol:"))]
+        self.assertTrue(all(n["group"] == "shop" for n in containers))
+
+    TFSTATE = {"format_version": "1.0", "values": {"root_module": {
+        "resources": [
+            {"address": "aws_instance.web", "mode": "managed", "type": "aws_instance",
+             "name": "web", "depends_on": ["aws_security_group.web"], "values": {}},
+            {"address": "aws_security_group.web", "mode": "managed",
+             "type": "aws_security_group", "name": "web", "values": {}},
+            {"address": "data.aws_ami.x", "mode": "data", "type": "aws_ami",
+             "name": "x", "values": {}}],
+        "child_modules": [{"address": "module.vpc", "resources": [
+            {"address": "module.vpc.aws_subnet.p[0]", "mode": "managed",
+             "type": "aws_subnet", "name": "p", "index": 0, "values": {}},
+            {"address": "module.vpc.aws_subnet.p[1]", "mode": "managed",
+             "type": "aws_subnet", "name": "p", "index": 1, "values": {}}]}]}}}
+
+    def test_tfstate_live(self):
+        # `terraform show -json` on stdin: data sources excluded, depends_on edge,
+        # count instances expanded, aws_instance -> official icon, module grouping.
+        graph = json.loads(run("tfstate.py", "-", "--group", "--no-reduce",
+                               input=json.dumps(self.TFSTATE)).stdout)
+        ids = {n["id"] for n in graph["nodes"]}
+        self.assertEqual(ids, {"aws_instance.web", "aws_security_group.web",
+                               "module.vpc.aws_subnet.p[0]", "module.vpc.aws_subnet.p[1]"})
+        self.assertEqual(graph["edges"],
+                         [{"source": "aws_instance.web", "target": "aws_security_group.web"}])
+        ec2 = next(n for n in graph["nodes"] if n["id"] == "aws_instance.web")
+        self.assertIn("mxgraph.aws4", ec2["style"])
+        sub = next(n for n in graph["nodes"] if n["id"].endswith("p[0]"))
+        self.assertEqual(sub["label"], "p[0]\naws_subnet")   # no icon -> type on box
+        self.assertEqual(sub["group"], "module.vpc")
+
+    def test_k8simports_stdin(self):
+        # `kubectl get ... -o json | k8simports.py -` reads the live snapshot.
+        graph = json.loads(run("k8simports.py", "-",
+                               input=json.dumps(self.K8S_LIST)).stdout)
+        self.assertEqual({n["id"] for n in graph["nodes"]},
+                         {"shop/Service/web", "shop/Deployment/web", "shop/ConfigMap/cfg"})
+
     SQL = ("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(255));\n"
            "CREATE TABLE orders (\n"
            "  id INT,\n"

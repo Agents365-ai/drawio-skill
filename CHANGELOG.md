@@ -4,6 +4,26 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.20.0] — 2026-07-03
+### Added
+- **Live-infrastructure importers** — draw what's *actually running / deployed*,
+  not just the declared config:
+  - `scripts/tfstate.py` — `terraform show -json | tfstate.py -` renders the
+    **deployed** state (provider-agnostic; `count`/`for_each` instances expanded,
+    module nesting preserved, `depends_on` edges). Reuses tfimports' icon
+    resolver, so the same official AWS/Azure/GCP icons and `--no-icons` fallback
+    apply. The actually-deployed counterpart to tfimports' `.tf` view.
+  - `scripts/dockerimports.py` — `docker inspect $(docker ps -q) | dockerimports.py -`
+    renders the **running** containers, the user networks they attach to (green
+    ellipses) and the named volumes they mount (cylinders); edges from `links`
+    and the compose `depends_on` label. Built-in `bridge`/`host`/`none`/`ingress`
+    networks and bind mounts are dropped as noise. The running counterpart to
+    composeimports.
+- **`k8simports.py` now reads a live cluster from stdin** (`-`):
+  `kubectl get all,ing,cm,secret,pvc -o json | k8simports.py -`.
+- New `references/live-infra.md` recipe (the three `terraform`/`docker`/`kubectl`
+  one-liners + caveats); router + autolayout reference updated. Suite now 50.
+
 ## [1.19.0] — 2026-07-03
 ### Added
 - **Accessibility built-in presets**: `colorblind-safe` (Okabe-Ito palette —

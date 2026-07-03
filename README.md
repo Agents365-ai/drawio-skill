@@ -160,6 +160,11 @@ python3 scripts/tfimports.py   ./infra      -o graph.json   # Terraform → AWS/
 python3 scripts/k8simports.py  ./manifests  -o graph.json   # K8s YAML/JSON → kind icons
 python3 scripts/composeimports.py compose.yml -o graph.json # services + named volumes
 
+# Live infrastructure — draw what's ACTUALLY running / deployed
+terraform show -json          | python3 scripts/tfstate.py -      -o graph.json  # deployed cloud
+docker inspect $(docker ps -q)| python3 scripts/dockerimports.py -  -o graph.json  # running containers
+kubectl get all,ing,cm,secret,pvc -o json | python3 scripts/k8simports.py - -o graph.json  # live cluster
+
 # Data & interactions
 python3 scripts/sqlerd.py      schema.sql   -o graph.json   # SQL DDL → ER diagram
 python3 scripts/seqlayout.py   seq.json  -o sequence.drawio # sequence diagram, direct to .drawio
@@ -171,7 +176,7 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 
 | Piece | What it does |
 |---|---|
-| **9 extractors** | import graphs for **Python · JS/TS · Go · Rust**, **Python class inheritance**, **Terraform / Kubernetes / docker-compose** resource graphs (official cloud icons), and **SQL DDL → ERD** |
+| **11 extractors** | import graphs for **Python · JS/TS · Go · Rust**, **Python class inheritance**, **Terraform / Kubernetes / docker-compose** resource graphs (official cloud icons), **SQL DDL → ERD**, and **live** infra from `terraform show -json` / `docker inspect` / `kubectl get -o json` (draw what's actually deployed) |
 | **Sequence engine** | `seqlayout.py` computes lifeline / activation-bar / arrow geometry from a message list — no Graphviz, no hand placement |
 | **Auto-layout** | Graphviz places nodes and routes orthogonal edges *around* them — removes the manual-coordinate ceiling for large graphs. `--tune` tries both directions and keeps the more readable one |
 | **Transitive reduction** | drops edges implied by a longer path, turning a dense hairball into a traceable graph (asyncio: 149 → 46 edges) |
