@@ -4,6 +4,24 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.18.0] — 2026-07-03
+### Added
+- **Mermaid authoring path** (draw.io CLI ≥ 30, discovered via
+  jgraph/drawio-mcp): for standard diagram types with no custom styling/icon
+  needs, write Mermaid text and convert natively —
+  `drawio -x -f xml -o out.drawio in.mmd` — 28 types incl. **mindmap, gantt,
+  timeline, journey, pie, sankey, kanban** that previously required painful
+  hand placement. New `references/mermaid-authoring.md` covers
+  when-to-prefer, draw.io-parser quirks (condensed from drawio-mcp's
+  reference, Apache-2.0), and the version gate.
+- **ELK `--layout` pass** (CLI ≥ 30): `verticalFlow` / `horizontalFlow` /
+  `verticalTree` / `horizontalTree` / `radialTree` / `organic` (or custom ELK
+  JSON) as a Graphviz-free alternative to autolayout.py, and the better
+  engine for organic/radial topologies.
+- **Version gating in step 1**: the CLI major version now decides feature
+  availability — on ≤ 29, `.mmd` input fails and `--layout` corrupts
+  argument parsing, so both paths are skipped (verified 29.7.8 vs 30.2.6).
+
 ## [1.17.0] — 2026-07-03
 ### Added
 - **`c4.py` — C4 model diagrams with drill-down.** Levels JSON (System
