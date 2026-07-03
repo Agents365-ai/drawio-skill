@@ -4,6 +4,21 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.19.0] — 2026-07-03
+### Added
+- **Accessibility built-in presets**: `colorblind-safe` (Okabe-Ito palette —
+  all seven role colors distinguishable under color-vision deficiency, plus
+  `strokeWidth=2`) and `dark` (dark fills + dark page background, light
+  strokes/text) join `default` / `corporate` / `handdrawn`.
+- **Schema + application-rule support for dark palettes**: optional
+  `extras.background` / `extras.fontColor` / `extras.edgeColor` (backwards
+  compatible); `style-presets.md` documents how each maps to styles and why
+  dark exports must not use `-t` (transparent PNG).
+- **Legend guidance**: `references/xml-authoring.md` gains a
+  "Legend (auto-generate from the palette)" section — mechanical swatch +
+  role-label recipe for diagrams using 3+ semantic colors.
+- Built-in preset conformance test (suite now 46).
+
 ## [1.18.0] — 2026-07-03
 ### Added
 - **Mermaid authoring path** (draw.io CLI ≥ 30, discovered via

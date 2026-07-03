@@ -253,7 +253,7 @@ python3 scripts/aiicons.py "openai" --embed     # self-contained data URI
 
 ## 🎨 Style Presets
 
-Capture a visual style once, reuse it everywhere. Three presets are built in — `default`, `corporate`, `handdrawn` — and you can teach the skill your own style from a `.drawio` file or a flat image:
+Capture a visual style once, reuse it everywhere. Five presets are built in — `default`, `corporate`, `handdrawn`, `colorblind-safe` (Okabe-Ito palette), `dark` — and you can teach the skill your own style from a `.drawio` file or a flat image:
 
 ```
 Draw a microservices architecture using my "corporate" style

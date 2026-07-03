@@ -11,6 +11,8 @@ Style presets let you capture and reuse a visual style across diagrams. When a p
 | `default` | Clean blue/green/yellow palette matching the built-in conventions |
 | `corporate` | Muted, professional palette suited for business presentations |
 | `handdrawn` | Sketch-style strokes for informal or whiteboard-style diagrams |
+| `colorblind-safe` | Okabe-Ito palette — all seven roles distinguishable under color-vision deficiency; thicker strokes |
+| `dark` | Dark fills + dark page background, light strokes/text — for dark-mode docs and slides |
 
 ## Apply a preset to a diagram
 

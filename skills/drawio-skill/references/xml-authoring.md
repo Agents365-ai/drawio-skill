@@ -151,6 +151,26 @@ When multiple edges connect to the same shape, assign different entry/exit point
 | Grey | `#f5f5f5` | `#666666` | external/neutral |
 | Purple | `#e1d5e7` | `#9673a6` | security, auth |
 
+### Legend (auto-generate from the palette)
+
+When a diagram uses 3+ semantic colors, add a legend so the color coding is self-explanatory. Generate it mechanically from the roles actually present — never invent legend entries that aren't in the diagram:
+
+```xml
+<!-- Legend container: place in a corner clear of the diagram (e.g. below-left) -->
+<mxCell id="legend" value="Legend" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#666666;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="40" y="720" width="180" height="110" as="geometry"/>
+</mxCell>
+<!-- One swatch + label pair per used role, 24px row pitch, children of the legend -->
+<mxCell id="leg1" value="" style="rounded=0;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="legend">
+  <mxGeometry x="10" y="30" width="30" height="16" as="geometry"/>
+</mxCell>
+<mxCell id="leg1t" value="Service" style="text;html=1;align=left;verticalAlign=middle;" vertex="1" parent="legend">
+  <mxGeometry x="50" y="28" width="120" height="20" as="geometry"/>
+</mxCell>
+```
+
+Rules: swatch colors come from the active palette (preset or the table above) with the **role name** as the label (Service, Database, Queue, …); height = `30 + 24 × rows`; the legend is a container (`parent="legend"`, relative coordinates); skip it entirely for single-color diagrams.
+
 ### Layout tips
 
 **Spacing — scale with complexity:**

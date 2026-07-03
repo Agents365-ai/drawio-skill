@@ -220,6 +220,33 @@ class TestAutolayoutColor(unittest.TestCase):
         self.assertIn("&quot;", out)
 
 
+class TestBuiltinPresets(unittest.TestCase):
+    STYLES = os.path.join(ROOT, "skills", "drawio-skill", "styles", "built-in")
+
+    def test_presets_conform(self):
+        import glob
+        import re
+        hexpat = re.compile(r"^#[0-9A-Fa-f]{6}$")
+        files = sorted(glob.glob(os.path.join(self.STYLES, "*.json")))
+        names = {os.path.basename(f)[:-5] for f in files}
+        self.assertLessEqual({"default", "corporate", "handdrawn",
+                              "colorblind-safe", "dark"}, names)
+        for f in files:
+            with open(f, encoding="utf-8") as fh:
+                d = json.load(fh)
+            self.assertEqual(d["name"], os.path.basename(f)[:-5])
+            self.assertFalse(d.get("default"), f)   # built-ins never default
+            for slot in ("primary", "success", "warning", "accent",
+                         "danger", "neutral", "secondary"):
+                pair = d["palette"][slot]
+                if pair is not None:
+                    self.assertRegex(pair["fillColor"], hexpat)
+                    self.assertRegex(pair["strokeColor"], hexpat)
+            for key in ("background", "fontColor", "edgeColor"):
+                if key in d.get("extras", {}):
+                    self.assertRegex(d["extras"][key], hexpat)
+
+
 class TestValidateCli(unittest.TestCase):
     GOOD = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
             '<mxCell id="0"/><mxCell id="1" parent="0"/>'

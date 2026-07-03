@@ -251,7 +251,7 @@ python3 scripts/aiicons.py "openai" --embed     # 内联为自包含 data URI
 
 ## 🎨 样式预设
 
-把视觉风格"教"给 Skill 一次，所有图表自动复用。内置三种预设：`default`、`corporate`、`handdrawn`；也可以从 `.drawio` 文件或图片学习你的风格：
+把视觉风格"教"给 Skill 一次，所有图表自动复用。内置五种预设：`default`、`corporate`、`handdrawn`、`colorblind-safe`（Okabe-Ito 色盲安全色板）、`dark`；也可以从 `.drawio` 文件或图片学习你的风格：
 
 ```
 画一个微服务架构图，使用我的 "corporate" 样式

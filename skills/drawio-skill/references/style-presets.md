@@ -11,7 +11,7 @@ Read this file when:
 ## Locations and lookup order
 
 1. `~/.drawio-skill/styles/<name>.json` — user presets (survive `git pull`).
-2. `<this-skill-dir>/styles/built-in/<name>.json` — built-ins shipped with the skill (`default`, `corporate`, `handdrawn`).
+2. `<this-skill-dir>/styles/built-in/<name>.json` — built-ins shipped with the skill (`default`, `corporate`, `handdrawn`, `colorblind-safe` — Okabe-Ito palette, distinguishable under color-vision deficiency, thicker strokes; `dark` — dark fills + page background, light strokes, needs the `extras.fontColor`/`edgeColor`/`background` rules below).
 
 A user preset shadows a built-in of the same name.
 
@@ -42,6 +42,9 @@ When SKILL.md's Step 0 identified a preset, it fully replaces the built-in palet
 **Extras.**
 - `preset.extras.sketch === true` → append `sketch=1` to every vertex style and every edge style.
 - `preset.extras.globalStrokeWidth !== 1` (any value other than the drawio default of 1, including `0.5`) → append `strokeWidth=<n>` to every vertex style and every edge style.
+- `preset.extras.fontColor` (present) → append `fontColor=<hex>` to every vertex and container style. Required for dark palettes — without it, dark fills render unreadable black text.
+- `preset.extras.edgeColor` (present) → append `strokeColor=<hex>;fontColor=<hex>` to every edge style (edges otherwise default to black, invisible on dark backgrounds).
+- `preset.extras.background` (present) → set `background="<hex>"` on the `<mxGraphModel>` element, and export PNG **without** `-t` (transparent) so the background is actually painted — a dark diagram on a transparent PNG looks broken in white viewers.
 
 **Interaction with diagram-type presets** (ERD / UML / Sequence / ML / Flowchart). Diagram-type presets set structural style keywords that the user preset must preserve (e.g. ERD tables rely on `shape=table;startSize=30;container=1;childLayout=tableLayout;...`). The rule: keep the diagram-type preset's structural keywords, then layer the user preset's color / font / edge / extras on top. When a diagram-type preset hardcodes a color (`fillColor=#dae8fc`, etc.) that conflicts with the user preset, the user preset's color wins. Exception: `fillColor=none` is structural — do not replace it with a palette color.
 

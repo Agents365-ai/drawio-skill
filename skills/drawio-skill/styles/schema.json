@@ -3,110 +3,262 @@
   "$id": "https://github.com/Agents365-ai/drawio-skill/styles/schema.json",
   "title": "drawio-skill preset",
   "type": "object",
-  "required": ["name", "version", "palette", "roles", "shapes", "font", "edges"],
+  "required": [
+    "name",
+    "version",
+    "palette",
+    "roles",
+    "shapes",
+    "font",
+    "edges"
+  ],
   "additionalProperties": false,
   "properties": {
-    "$schema":    { "type": "string" },
-    "name":       { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$" },
-    "version":    { "type": "integer", "const": 1 },
-    "default":    { "type": "boolean" },
-    "confidence": { "type": "string", "enum": ["low", "medium", "high"] },
+    "$schema": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]*$"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "default": {
+      "type": "boolean"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
     "source": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "type":          { "type": "string", "enum": ["xml", "image", "built-in", "hand-authored"] },
-        "path":          { "type": "string" },
-        "extracted_at":  { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+        "type": {
+          "type": "string",
+          "enum": [
+            "xml",
+            "image",
+            "built-in",
+            "hand-authored"
+          ]
+        },
+        "path": {
+          "type": "string"
+        },
+        "extracted_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
       }
     },
     "palette": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["primary", "success", "warning", "accent", "danger", "neutral", "secondary"],
+      "required": [
+        "primary",
+        "success",
+        "warning",
+        "accent",
+        "danger",
+        "neutral",
+        "secondary"
+      ],
       "properties": {
-        "primary":   { "$ref": "#/$defs/colorPair" },
-        "success":   { "$ref": "#/$defs/colorPair" },
-        "warning":   { "$ref": "#/$defs/colorPair" },
-        "accent":    { "$ref": "#/$defs/colorPair" },
-        "danger":    { "$ref": "#/$defs/colorPair" },
-        "neutral":   { "$ref": "#/$defs/colorPair" },
-        "secondary": { "$ref": "#/$defs/colorPair" }
+        "primary": {
+          "$ref": "#/$defs/colorPair"
+        },
+        "success": {
+          "$ref": "#/$defs/colorPair"
+        },
+        "warning": {
+          "$ref": "#/$defs/colorPair"
+        },
+        "accent": {
+          "$ref": "#/$defs/colorPair"
+        },
+        "danger": {
+          "$ref": "#/$defs/colorPair"
+        },
+        "neutral": {
+          "$ref": "#/$defs/colorPair"
+        },
+        "secondary": {
+          "$ref": "#/$defs/colorPair"
+        }
       }
     },
     "roles": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "service":  { "$ref": "#/$defs/slotName" },
-        "database": { "$ref": "#/$defs/slotName" },
-        "queue":    { "$ref": "#/$defs/slotName" },
-        "gateway":  { "$ref": "#/$defs/slotName" },
-        "error":    { "$ref": "#/$defs/slotName" },
-        "external": { "$ref": "#/$defs/slotName" },
-        "security": { "$ref": "#/$defs/slotName" }
+        "service": {
+          "$ref": "#/$defs/slotName"
+        },
+        "database": {
+          "$ref": "#/$defs/slotName"
+        },
+        "queue": {
+          "$ref": "#/$defs/slotName"
+        },
+        "gateway": {
+          "$ref": "#/$defs/slotName"
+        },
+        "error": {
+          "$ref": "#/$defs/slotName"
+        },
+        "external": {
+          "$ref": "#/$defs/slotName"
+        },
+        "security": {
+          "$ref": "#/$defs/slotName"
+        }
       }
     },
     "shapes": {
       "type": "object",
-      "additionalProperties": { "type": "string" },
+      "additionalProperties": {
+        "type": "string"
+      },
       "properties": {
-        "service":   { "type": "string" },
-        "database":  { "type": "string" },
-        "queue":     { "type": "string" },
-        "decision":  { "type": "string" },
-        "external":  { "type": "string" },
-        "container": { "type": "string" }
+        "service": {
+          "type": "string"
+        },
+        "database": {
+          "type": "string"
+        },
+        "queue": {
+          "type": "string"
+        },
+        "decision": {
+          "type": "string"
+        },
+        "external": {
+          "type": "string"
+        },
+        "container": {
+          "type": "string"
+        }
       }
     },
     "font": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fontFamily", "fontSize"],
+      "required": [
+        "fontFamily",
+        "fontSize"
+      ],
       "properties": {
-        "fontFamily":    { "type": "string" },
-        "fontSize":      { "type": "integer", "minimum": 8, "maximum": 36 },
-        "titleFontSize": { "type": "integer", "minimum": 8, "maximum": 48 },
-        "titleBold":     { "type": "boolean" }
+        "fontFamily": {
+          "type": "string"
+        },
+        "fontSize": {
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 36
+        },
+        "titleFontSize": {
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 48
+        },
+        "titleBold": {
+          "type": "boolean"
+        }
       }
     },
     "edges": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["style", "arrow"],
+      "required": [
+        "style",
+        "arrow"
+      ],
       "properties": {
-        "style":      { "type": "string" },
-        "arrow":      { "type": "string" },
-        "dashedFor":  { "type": "array", "items": { "type": "string" } }
+        "style": {
+          "type": "string"
+        },
+        "arrow": {
+          "type": "string"
+        },
+        "dashedFor": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
     "extras": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "sketch":            { "type": "boolean" },
-        "globalStrokeWidth": { "type": "number", "minimum": 0.5, "maximum": 6 }
+        "sketch": {
+          "type": "boolean"
+        },
+        "globalStrokeWidth": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 6
+        },
+        "background": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "fontColor": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "edgeColor": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        }
       }
     }
   },
   "$defs": {
     "colorPair": {
       "oneOf": [
-        { "type": "null" },
+        {
+          "type": "null"
+        },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["fillColor", "strokeColor"],
+          "required": [
+            "fillColor",
+            "strokeColor"
+          ],
           "properties": {
-            "fillColor":   { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
-            "strokeColor": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" }
+            "fillColor": {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            "strokeColor": {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            }
           }
         }
       ]
     },
     "slotName": {
       "type": "string",
-      "enum": ["primary", "success", "warning", "accent", "danger", "neutral", "secondary"]
+      "enum": [
+        "primary",
+        "success",
+        "warning",
+        "accent",
+        "danger",
+        "neutral",
+        "secondary"
+      ]
     }
   }
 }
