@@ -247,7 +247,18 @@ def check_page(diagram):
             return [], [f"page {name!r}: compressed, skipped (cannot lint)"]
         return [f"page {name!r}: no <mxGraphModel>"], []
     root = model.find("root")
-    cells = root.findall("mxCell") if root is not None else []
+    # Normalize UserObject/object wrappers (used for links & metadata): the id
+    # lives on the wrapper, geometry/style on the inner mxCell — fold the two
+    # into one cell so edges referencing the wrapper id resolve.
+    cells = []
+    for child in (root if root is not None else []):
+        if child.tag == "mxCell":
+            cells.append(child)
+        elif child.tag in ("UserObject", "object"):
+            inner = child.find("mxCell")
+            if inner is not None:
+                inner.set("id", child.get("id", ""))
+                cells.append(inner)
     errors, warns = [], []
     ids = {}
     for c in cells:

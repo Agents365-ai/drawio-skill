@@ -180,6 +180,14 @@ class TestAutolayoutColor(unittest.TestCase):
         self.assertIn("ranksep=0.70;", dot)
         self.assertIn("nodesep=0.60;", dot)
 
+    def test_node_link_wraps_userobject(self):
+        out = self.m.to_drawio(
+            {"direction": "TB",
+             "nodes": [{"id": "n", "label": "L", "link": "data:page/id,p2"}],
+             "edges": []}, 5, {"n": (1, 1)}, {}, color=True)
+        self.assertIn('<UserObject label="L" link="data:page/id,p2" id="n">', out)
+        self.assertNotIn('value="L"', out)          # label moved to the wrapper
+
     def test_edge_style_passthrough(self):
         out = self.m.to_drawio(
             {"direction": "TB",
@@ -260,6 +268,25 @@ class TestValidateCli(unittest.TestCase):
         r = self._check(self.BAD)
         self.assertEqual(r.returncode, 1)
         self.assertIn("error", r.stdout)
+
+    # A vertex wrapped in UserObject (link) — the edge references the wrapper id.
+    LINKED = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
+              '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+              '<UserObject label="A" link="data:page/id,p2" id="2">'
+              '<mxCell vertex="1" parent="1">'
+              '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+              '</UserObject>'
+              '<mxCell id="3" value="B" vertex="1" parent="1">'
+              '<mxGeometry x="200" y="0" width="80" height="40" as="geometry"/></mxCell>'
+              '<mxCell id="4" edge="1" parent="1" source="2" target="3">'
+              '<mxGeometry relative="1" as="geometry"/></mxCell>'
+              '</root></mxGraphModel></diagram></mxfile>')
+
+    def test_userobject_wrapper_resolves(self):
+        # The wrapper id must satisfy edge source refs (no dangling-edge error).
+        r = self._check(self.LINKED)
+        self.assertEqual(r.returncode, 0, r.stdout)
+        self.assertIn("0 error(s)", r.stdout)
 
     def test_edge_label_passes(self):
         # edgeLabel vertices have no width/height; they must not be flagged
@@ -565,6 +592,35 @@ class TestImportersCli(unittest.TestCase):
             self.assertIn("endArrow=block", xml)                 # sync arrow
             self.assertIn("strokeColor=#999999", xml)            # return arrow
             # the generated file passes the structural linter
+            v = run("validate.py", out)
+            self.assertEqual(v.returncode, 0, v.stdout)
+
+    def test_c4_multipage_drilldown(self):
+        import shutil
+        if not shutil.which("dot"):
+            self.skipTest("Graphviz dot not installed")
+        spec = {"levels": [
+            {"name": "Context",
+             "elements": [{"id": "u", "type": "person", "label": "User"},
+                          {"id": "sys", "type": "system", "label": "System",
+                           "children": "Containers"}],
+             "relations": [{"from": "u", "to": "sys", "label": "Uses"}]},
+            {"name": "Containers",
+             "elements": [{"id": "api", "type": "container", "label": "API",
+                           "tech": "Go"},
+                          {"id": "db", "type": "database", "label": "DB"}],
+             "relations": [{"from": "api", "to": "db"}]}]}
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "c4.json")
+            self._write(path, json.dumps(spec))
+            out = os.path.join(d, "c4.drawio")
+            r = run("c4.py", path, "-o", out)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            xml = open(out, encoding="utf-8").read()
+            self.assertEqual(xml.count("<diagram"), 2)
+            self.assertIn('link="data:page/id,containers"', xml)   # drill-down
+            self.assertIn("mxgraph.c4.person2", xml)
+            self.assertIn("[Container: Go]", xml)
             v = run("validate.py", out)
             self.assertEqual(v.returncode, 0, v.stdout)
 

@@ -187,7 +187,9 @@ def group_style(stroke):
             f"fontColor={stroke};verticalAlign=top;fontStyle=2;dashed=1;")
 
 
-def to_drawio(graph, height, pos, edge_pts, color=True):
+def page_cells(graph, height, pos, edge_pts, color=True):
+    """The <root> child cells (everything after the two reserved cells) for one
+    laid-out graph — reusable by multi-page generators (c4.py)."""
     nodes = graph["nodes"]
     # Absolute snapped rect for every placed node.
     rects = {}
@@ -283,12 +285,19 @@ def to_drawio(graph, height, pos, edge_pts, color=True):
             style = f"rounded=1;whiteSpace=wrap;html=1;fillColor={fill};strokeColor={stroke};"
         else:
             style = NODE_STYLE
-        cells.append(
-            f'        <mxCell id="{attr(nid)}" value="{attr(node.get("label", nid))}" '
-            f'style="{attr(style)}" vertex="1" parent="{attr(parent)}">\n'
-            f'          <mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry"/>\n'
-            f"        </mxCell>"
-        )
+        body = (f'style="{attr(style)}" vertex="1" parent="{attr(parent)}">\n'
+                f'          <mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry"/>\n'
+                f"        </mxCell>")
+        if node.get("link"):
+            # Links ride on a UserObject wrapper (id + label move to it).
+            cells.append(
+                f'        <UserObject label="{attr(node.get("label", nid))}" '
+                f'link="{attr(node["link"])}" id="{attr(nid)}">\n'
+                f"          <mxCell " + body + "\n        </UserObject>")
+        else:
+            cells.append(
+                f'        <mxCell id="{attr(nid)}" value="{attr(node.get("label", nid))}" '
+                + body)
     for i, edge in enumerate(graph.get("edges", [])):
         # Drop the first/last points (they sit on the node borders, where
         # draw.io attaches anyway) and replay the interior bends as waypoints.
@@ -309,17 +318,28 @@ def to_drawio(graph, height, pos, edge_pts, color=True):
             f"          {geom}\n"
             f"        </mxCell>"
         )
+    return "\n".join(cells)
+
+
+def wrap_page(cells, page_id="autolayout", name="Page-1"):
+    """One <diagram> page around pre-rendered root cells."""
     return (
-        '<mxfile>\n  <diagram id="autolayout" name="Page-1">\n'
+        f'  <diagram id="{attr(page_id)}" name="{attr(name)}">\n'
         '    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" '
         'tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" '
         'pageWidth="850" pageHeight="1100" math="0" shadow="0">\n'
         "      <root>\n"
         '        <mxCell id="0"/>\n'
         '        <mxCell id="1" parent="0"/>\n'
-        + "\n".join(cells)
-        + "\n      </root>\n    </mxGraphModel>\n  </diagram>\n</mxfile>\n"
+        + cells
+        + "\n      </root>\n    </mxGraphModel>\n  </diagram>\n"
     )
+
+
+def to_drawio(graph, height, pos, edge_pts, color=True):
+    return ("<mxfile>\n"
+            + wrap_page(page_cells(graph, height, pos, edge_pts, color=color))
+            + "</mxfile>\n")
 
 
 def route_score(graph, height, pos, edge_pts):

@@ -3,7 +3,7 @@
 When the user requests a specific diagram type, apply the matching preset below for shapes, styles, and layout conventions. These presets set **structural** style keywords (e.g. ERD's `shape=table;childLayout=tableLayout`); a user style preset (see `references/style-presets.md`) layers color/font/edge/extras on top.
 
 Read this file when:
-- The user names one of these diagram types (ERD, UML class, sequence, architecture, ML/DL model, flowchart)
+- The user names one of these diagram types (ERD, UML class, sequence, C4, architecture, ML/DL model, flowchart)
 - You're choosing shape vocabulary or layout direction for a new diagram
 
 ## ERD (Entity-Relationship Diagram)
@@ -42,6 +42,23 @@ Read this file when:
 | Return message | `html=1;verticalAlign=bottom;endArrow=open;dashed=1;strokeColor=#999999;` | Grey dashed |
 | Activation box | `shape=umlFrame;whiteSpace=wrap;` on the lifeline | Narrow rectangle on lifeline |
 | Layout | LR, lifelines spaced 200px apart | Time flows top to bottom |
+
+## C4 Model (System Context / Container / Component)
+
+**Don't hand-build** — `python3 scripts/c4.py c4.json -o out.drawio` generates the whole multi-page set (one page per level, drill-down links from parent elements to child pages, Graphviz placement; schema in the script docstring). The styles below are what it emits — for hand-tweaks afterwards:
+
+| Element | Style | Notes |
+|---------|-------|-------|
+| Person | `shape=mxgraph.c4.person2;html=1;whiteSpace=wrap;fontColor=#ffffff;fillColor=#083F75;strokeColor=#06315C;` | Dark-blue person shape, 200×180 |
+| Software System | `rounded=1;arcSize=10;html=1;whiteSpace=wrap;fontColor=#ffffff;fillColor=#1061B0;strokeColor=#0D5091;` | 240×120 |
+| External System | same, `fillColor=#8C8496;strokeColor=#736782;` | Grey = outside your control |
+| Container | same, `fillColor=#23A2D9;strokeColor=#0E7DAD;` | Mid-blue |
+| Component | same, `fillColor=#63BEF2;strokeColor=#2086C9;` | Light-blue |
+| Database | `shape=cylinder3;size=15;boundedLbl=1;` + Container colors | Cylinder |
+| Relationship | `endArrow=blockThin;endFill=1;html=1;fontSize=11;fontColor=#404040;strokeColor=#828282;labelBackgroundColor=#ffffff;` | Grey thin arrow, label = protocol/action |
+| Label format | `Name` ⏎ `[Type: Tech]` ⏎ `description` | The standard three-line C4 label |
+| Drill-down | wrap the element in `<UserObject link="data:page/id,<pageId>">` | Click jumps to the child page in draw.io / viewer |
+| Layout | TB, one `<diagram>` page per level | Export a single page with `--page-index <n>` (1-based) |
 
 ## Architecture Diagram
 

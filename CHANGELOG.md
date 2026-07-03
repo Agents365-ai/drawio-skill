@@ -4,6 +4,27 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.17.0] — 2026-07-03
+### Added
+- **`c4.py` — C4 model diagrams with drill-down.** Levels JSON (System
+  Context → Containers → Components, any depth) in, one multi-page `.drawio`
+  out: official C4 shapes/colors (`mxgraph.c4.person2`, c4model.com
+  palette), standard three-line labels (`Name` / `[Type: Tech]` / desc),
+  Graphviz placement per page, and **click-to-drill-down** — an element with
+  `"children"` links to that level's page (`data:page/id,…`).
+- `autolayout.py`: node-level `link` support (wraps the cell in a
+  `UserObject`) and a reusable `page_cells`/`wrap_page` split so multi-page
+  generators can share its layout pipeline.
+- `validate.py`: understands `UserObject`/`object` wrappers — linked cells
+  no longer produce false dangling-edge errors (also fixes linting of
+  hand-authored diagrams that use links/metadata).
+- `references/diagram-types.md`: C4 Model section (styles, label format,
+  drill-down recipe); SKILL.md routes "C4", "container diagram", etc. to it.
+### Fixed
+- SKILL.md export flags: `--page-index` is **1-based** in current
+  drawio-desktop (verified on 29.7.8) — previously documented as 0-based.
+- Tests: 45.
+
 ## [1.16.0] — 2026-07-02
 ### Added
 - **`seqlayout.py` — deterministic sequence diagrams.** Participants +
