@@ -82,3 +82,7 @@ draw.io ships no modern AI/LLM logos, so an LLM-app diagram renders as generic b
 python3 scripts/aiicons.py "claude" --json      # CDN-referenced (default)
 python3 scripts/aiicons.py "openai" --embed     # self-contained data URI
 ```
+
+## Rendering in CI
+
+Regenerate, lint (`validate.py --strict`), and export diagrams headlessly in GitHub Actions — via draw.io desktop under `xvfb` or the Docker REST renderer. Full workflow recipes in [CI.md](CI.md).
