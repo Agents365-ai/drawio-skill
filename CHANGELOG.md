@@ -4,6 +4,20 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.25.0] — 2026-07-03
+### Added
+- **Animated data-flow SVG** (`scripts/svgflow.py`) — export a `.drawio` to SVG
+  and turn every edge into a marching-ants animation (dashes travel along each
+  connector in the arrow's direction), so the diagram shows data/flow moving
+  through it. Self-contained looping `.svg` that renders on GitHub and any
+  browser — good for a README, docs page, or slide background.
+  - `svgflow.py diagram.drawio -o flow.svg` (also takes an `.svg` directly);
+    `--speed` (seconds/cycle), `--dash` (pattern), `--reverse` (flow to source).
+  - Only real edges animate: draw.io marks connector lines with
+    `pointer-events="stroke"` (shape outlines / arrowheads use `="all"`), so
+    arrowheads and shapes stay static. SKILL.md router + READMEs updated.
+    Suite now 61.
+
 ## [1.24.0] — 2026-07-03
 ### Added
 - **Diagram → PowerPoint** (`scripts/drawio2pptx.py`) — export a (multi-page)

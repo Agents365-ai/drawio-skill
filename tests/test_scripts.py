@@ -823,6 +823,31 @@ class TestImportersCli(unittest.TestCase):
             prs = Presentation(out)
             self.assertEqual(len(prs.slides), 1)
 
+    # An edge line (pointer-events=stroke), an arrowhead + a shape (both =all).
+    FLOW_SVG = (
+        '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="50">'
+        '<rect x="0" y="0" width="20" height="20" fill="#fff" pointer-events="all"/>'
+        '<path d="M 20 10 L 60 10" fill="none" stroke="#000" pointer-events="stroke"/>'
+        '<path d="M 60 10 L 55 7 L 55 13 Z" fill="#000000" pointer-events="all"/>'
+        "</svg>")
+
+    def test_svgflow_animates_only_edges(self):
+        sf = load("svgflow")
+        out, n = sf.animate(self.FLOW_SVG, 1.2, "6 4", reverse=False)
+        self.assertEqual(n, 1)                                    # one edge line
+        self.assertIn("@keyframes dio-flow", out)                # keyframes injected
+        self.assertIn("stroke-dashoffset:-10", out)              # -(6+4) forward travel
+        self.assertEqual(out.count('class="dio-flow"'), 1)
+        # class is injected right after "<path " — only on the stroke edge
+        self.assertIn('<path class="dio-flow" d="M 20 10', out)
+        self.assertNotIn('<path class="dio-flow" d="M 60 10', out)  # arrowhead untouched
+        self.assertNotIn('class="dio-flow"', out.split("<rect", 1)[1].split("/>", 1)[0])
+
+    def test_svgflow_reverse_flips_offset(self):
+        sf = load("svgflow")
+        out, _ = sf.animate(self.FLOW_SVG, 2, "8 2", reverse=True)
+        self.assertIn("stroke-dashoffset:10", out)               # +(8+2), toward source
+
     SQL = ("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(255));\n"
            "CREATE TABLE orders (\n"
            "  id INT,\n"

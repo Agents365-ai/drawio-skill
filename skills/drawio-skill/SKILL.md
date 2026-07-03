@@ -1,6 +1,6 @@
 ---
 name: drawio-skill
-version: 1.24.0
+version: 1.25.0
 description: Use when the user requests diagrams, flowcharts, architecture diagrams, ER diagrams, UML / sequence / class diagrams, network topology, cloud architecture from Terraform or Kubernetes manifests, ML/DL model figures (Transformer/CNN/LSTM), mind maps, or any visualization. Also use proactively when explaining systems with 3+ components, complex data flows, or relationships that benefit from visual representation. Best suited when the diagram needs custom styling, rich shape vocabulary, swimlanes, or exportable images (PNG/SVG/PDF/JPG). Generates .drawio XML and exports locally via the native draw.io desktop CLI.
 license: MIT
 homepage: https://github.com/Agents365-ai/drawio-skill
@@ -53,6 +53,7 @@ When the workflow references one of these, read it on demand — none of them ne
 | `scripts/timelapse.py` | The user wants an **architecture time-lapse / to see how a codebase's structure evolved over git history** — `timelapse.py <dir> --importer pyimports` re-runs an importer at each sampled commit and assembles a self-contained HTML player (embedded frames, play/step controls). Best on a package with real import edges (point `<dir>` at the module root) |
 | `scripts/explain.py` | The user wants to **describe / document / summarize an existing `.drawio` in words** (reverse of generating one) — `explain.py diagram.drawio` emits structured Markdown: components grouped by container/tier, relations (`A —label→ B`), per-page sections for multi-page/C4. Good for a README/PR summary or a text-only read-out |
 | `scripts/drawio2pptx.py` | The user wants a **PowerPoint deck / slides from a diagram** — `drawio2pptx.py diagram.drawio -o deck.pptx` puts each page on its own 16:9 slide (page name as title), so a multi-page **C4 model** becomes a ready-to-present deck. Needs `python-pptx` (`pip install python-pptx`) + the draw.io CLI |
+| `scripts/svgflow.py` | The user wants an **animated / "flowing" diagram** (data-flow, moving edges) — `svgflow.py diagram.drawio -o flow.svg` exports to SVG and makes every edge a marching-ants animation (dashes travel along the arrows). Self-contained looping `.svg` that renders on GitHub / any browser; `--speed` / `--dash` / `--reverse` |
 | `scripts/sqlerd.py` | The user wants an **ER diagram from SQL DDL** — parses `CREATE TABLE` statements into per-table nodes (columns with PK/FK markers) and crow's-foot FK edges for autolayout |
 | `scripts/seqlayout.py` | The user wants a **sequence diagram** — describe participants + messages as JSON and the script computes all lifeline/activation/arrow geometry deterministically (no hand-placed coordinates, no Graphviz needed) |
 | `scripts/c4.py` | The user wants a **C4 model** (System Context / Container / Component) — levels JSON in, one multi-page `.drawio` out with official C4 shapes/colors and **click-to-drill-down** links between levels |
