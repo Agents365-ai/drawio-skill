@@ -4,6 +4,14 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.26.1] — 2026-07-04
+### Added
+- **`references/toolbox.md`** — a use-case map of all 25 bundled scripts
+  (author / import code / import IaC / live infra / compare / reverse-export /
+  utilities) with an "I have X, I want Y → use Z" decision guide and the shared
+  extractor → autolayout → validate → export pipeline. Docs only; SKILL.md
+  resource table points to it as the "not sure which script fits" entry.
+
 ## [1.26.0] — 2026-07-04
 ### Added
 - **Diagram → Mermaid** (`scripts/drawio2mermaid.py`) — convert a `.drawio` into
