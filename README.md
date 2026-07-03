@@ -14,7 +14,7 @@
 
 **English** · [中文](README_CN.md) · [📖 Online Docs](https://agents365-ai.github.io/drawio-skill/)
 
-A skill that turns natural-language descriptions into `.drawio` XML and exports them to PNG / SVG / PDF / JPG via the native draw.io desktop CLI. It can also turn an **existing codebase** (Python / JS-TS / Go / Rust) into an auto-laid-out structure diagram. Works with **Claude Code, Cursor, Copilot, OpenClaw, Codex, Hermes**, and any agent compatible with the [Agent Skills](https://agentskills.io) format.
+A skill that turns natural-language descriptions into `.drawio` XML and exports them to PNG / SVG / PDF / JPG via the native draw.io desktop CLI. It can also turn an **existing codebase** (Python / JS-TS / Go / Rust), **Terraform / Kubernetes / docker-compose infrastructure**, or a **SQL schema** into an auto-laid-out diagram. Works with **Claude Code, Cursor, Copilot, OpenClaw, Codex, Hermes**, and any agent compatible with the [Agent Skills](https://agentskills.io) format.
 
 <p align="center">
   <img src="assets/microservices-example.png" width="900" alt="Microservices Architecture — generated from a single natural-language prompt">
@@ -22,14 +22,14 @@ A skill that turns natural-language descriptions into `.drawio` XML and exports 
 
 ## ✨ Highlights
 
-- **6 diagram type presets** — ERD, UML Class, Sequence, Architecture, ML/Deep Learning, Flowchart
+- **7 diagram type presets** — ERD, UML Class, Sequence, C4, Architecture, ML/Deep Learning, Flowchart
 - **Visualize a codebase** — extract and auto-lay-out the structure of a Python / JS-TS / Go / Rust project (import graphs) or a Python class hierarchy — Graphviz placement, transitive reduction, nested module containers
 - **IaC → architecture diagram** — turn **Terraform** configs, **Kubernetes** manifests, or **docker-compose** files into an architecture diagram where every resource renders as its **official AWS / Azure / GCP / K8s icon**, edges derived from actual references (role ARNs, selectors, volume mounts)
 - **SQL DDL → ER diagram** — parse `CREATE TABLE` statements into per-table nodes with PK/FK markers and crow's-foot foreign-key edges
 - **Deterministic sequence diagrams** — describe participants + messages as JSON; lifelines, auto-tracked activation bars, and arrows are computed, never hand-placed
 - **C4 model with drill-down** — one command generates the multi-page System Context → Container → Component set with official C4 shapes; parent elements **click through** to their child page
 - **Search 10,000+ official shapes** — resolve the exact AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN icon style instead of guessing (no more blank-box `shape=mxgraph.*` typos)
-- **AI / LLM brand logos** — 321 logos (OpenAI, Claude, Gemini, Mistral, Llama, Ollama, LangChain…) that draw.io has none of, for LLM-app architecture diagrams
+- **AI / LLM brand logos** — 321 logos (OpenAI, Claude, Gemini, Mistral, Llama, Ollama, LangChain…) that draw.io has none of, plus **18 data-store brands** (Redis, Postgres, Qdrant, Milvus…) for LLM/RAG architecture diagrams
 - **Self-check + auto-fix** — reads its own PNG output and auto-fixes overlaps, clipped labels, stacked edges, and more (up to 2 rounds)
 - **Iterative feedback loop** — up to 5 rounds of targeted refinement
 - **Style presets** — capture your visual style from a `.drawio` file or image, reuse on demand
@@ -120,9 +120,9 @@ Annotate tensor shapes between layers and color-code by layer type.
 
 The skill plans the layout, generates the `.drawio` XML, exports to your chosen format, self-checks the result, and lets you iterate.
 
-## 🗺️ Visualize a Codebase
+## 🗺️ Visualize Code & Infrastructure
 
-Beyond hand-authored diagrams, the skill turns **existing code into structure diagrams** — no manual coordinates. Just ask:
+Beyond hand-authored diagrams, the skill turns **existing code, infrastructure, and schemas into diagrams** — no manual coordinates. Just ask:
 
 > *"Visualize the module structure of this Python project"* · *"Draw the class hierarchy of `mypackage`"*
 
@@ -190,13 +190,14 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 | **Nested containers** | `--group` boxes modules by sub-package, nested for deep package trees |
 | **Deterministic validator** | `validate.py` lints the `.drawio` (dangling edges, duplicate ids, overlaps) before the visual self-check |
 
-Layout needs Graphviz (`brew install graphviz` / `apt install graphviz`) — optional; everything else works without it. Full format + flag reference in [references/autolayout.md](skills/drawio-skill/references/autolayout.md).
+Layout needs Graphviz (`brew install graphviz` / `apt install graphviz`) — optional; everything else works without it. Full format + flag reference in [references/autolayout.md](skills/drawio-skill/references/autolayout.md). Regenerate, validate (`--strict` gate) and render headlessly in CI: [docs/CI.md](docs/CI.md).
 
 ## 🧩 Supported Diagram Types
 
 | Category | Examples | Notable features |
 |---|---|---|
 | Architecture | microservices, cloud (AWS/GCP/Azure), network topology, deployment | Tier-based swimlanes, hub-center strategy |
+| C4 model | system context, containers, components | Multi-page `.drawio`, click-to-drill-down links |
 | ML / Deep Learning | Transformer, CNN, LSTM, GRU | Tensor shape annotations, layer-type color coding |
 | Flowcharts | business processes, workflows, decision trees, state machines | Semantic shapes (parallelogram I/O, diamond decisions) |
 | UML | class diagrams, sequence diagrams | Inheritance / composition / aggregation arrows; lifelines + activation boxes |
@@ -225,7 +226,7 @@ Covers AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN / ER / electrical / P
 
 ## 🤖 AI / LLM Brand Logos
 
-draw.io ships **no** modern AI/LLM logos, so an LLM-app diagram renders as generic boxes. `aiicons.py` resolves a brand name to a draw.io image style for any of **321 logos** (OpenAI, Claude, Gemini, Mistral, Llama, Cohere, DeepSeek, Qwen, Ollama, LangChain, HuggingFace…) from [lobe-icons](https://github.com/lobehub/lobe-icons) (MIT).
+draw.io ships **no** modern AI/LLM logos, so an LLM-app diagram renders as generic boxes. `aiicons.py` resolves a brand name to a draw.io image style for any of **321 logos** (OpenAI, Claude, Gemini, Mistral, Llama, Cohere, DeepSeek, Qwen, Ollama, LangChain, HuggingFace…) from [lobe-icons](https://github.com/lobehub/lobe-icons) (MIT), plus **18 data-store brands** (Redis, Postgres, MongoDB, Qdrant, Milvus, Supabase…) via [simple-icons](https://simpleicons.org) (CC0) for RAG stacks.
 
 ```bash
 python3 scripts/aiicons.py "claude" --json      # CDN-referenced (default)
@@ -268,7 +269,7 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 |---|---|---|
 | Self-check after export | ❌ | ✅ reads PNG, auto-fixes 6 issue types |
 | Iterative review loop | ❌ manual re-prompt | ✅ targeted edits, 5-round safety valve |
-| Diagram type presets | ❌ | ✅ 6 presets (ERD, UML, Seq, Arch, ML, Flow) |
+| Diagram type presets | ❌ | ✅ 7 presets (ERD, UML, Seq, C4, Arch, ML, Flow) |
 | Visualize a codebase | ❌ | ✅ import graphs (Py/JS/Go/Rust) + class diagrams |
 | IaC → architecture diagram | ❌ | ✅ Terraform / K8s / compose → official cloud icons |
 | SQL DDL → ER diagram | ❌ | ✅ `CREATE TABLE` → PK/FK tables, crow's-foot edges |
@@ -277,7 +278,7 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 | Auto-layout for large graphs | ❌ hand-places, overlaps | ✅ Graphviz placement, ortho routing, nested containers |
 | Structural validation | ❌ | ✅ deterministic `.drawio` linter |
 | Official shape search | ❌ guesses, blank boxes | ✅ exact style for 10k+ AWS/Azure/GCP/UML shapes |
-| AI/LLM brand logos | ❌ none | ✅ 321 logos (OpenAI/Claude/Gemini/…) via aiicons.py |
+| AI/LLM brand logos | ❌ none | ✅ 321 AI + 18 data-store logos via aiicons.py |
 | Grid-aligned layout | ❌ | ✅ 10px snap, routing corridors |
 | Color palette | random / inconsistent | ✅ 7-color semantic system |
 | Style presets | ❌ | ✅ learn from `.drawio` file or image |
@@ -291,11 +292,11 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 | **Multi-agent** | ✅ 6 platforms | ❌ Claude apps only | ✅ Claude / Gemini / Codex | ❌ Claude Code only |
 | **Self-check + auto-fix** | ✅ 2-round (reads PNG) | ❌ | ✅ validation + strict mode | ❌ screenshot only |
 | **Iterative review** | ✅ 5-round loop | ❌ generate once | ✅ 3 workflows | ❌ |
-| **Diagram presets** | ✅ 6 types | ❌ | ✅ paper-mode classifier | ❌ |
+| **Diagram presets** | ✅ 7 types | ❌ | ✅ paper-mode classifier | ❌ |
 | **ML/DL diagrams** | ✅ tensor shapes, layer colors | ❌ | ❌ | ❌ |
 | **Color system** | ✅ 7-color semantic | ❌ | ✅ 6 themes | ❌ |
 | **Official shape search** | ✅ 10k+ shapes (local) | ✅ 10k+ shapes (MCP) | ❌ | ❌ |
-| **AI/LLM brand logos** | ✅ 321 (lobe-icons) | ❌ | ❌ | ❌ |
+| **AI/LLM brand logos** | ✅ 321 + 18 data-store | ❌ | ❌ | ❌ |
 | **Browser fallback** | ✅ diagrams.net URL (viewer + editable) | ❌ inline preview only | ✅ via optional MCP | ✅ diagrams.net viewer (primary) |
 | **Zero-config** | ✅ copy `skills/drawio-skill/` | ✅ | ✅ desktop-only mode | ❌ needs plugin install |
 

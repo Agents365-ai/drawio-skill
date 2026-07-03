@@ -14,7 +14,7 @@
 
 [English](README.md) · **中文** · [📖 在线文档](https://agents365-ai.github.io/drawio-skill/)
 
-一个把自然语言描述变成 `.drawio` XML，并通过 draw.io 桌面版原生 CLI 导出 PNG / SVG / PDF / JPG 的技能。它还能把**现有代码库**（Python / JS-TS / Go / Rust）转成自动布局的结构图。支持 **Claude Code、Cursor、Copilot、OpenClaw、Codex、Hermes** 等任何兼容 [Agent Skills](https://agentskills.io) 规范的 agent。
+一个把自然语言描述变成 `.drawio` XML，并通过 draw.io 桌面版原生 CLI 导出 PNG / SVG / PDF / JPG 的技能。它还能把**现有代码库**（Python / JS-TS / Go / Rust）、**Terraform / Kubernetes / docker-compose 基础设施**或 **SQL schema** 转成自动布局的图表。支持 **Claude Code、Cursor、Copilot、OpenClaw、Codex、Hermes** 等任何兼容 [Agent Skills](https://agentskills.io) 规范的 agent。
 
 <p align="center">
   <img src="assets/microservices-example.png" width="900" alt="微服务架构图 —— 来自一条自然语言提示词">
@@ -22,14 +22,14 @@
 
 ## ✨ 核心亮点
 
-- **6 种图表类型预设** —— ER 图、UML 类图、序列图、架构图、ML/深度学习、流程图
+- **7 种图表类型预设** —— ER 图、UML 类图、序列图、C4、架构图、ML/深度学习、流程图
 - **可视化代码库** —— 提取并自动布局一个 Python / JS-TS / Go / Rust 项目的结构（导入关系图）或 Python 类继承层级 —— Graphviz 布点、传递约简、按子包嵌套的容器
 - **IaC → 架构图** —— 把 **Terraform** 配置、**Kubernetes** manifest 或 **docker-compose** 文件直接变成架构图，每个资源渲染为**官方 AWS / Azure / GCP / K8s 图标**，连线来自真实引用（role ARN、selector、volume 挂载）
 - **SQL DDL → ER 图** —— 解析 `CREATE TABLE` 语句，生成带 PK/FK 标记的表节点和鸦爪外键连线
 - **确定性时序图** —— 用 JSON 描述参与者 + 消息序列，lifeline、自动追踪的激活条、箭头几何全部计算得出，无需手摆坐标
 - **C4 模型 + 下钻** —— 一条命令生成多页 System Context → Container → Component 全套，官方 C4 形状配色，父元素**点击跳转**到子层页面
 - **搜索 10,000+ 个官方形状** —— 直接拿到 AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN 图标的精确 style，不靠猜（杜绝 `shape=mxgraph.*` 拼错变空白框）
-- **AI / LLM 品牌图标** —— 321 个 draw.io 自身没有的 logo（OpenAI、Claude、Gemini、Mistral、Llama、Ollama、LangChain……），专为 LLM 应用架构图准备
+- **AI / LLM 品牌图标** —— 321 个 draw.io 自身没有的 logo（OpenAI、Claude、Gemini、Mistral、Llama、Ollama、LangChain……），外加 **18 个数据存储品牌**（Redis、Postgres、Qdrant、Milvus……），专为 LLM/RAG 应用架构图准备
 - **自检 + 自动修复** —— 读取自己导出的 PNG，自动修复重叠、截断标签、连线堆叠等问题（最多 2 轮）
 - **迭代反馈循环** —— 最多 5 轮定向优化
 - **样式预设** —— 用 `.drawio` 文件或图片"教会"Skill 你的风格，命名保存后随时复用
@@ -118,9 +118,9 @@ git clone https://github.com/Agents365-ai/drawio-skill.git \
 
 Skill 会自动规划布局、生成 `.drawio` XML、导出为你选择的格式、自检结果，并支持后续迭代。
 
-## 🗺️ 可视化代码库
+## 🗺️ 可视化代码与基础设施
 
-除了手写图表，Skill 还能把**现有代码变成结构图** —— 无需手动摆坐标。直接说：
+除了手写图表，Skill 还能把**现有代码、基础设施和 schema 变成图表** —— 无需手动摆坐标。直接说：
 
 > *"可视化这个 Python 项目的模块结构"* · *"画出 `mypackage` 的类继承层级"*
 
@@ -188,13 +188,14 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 | **嵌套容器** | `--group` 按子包给模块分框，深层包树自动嵌套 |
 | **确定性校验器** | `validate.py` 在视觉自检前先做结构 lint（悬空边、重复 id、重叠） |
 
-布局需要 Graphviz（`brew install graphviz` / `apt install graphviz`）—— 可选，其余功能无需它。完整格式与参数见 [references/autolayout.md](skills/drawio-skill/references/autolayout.md)。
+布局需要 Graphviz（`brew install graphviz` / `apt install graphviz`）—— 可选，其余功能无需它。完整格式与参数见 [references/autolayout.md](skills/drawio-skill/references/autolayout.md)。在 CI 中重新生成、校验（`--strict` 门禁）并无头渲染：[docs/CI_CN.md](docs/CI_CN.md)。
 
 ## 🧩 支持的图表类型
 
 | 类别 | 示例 | 特色 |
 |------|------|------|
 | 架构图 | 微服务、云（AWS/GCP/Azure）、网络拓扑、部署 | 分层泳道、hub 居中策略 |
+| C4 模型 | 系统上下文、容器、组件 | 多页 `.drawio`、点击下钻链接 |
 | ML / 深度学习 | Transformer、CNN、LSTM、GRU | 张量形状标注、层类型配色 |
 | 流程图 | 业务流程、工作流、决策树、状态机 | 语义形状（平行四边形 I/O、菱形判断） |
 | UML | 类图、序列图 | 继承 / 组合 / 聚合箭头；生命线 + 激活框 |
@@ -223,7 +224,7 @@ python3 scripts/shapesearch.py "aws lambda" --limit 5
 
 ## 🤖 AI / LLM 品牌图标
 
-draw.io **没有**任何现代 AI/LLM 品牌图标，所以画 LLM 应用架构时只能是一堆方框。`aiicons.py` 能把品牌名解析成 draw.io 图片样式，覆盖 [lobe-icons](https://github.com/lobehub/lobe-icons)（MIT）的 **321 个图标**（OpenAI、Claude、Gemini、Mistral、Llama、Cohere、DeepSeek、Qwen、Ollama、LangChain、HuggingFace……）。
+draw.io **没有**任何现代 AI/LLM 品牌图标，所以画 LLM 应用架构时只能是一堆方框。`aiicons.py` 能把品牌名解析成 draw.io 图片样式，覆盖 [lobe-icons](https://github.com/lobehub/lobe-icons)（MIT）的 **321 个图标**（OpenAI、Claude、Gemini、Mistral、Llama、Cohere、DeepSeek、Qwen、Ollama、LangChain、HuggingFace……），并经 [simple-icons](https://simpleicons.org)（CC0）补充 **18 个数据存储品牌**（Redis、Postgres、MongoDB、Qdrant、Milvus、Supabase……），适合 RAG 架构图。
 
 ```bash
 python3 scripts/aiicons.py "claude" --json      # CDN 引用（默认）
@@ -266,7 +267,7 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 |------|-----------|--------------|
 | 导出后自检 | ❌ | ✅ 读取 PNG 自动修复 6 类问题 |
 | 迭代审查循环 | ❌ 需手动重新提问 | ✅ 定向编辑，5 轮安全阀 |
-| 图表类型预设 | ❌ | ✅ 6 种（ERD、UML、序列、架构、ML、流程） |
+| 图表类型预设 | ❌ | ✅ 7 种（ERD、UML、序列、C4、架构、ML、流程） |
 | 可视化代码库 | ❌ | ✅ 导入关系图（Py/JS/Go/Rust）+ 类图 |
 | IaC → 架构图 | ❌ | ✅ Terraform / K8s / compose → 官方云图标 |
 | SQL DDL → ER 图 | ❌ | ✅ `CREATE TABLE` → PK/FK 表节点 + 鸦爪连线 |
@@ -275,7 +276,7 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 | 大图自动布局 | ❌ 手动摆放、易重叠 | ✅ Graphviz 布点、正交路由、嵌套容器 |
 | 结构校验 | ❌ | ✅ 确定性 `.drawio` linter |
 | 官方形状搜索 | ❌ 靠猜、变空白框 | ✅ 1 万+ AWS/Azure/GCP/UML 形状的精确 style |
-| AI/LLM 品牌图标 | ❌ 没有 | ✅ 321 个 logo（OpenAI/Claude/Gemini/…）经 aiicons.py |
+| AI/LLM 品牌图标 | ❌ 没有 | ✅ 321 个 AI logo + 18 个数据存储品牌，经 aiicons.py |
 | 网格对齐布局 | ❌ | ✅ 10px 对齐、路由走廊 |
 | 配色方案 | 随机 / 不一致 | ✅ 7 色语义系统 |
 | 样式预设 | ❌ | ✅ 从 `.drawio` 文件或图片学习 |
@@ -289,11 +290,11 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 | **多智能体支持** | ✅ 6 个平台 | ❌ 仅 Claude 系列 | ✅ Claude / Gemini / Codex | ❌ 仅 Claude Code |
 | **自检 + 自动修复** | ✅ 2 轮（读取 PNG） | ❌ | ✅ 校验 + 严格模式 | ❌ 仅截图 |
 | **迭代审查** | ✅ 5 轮循环 | ❌ 一次生成 | ✅ 3 种工作流 | ❌ |
-| **图表预设** | ✅ 6 种 | ❌ | ✅ 论文模式分类 | ❌ |
+| **图表预设** | ✅ 7 种 | ❌ | ✅ 论文模式分类 | ❌ |
 | **ML/DL 图** | ✅ 张量标注、层配色 | ❌ | ❌ | ❌ |
 | **配色系统** | ✅ 7 色语义 | ❌ | ✅ 6 种主题 | ❌ |
 | **官方形状搜索** | ✅ 1 万+ 形状（本地） | ✅ 1 万+ 形状（MCP） | ❌ | ❌ |
-| **AI/LLM 品牌图标** | ✅ 321 个（lobe-icons） | ❌ | ❌ | ❌ |
+| **AI/LLM 品牌图标** | ✅ 321 + 18 数据存储 | ❌ | ❌ | ❌ |
 | **浏览器降级** | ✅ diagrams.net URL（查看 + 可编辑） | ❌ 仅内联预览 | ✅ 通过可选 MCP | ✅ diagrams.net viewer（主要） |
 | **零配置** | ✅ 复制 `skills/drawio-skill/` | ✅ | ✅ 桌面版模式 | ❌ 需安装插件 |
 
