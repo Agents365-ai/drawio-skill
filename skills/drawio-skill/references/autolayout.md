@@ -134,6 +134,17 @@ python3 <this-skill-dir>/scripts/autolayout.py diff.json -o diff.drawio
 
 Nodes match by cell **id** by default — ideal for anything the importers or live-infra snapshots produce (their ids are stable semantic keys), so *snapshot → change → snapshot → diff* shows drift directly (e.g. two `tfstate.py` or `k8simports.py` snapshots). Pass `--by-label` to match on the visible label instead, for hand-drawn diagrams whose ids are random. Only leaf vertices and their edges are compared (containers/group cells and edge labels are skipped); the diff is a flat colour-coded view, so original icons are replaced by status colours (labels are kept). Multi-page files are flattened; compressed pages are skipped with a warning (this skill always writes uncompressed XML).
 
+## Architecture time-lapse over git history (`timelapse.py`)
+
+`timelapse.py <dir> --importer pyimports` shows how a codebase's structure grew: it walks the git history of `<dir>`, re-runs the importer at each sampled commit (pulling the tree with `git archive` — the working copy is never touched), lays each out and exports a PNG frame, then assembles **one self-contained HTML player** (frames embedded as base64, play / step / scrub controls, no external files or CDNs).
+
+```bash
+python3 <this-skill-dir>/scripts/timelapse.py src --importer pyimports --max-frames 12
+# -> architecture-evolution.html   (open in any browser)
+```
+
+`--importer` is any bundled graph extractor (`pyimports`/`jsimports`/`goimports`/`rustimports`/`pyclasses`/`tfimports`/`k8simports`/`composeimports`/`sqlerd`), run with the same positional `<dir>` it expects, so **point `<dir>` at the module / project / infra root** — extra flags pass through via `--importer-args "--group"`. Commits touching the dir are sampled evenly down to `--max-frames` (always keeping the first and last); a commit where the importer finds nothing (the path did not exist yet) is skipped. It renders one draw.io frame per commit, so it needs git + Graphviz + the draw.io CLI and takes a few seconds per frame. The story is strongest on a package with real **import edges** (they accumulate over time); a flat directory still shows the node count grow.
+
 The tf/k8s importers emit `ranksep`/`nodesep` in the graph JSON automatically (icon labels render *below* the shape, so rows need extra separation).
 
 **`--tune` (autolayout flag)**: lays the graph out in both directions (TB and LR), scores each (through-vertex routes ×20 + edge crossings ×10 + total edge length as tiebreak), and keeps the better one — report on stderr. `validate.py --score` prints the same style of readability score for a finished `.drawio`, for comparing variants.

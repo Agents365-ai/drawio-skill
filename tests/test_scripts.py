@@ -710,6 +710,30 @@ class TestImportersCli(unittest.TestCase):
             status = {n["id"]: self._status(n["style"]) for n in graph["nodes"]}
             self.assertEqual(status, {"API": "same", "DB": "removed", "Cache": "added"})
 
+    def test_timelapse_sample_indices(self):
+        tl = load("timelapse")
+        self.assertEqual(tl.sample_indices(3, 10), [0, 1, 2])        # fewer than n -> all
+        self.assertEqual(tl.sample_indices(0, 5), [])
+        picked = tl.sample_indices(20, 5)
+        self.assertEqual(picked[0], 0)                                # always first
+        self.assertEqual(picked[-1], 19)                             # always last
+        self.assertEqual(len(picked), 5)
+        self.assertEqual(picked, sorted(set(picked)))                # unique + ordered
+
+    def test_timelapse_build_html_self_contained(self):
+        tl = load("timelapse")
+        frames = [(b"\x89PNG-old", "abc1234567", "2026-01-01", "init", 2, 1),
+                  (b"\x89PNG-new", "def7654321", "2026-02-02", "grow", 9, 12)]
+        html = tl.build_html(frames, "Evo")
+        self.assertEqual(html.count("data:image/png;base64,"), 2)
+        self.assertNotIn("http://", html)
+        self.assertNotIn("https://", html)                           # no CDN/external refs
+        for ctl in ('id="play"', 'id="scrub"', 'id="bar"'):
+            self.assertIn(ctl, html)
+        # the embedded frame payload carries per-commit counts
+        self.assertIn('"n": 9', html)
+        self.assertIn('"e": 12', html)
+
     SQL = ("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(255));\n"
            "CREATE TABLE orders (\n"
            "  id INT,\n"

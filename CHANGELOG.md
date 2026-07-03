@@ -4,6 +4,23 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.22.0] — 2026-07-03
+### Added
+- **Architecture time-lapse** (`scripts/timelapse.py`) — animate how a codebase's
+  structure grew across git history. Walks a directory's commits, re-runs a
+  bundled importer at each sampled commit (tree pulled with `git archive`; the
+  working copy is never touched), lays out + exports a PNG per commit, and
+  assembles **one self-contained HTML player** (frames embedded as base64,
+  play / step / scrub controls, no external files or CDNs).
+  - `timelapse.py <dir> --importer pyimports` → `architecture-evolution.html`.
+  - Works with any bundled extractor (`pyimports`/`jsimports`/`goimports`/
+    `rustimports`/`pyclasses`/`tfimports`/`k8simports`/`composeimports`/`sqlerd`);
+    `--importer-args` passes extra flags. Commits are sampled evenly to
+    `--max-frames` (first + last always kept); commits where the path did not
+    exist yet are skipped.
+  - Documented in `references/autolayout.md`; SKILL.md router + READMEs updated.
+    Suite now 54.
+
 ## [1.21.0] — 2026-07-03
 ### Added
 - **Diagram diff** (`scripts/drawiodiff.py`) — compare two `.drawio` files into a
