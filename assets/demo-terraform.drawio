@@ -5,67 +5,67 @@
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
         <mxCell id="aws_api_gateway_rest_api.api" value="api" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;" vertex="1" parent="1">
-          <mxGeometry x="0" y="130" width="78" height="78" as="geometry"/>
+          <mxGeometry x="0" y="190" width="78" height="78" as="geometry"/>
         </mxCell>
         <mxCell id="aws_lambda_function.orders" value="orders" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
-          <mxGeometry x="240" y="130" width="78" height="78" as="geometry"/>
+          <mxGeometry x="240" y="190" width="78" height="78" as="geometry"/>
         </mxCell>
         <mxCell id="aws_lambda_function.worker" value="worker" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
-          <mxGeometry x="120" y="130" width="78" height="78" as="geometry"/>
+          <mxGeometry x="120" y="190" width="78" height="78" as="geometry"/>
         </mxCell>
         <mxCell id="aws_lambda_event_source_mapping.worker_trigger" value="worker_trigger" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
           <mxGeometry x="230" y="0" width="78" height="78" as="geometry"/>
         </mxCell>
         <mxCell id="aws_iam_role.lambda" value="lambda" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#DD344C;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.role;" vertex="1" parent="1">
-          <mxGeometry x="220" y="270" width="78" height="44" as="geometry"/>
+          <mxGeometry x="220" y="390" width="78" height="44" as="geometry"/>
         </mxCell>
         <mxCell id="aws_dynamodb_table.orders" value="orders" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#C925D1;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;" vertex="1" parent="1">
-          <mxGeometry x="100" y="260" width="78" height="78" as="geometry"/>
+          <mxGeometry x="100" y="370" width="78" height="78" as="geometry"/>
         </mxCell>
         <mxCell id="aws_sqs_queue.jobs" value="jobs" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sqs;" vertex="1" parent="1">
-          <mxGeometry x="350" y="260" width="78" height="78" as="geometry"/>
+          <mxGeometry x="350" y="370" width="78" height="78" as="geometry"/>
         </mxCell>
         <mxCell id="aws_s3_bucket.uploads" value="uploads" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="1">
-          <mxGeometry x="470" y="260" width="78" height="78" as="geometry"/>
+          <mxGeometry x="470" y="370" width="78" height="78" as="geometry"/>
         </mxCell>
         <mxCell id="aws_cloudfront_distribution.cdn" value="cdn" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#8C4FFF;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudfront;" vertex="1" parent="1">
-          <mxGeometry x="470" y="130" width="78" height="78" as="geometry"/>
+          <mxGeometry x="470" y="190" width="78" height="78" as="geometry"/>
         </mxCell>
         <mxCell id="aws_api_gateway_integration.lambda_proxy" value="lambda_proxy" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;" vertex="1" parent="1">
           <mxGeometry x="110" y="0" width="78" height="78" as="geometry"/>
         </mxCell>
         <mxCell id="e0" value="" style="html=1;rounded=0;" edge="1" parent="1" source="aws_api_gateway_integration.lambda_proxy" target="aws_api_gateway_rest_api.api">
-          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="120" y="120"/><mxPoint x="120" y="170"/><mxPoint x="120" y="170"/><mxPoint x="120" y="170"/><mxPoint x="90" y="170"/></Array></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="120" y="130"/><mxPoint x="120" y="220"/><mxPoint x="120" y="220"/><mxPoint x="120" y="220"/><mxPoint x="90" y="220"/></Array></mxGeometry>
         </mxCell>
         <mxCell id="e1" value="" style="html=1;rounded=0;" edge="1" parent="1" source="aws_api_gateway_integration.lambda_proxy" target="aws_lambda_function.orders">
-          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="160" y="90"/><mxPoint x="160" y="100"/><mxPoint x="160" y="100"/><mxPoint x="160" y="100"/><mxPoint x="280" y="100"/><mxPoint x="280" y="100"/><mxPoint x="280" y="100"/><mxPoint x="280" y="120"/></Array></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="160" y="100"/><mxPoint x="160" y="130"/><mxPoint x="160" y="130"/><mxPoint x="160" y="130"/><mxPoint x="280" y="130"/><mxPoint x="280" y="130"/><mxPoint x="280" y="130"/><mxPoint x="280" y="170"/></Array></mxGeometry>
         </mxCell>
         <mxCell id="e2" value="" style="html=1;rounded=0;" edge="1" parent="1" source="aws_lambda_function.orders" target="aws_s3_bucket.uploads">
-          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="310" y="220"/><mxPoint x="310" y="230"/><mxPoint x="310" y="230"/><mxPoint x="310" y="230"/><mxPoint x="490" y="230"/><mxPoint x="490" y="230"/><mxPoint x="490" y="230"/><mxPoint x="490" y="240"/></Array></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="310" y="290"/><mxPoint x="310" y="320"/><mxPoint x="310" y="320"/><mxPoint x="310" y="320"/><mxPoint x="490" y="320"/><mxPoint x="490" y="320"/><mxPoint x="490" y="320"/><mxPoint x="490" y="360"/></Array></mxGeometry>
         </mxCell>
         <mxCell id="e3" value="" style="html=1;rounded=0;" edge="1" parent="1" source="aws_lambda_function.orders" target="aws_sqs_queue.jobs">
-          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="310" y="230"/><mxPoint x="310" y="270"/><mxPoint x="310" y="270"/><mxPoint x="310" y="270"/><mxPoint x="330" y="270"/></Array></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="310" y="310"/><mxPoint x="310" y="380"/><mxPoint x="310" y="380"/><mxPoint x="310" y="380"/><mxPoint x="330" y="380"/></Array></mxGeometry>
         </mxCell>
         <mxCell id="e4" value="" style="html=1;rounded=0;" edge="1" parent="1" source="aws_lambda_function.orders" target="aws_dynamodb_table.orders">
-          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="260" y="230"/><mxPoint x="260" y="260"/><mxPoint x="260" y="260"/><mxPoint x="260" y="260"/><mxPoint x="190" y="260"/></Array></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="260" y="310"/><mxPoint x="260" y="380"/><mxPoint x="260" y="380"/><mxPoint x="260" y="380"/><mxPoint x="190" y="380"/></Array></mxGeometry>
         </mxCell>
         <mxCell id="e5" value="" style="html=1;rounded=0;" edge="1" parent="1" source="aws_lambda_function.orders" target="aws_iam_role.lambda">
-          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="280" y="210"/><mxPoint x="280" y="260"/></Array></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="280" y="260"/><mxPoint x="280" y="380"/></Array></mxGeometry>
         </mxCell>
         <mxCell id="e6" value="" style="html=1;rounded=0;" edge="1" parent="1" source="aws_cloudfront_distribution.cdn" target="aws_s3_bucket.uploads">
-          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="520" y="210"/><mxPoint x="520" y="240"/></Array></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="520" y="260"/><mxPoint x="520" y="360"/></Array></mxGeometry>
         </mxCell>
         <mxCell id="e7" value="" style="html=1;rounded=0;" edge="1" parent="1" source="aws_lambda_event_source_mapping.worker_trigger" target="aws_lambda_function.worker">
-          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="240" y="120"/><mxPoint x="240" y="170"/><mxPoint x="240" y="170"/><mxPoint x="240" y="170"/><mxPoint x="210" y="170"/></Array></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="210" y="40"/><mxPoint x="190" y="40"/><mxPoint x="190" y="40"/><mxPoint x="190" y="40"/><mxPoint x="190" y="170"/></Array></mxGeometry>
         </mxCell>
         <mxCell id="e8" value="" style="html=1;rounded=0;" edge="1" parent="1" source="aws_lambda_event_source_mapping.worker_trigger" target="aws_sqs_queue.jobs">
-          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="340" y="40"/><mxPoint x="380" y="40"/><mxPoint x="380" y="40"/><mxPoint x="380" y="40"/><mxPoint x="380" y="240"/></Array></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="340" y="40"/><mxPoint x="380" y="40"/><mxPoint x="380" y="40"/><mxPoint x="380" y="40"/><mxPoint x="380" y="360"/></Array></mxGeometry>
         </mxCell>
         <mxCell id="e9" value="" style="html=1;rounded=0;" edge="1" parent="1" source="aws_lambda_function.worker" target="aws_dynamodb_table.orders">
-          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="150" y="210"/><mxPoint x="150" y="240"/></Array></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="150" y="260"/><mxPoint x="150" y="360"/></Array></mxGeometry>
         </mxCell>
         <mxCell id="e10" value="" style="html=1;rounded=0;" edge="1" parent="1" source="aws_lambda_function.worker" target="aws_iam_role.lambda">
-          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="190" y="240"/><mxPoint x="190" y="290"/><mxPoint x="190" y="290"/><mxPoint x="190" y="290"/><mxPoint x="210" y="290"/></Array></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="190" y="320"/><mxPoint x="190" y="410"/><mxPoint x="190" y="410"/><mxPoint x="190" y="410"/><mxPoint x="210" y="410"/></Array></mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
