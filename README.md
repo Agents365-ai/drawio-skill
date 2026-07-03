@@ -23,6 +23,7 @@ A skill that turns natural-language descriptions into `.drawio` XML and exports 
 ## ✨ Highlights
 
 - **7 diagram type presets** — ERD, UML Class, Sequence, C4, Architecture, ML/Deep Learning, Flowchart
+- **Mermaid → native .drawio** (draw.io ≥ 30) — author 28 standard types as Mermaid text (**mindmap, gantt, timeline, journey, pie, sankey, kanban**…) and the CLI converts them into a laid-out, editable `.drawio` — structure in, layout free
 - **Visualize a codebase** — extract and auto-lay-out the structure of a Python / JS-TS / Go / Rust project (import graphs) or a Python class hierarchy — Graphviz placement, transitive reduction, nested module containers
 - **IaC → architecture diagram** — turn **Terraform** configs, **Kubernetes** manifests, or **docker-compose** files into an architecture diagram where every resource renders as its **official AWS / Azure / GCP / K8s icon**, edges derived from actual references (role ARNs, selectors, volume mounts)
 - **SQL DDL → ER diagram** — parse `CREATE TABLE` statements into per-table nodes with PK/FK markers and crow's-foot foreign-key edges
@@ -82,7 +83,7 @@ Full walkthrough in [docs/USAGE.md](docs/USAGE.md).
 | **Windows** | [Download installer](https://github.com/jgraph/drawio-desktop/releases) |
 | **Linux** | `.deb`/`.rpm` from [releases](https://github.com/jgraph/drawio-desktop/releases); `sudo apt install xvfb` for headless |
 
-Verify with `drawio --version`. On **WSL2** the CLI is the Windows desktop exe reached via `/mnt/c` — the skill detects this automatically (see [troubleshooting](skills/drawio-skill/references/troubleshooting.md)). Full recipes in [docs/INSTALL_CLI.md](docs/INSTALL_CLI.md).
+Verify with `drawio --version`. **Version ≥ 30 recommended** — it unlocks Mermaid → `.drawio` conversion and the ELK `--layout` pass (both unavailable on ≤ 29). On **WSL2** the CLI is the Windows desktop exe reached via `/mnt/c` — the skill detects this automatically (see [troubleshooting](skills/drawio-skill/references/troubleshooting.md)). Full recipes in [docs/INSTALL_CLI.md](docs/INSTALL_CLI.md).
 
 ### 2. Install the skill
 
@@ -212,7 +213,8 @@ Layout needs Graphviz (`brew install graphviz` / `apt install graphviz`) — opt
 | Flowcharts | business processes, workflows, decision trees, state machines | Semantic shapes (parallelogram I/O, diamond decisions) |
 | UML | class diagrams, sequence diagrams | Inheritance / composition / aggregation arrows; lifelines + activation boxes |
 | Data | ER diagrams, data flow diagrams (DFD) | Table containers, PK/FK notation |
-| Other | org charts, mind maps, wireframes | — |
+| Mermaid-authored | mind maps, gantt, timeline, journey, pie, sankey, kanban + 20 more | Native CLI conversion (≥ v30) — structure only, layout free |
+| Other | org charts, wireframes | — |
 
 ## 🔍 Shape Search
 
@@ -280,6 +282,7 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 | Self-check after export | ❌ | ✅ reads PNG, auto-fixes 6 issue types |
 | Iterative review loop | ❌ manual re-prompt | ✅ targeted edits, 5-round safety valve |
 | Diagram type presets | ❌ | ✅ 7 presets (ERD, UML, Seq, C4, Arch, ML, Flow) |
+| Mermaid → editable .drawio | ❌ | ✅ 28 types via native CLI conversion (≥ v30) |
 | Visualize a codebase | ❌ | ✅ import graphs (Py/JS/Go/Rust) + class diagrams |
 | IaC → architecture diagram | ❌ | ✅ Terraform / K8s / compose → official cloud icons |
 | SQL DDL → ER diagram | ❌ | ✅ `CREATE TABLE` → PK/FK tables, crow's-foot edges |
@@ -303,6 +306,7 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 | **Self-check + auto-fix** | ✅ 2-round (reads PNG) | ❌ | ✅ validation + strict mode | ❌ screenshot only |
 | **Iterative review** | ✅ 5-round loop | ❌ generate once | ✅ 3 workflows | ❌ |
 | **Diagram presets** | ✅ 7 types | ❌ | ✅ paper-mode classifier | ❌ |
+| **Mermaid authoring** | ✅ 28 types (CLI ≥ 30) | ✅ | ❌ | ❌ |
 | **ML/DL diagrams** | ✅ tensor shapes, layer colors | ❌ | ❌ | ❌ |
 | **Color system** | ✅ 7-color semantic | ❌ | ✅ 6 themes | ❌ |
 | **Official shape search** | ✅ 10k+ shapes (local) | ✅ 10k+ shapes (MCP) | ❌ | ❌ |
