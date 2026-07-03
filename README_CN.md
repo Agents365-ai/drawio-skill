@@ -168,6 +168,9 @@ python3 scripts/sqlerd.py      schema.sql   -o graph.json   # SQL DDL → ER 图
 python3 scripts/seqlayout.py   seq.json  -o sequence.drawio # 时序图，直接生成 .drawio
 python3 scripts/c4.py          c4.json   -o c4.drawio       # C4 模型，多页 + 下钻
 
+# 对比两张图 / 两个快照 → 高亮「改了什么」
+python3 scripts/drawiodiff.py old.drawio new.drawio -o graph.json # +新增 -删除 ~变更
+
 # 任一提取器 → 自动布局 → 可编辑的 .drawio
 python3 scripts/autolayout.py  graph.json -o diagram.drawio
 ```
@@ -175,6 +178,7 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 | 组件 | 作用 |
 |---|---|
 | **11 个提取器** | **Python · JS/TS · Go · Rust** 的导入关系图、**Python 类继承**、**Terraform / Kubernetes / docker-compose** 资源图（自动配官方云图标）、**SQL DDL → ER 图**，以及从 `terraform show -json` / `docker inspect` / `kubectl get -o json` 提取的**实时**基础设施（画出真正已部署的样子） |
+| **图对比 (diff)** | `drawiodiff.py` 把两张 `.drawio`（或两个实时快照）对比成一张彩色图 —— 新增=绿、删除=红、变更=橙 —— 一眼看出架构 / 基础设施**漂移** |
 | **时序图引擎** | `seqlayout.py` 从消息列表直接算出 lifeline / 激活条 / 箭头几何 —— 不需要 Graphviz，不需要手摆 |
 | **自动布局** | Graphviz 自动布点，正交连线**绕开**节点 —— 大图不再需要手动摆坐标。`--tune` 双向各排一次取更可读的 |
 | **传递约简** | 删掉被更长路径蕴含的边，把密集的"毛线团"变成可读图（asyncio：149 → 46 条边） |

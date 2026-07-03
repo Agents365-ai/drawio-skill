@@ -123,6 +123,17 @@ Each code importer keeps only **intra-project** edges (third-party/stdlib import
 - **Docker — live** (`dockerimports.py`): reads the JSON array `docker inspect` prints (file or `-`). Containers become rounded boxes (name + image) matching the compose look; the user networks they attach to become green ellipses and the named volumes they mount become cylinders (Docker's built-in `bridge`/`host`/`none`/`ingress` networks and bind mounts are ignored as noise). Edges: container→network, container→volume, plus container→container from `links` and the compose `depends_on` label. `--group` boxes containers by compose project (falling back to first network). The **actually-running** counterpart to composeimports' declared view.
 - **SQL DDL** (`sqlerd.py`): regex + paren matching, no SQL library. Handles inline and table-level `PRIMARY KEY`/`FOREIGN KEY ... REFERENCES`, quoted identifiers, `schema.table` prefixes (`--group` boxes by schema). Column lines carry `PK`/`FK` markers and types (`--no-types` to hide). Unknown dialect clauses are skipped, never mis-parsed into edges.
 
+## Diffing two diagrams (`drawiodiff.py`)
+
+`drawiodiff.py old.drawio new.drawio -o diff.json` compares two `.drawio` files and emits a colour-coded graph JSON for autolayout — one diagram showing **what changed**: nodes/edges added (green), removed (red, dashed), changed (orange, a matched node whose label moved) or unchanged (grey).
+
+```bash
+python3 <this-skill-dir>/scripts/drawiodiff.py old.drawio new.drawio -o diff.json
+python3 <this-skill-dir>/scripts/autolayout.py diff.json -o diff.drawio
+```
+
+Nodes match by cell **id** by default — ideal for anything the importers or live-infra snapshots produce (their ids are stable semantic keys), so *snapshot → change → snapshot → diff* shows drift directly (e.g. two `tfstate.py` or `k8simports.py` snapshots). Pass `--by-label` to match on the visible label instead, for hand-drawn diagrams whose ids are random. Only leaf vertices and their edges are compared (containers/group cells and edge labels are skipped); the diff is a flat colour-coded view, so original icons are replaced by status colours (labels are kept). Multi-page files are flattened; compressed pages are skipped with a warning (this skill always writes uncompressed XML).
+
 The tf/k8s importers emit `ranksep`/`nodesep` in the graph JSON automatically (icon labels render *below* the shape, so rows need extra separation).
 
 **`--tune` (autolayout flag)**: lays the graph out in both directions (TB and LR), scores each (through-vertex routes ×20 + edge crossings ×10 + total edge length as tiebreak), and keeps the better one — report on stderr. `validate.py --score` prints the same style of readability score for a finished `.drawio`, for comparing variants.
