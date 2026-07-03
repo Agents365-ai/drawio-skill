@@ -24,7 +24,9 @@ A skill that turns natural-language descriptions into `.drawio` XML and exports 
 
 - **6 diagram type presets** — ERD, UML Class, Sequence, Architecture, ML/Deep Learning, Flowchart
 - **Visualize a codebase** — extract and auto-lay-out the structure of a Python / JS-TS / Go / Rust project (import graphs) or a Python class hierarchy — Graphviz placement, transitive reduction, nested module containers
-- **IaC → architecture diagram** — turn **Terraform** configs or **Kubernetes** manifests into an architecture diagram where every resource renders as its **official AWS / Azure / GCP / K8s icon**, edges derived from actual references (role ARNs, selectors, volume mounts)
+- **IaC → architecture diagram** — turn **Terraform** configs, **Kubernetes** manifests, or **docker-compose** files into an architecture diagram where every resource renders as its **official AWS / Azure / GCP / K8s icon**, edges derived from actual references (role ARNs, selectors, volume mounts)
+- **SQL DDL → ER diagram** — parse `CREATE TABLE` statements into per-table nodes with PK/FK markers and crow's-foot foreign-key edges
+- **Deterministic sequence diagrams** — describe participants + messages as JSON; lifelines, auto-tracked activation bars, and arrows are computed, never hand-placed
 - **Search 10,000+ official shapes** — resolve the exact AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN icon style instead of guessing (no more blank-box `shape=mxgraph.*` typos)
 - **AI / LLM brand logos** — 321 logos (OpenAI, Claude, Gemini, Mistral, Llama, Ollama, LangChain…) that draw.io has none of, for LLM-app architecture diagrams
 - **Self-check + auto-fix** — reads its own PNG output and auto-fixes overlaps, clipped labels, stacked edges, and more (up to 2 rounds)
@@ -144,6 +146,11 @@ python3 scripts/pyclasses.py   mypackage --group -o graph.json
 # Infrastructure as Code — official cloud icons resolved automatically
 python3 scripts/tfimports.py   ./infra      -o graph.json   # Terraform → AWS/Azure/GCP icons
 python3 scripts/k8simports.py  ./manifests  -o graph.json   # K8s YAML/JSON → kind icons
+python3 scripts/composeimports.py compose.yml -o graph.json # services + named volumes
+
+# Data & interactions
+python3 scripts/sqlerd.py      schema.sql   -o graph.json   # SQL DDL → ER diagram
+python3 scripts/seqlayout.py   seq.json  -o sequence.drawio # sequence diagram, direct to .drawio
 ```
 
 <p align="center">
@@ -159,8 +166,9 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 
 | Piece | What it does |
 |---|---|
-| **7 extractors** | import graphs for **Python · JS/TS · Go · Rust**, **Python class inheritance**, plus **Terraform** and **Kubernetes** resource graphs with official cloud icons |
-| **Auto-layout** | Graphviz places nodes and routes orthogonal edges *around* them — removes the manual-coordinate ceiling for large graphs |
+| **9 extractors** | import graphs for **Python · JS/TS · Go · Rust**, **Python class inheritance**, **Terraform / Kubernetes / docker-compose** resource graphs (official cloud icons), and **SQL DDL → ERD** |
+| **Sequence engine** | `seqlayout.py` computes lifeline / activation-bar / arrow geometry from a message list — no Graphviz, no hand placement |
+| **Auto-layout** | Graphviz places nodes and routes orthogonal edges *around* them — removes the manual-coordinate ceiling for large graphs. `--tune` tries both directions and keeps the more readable one |
 | **Transitive reduction** | drops edges implied by a longer path, turning a dense hairball into a traceable graph (asyncio: 149 → 46 edges) |
 | **Nested containers** | `--group` boxes modules by sub-package, nested for deep package trees |
 | **Deterministic validator** | `validate.py` lints the `.drawio` (dangling edges, duplicate ids, overlaps) before the visual self-check |
@@ -245,7 +253,9 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 | Iterative review loop | ❌ manual re-prompt | ✅ targeted edits, 5-round safety valve |
 | Diagram type presets | ❌ | ✅ 6 presets (ERD, UML, Seq, Arch, ML, Flow) |
 | Visualize a codebase | ❌ | ✅ import graphs (Py/JS/Go/Rust) + class diagrams |
-| IaC → architecture diagram | ❌ | ✅ Terraform / K8s manifests → official cloud icons |
+| IaC → architecture diagram | ❌ | ✅ Terraform / K8s / compose → official cloud icons |
+| SQL DDL → ER diagram | ❌ | ✅ `CREATE TABLE` → PK/FK tables, crow's-foot edges |
+| Sequence diagrams | ❌ hand-placed coordinates | ✅ deterministic geometry engine (`seqlayout.py`) |
 | Auto-layout for large graphs | ❌ hand-places, overlaps | ✅ Graphviz placement, ortho routing, nested containers |
 | Structural validation | ❌ | ✅ deterministic `.drawio` linter |
 | Official shape search | ❌ guesses, blank boxes | ✅ exact style for 10k+ AWS/Azure/GCP/UML shapes |
