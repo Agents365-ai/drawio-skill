@@ -4,6 +4,18 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.24.0] — 2026-07-03
+### Added
+- **Diagram → PowerPoint** (`scripts/drawio2pptx.py`) — export a (multi-page)
+  `.drawio` to a 16:9 `.pptx`, one page per slide, the page name as the slide
+  title and the diagram centred + scaled to fit. A C4 model
+  (Context / Container / Component) becomes a ready-to-present deck.
+  - `drawio2pptx.py c4.drawio -o c4.pptx`.
+  - Needs the draw.io CLI (page PNG export, `--page-index` is 1-based) and the
+    optional `python-pptx` package (graceful error if absent, same pattern as
+    PyYAML). Verified openable via LibreOffice + python-pptx.
+  - SKILL.md router + READMEs updated. Suite now 59.
+
 ## [1.23.0] — 2026-07-03
 ### Added
 - **Diagram → Markdown** (`scripts/explain.py`) — the inverse of the generators:

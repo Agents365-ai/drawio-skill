@@ -779,6 +779,50 @@ class TestImportersCli(unittest.TestCase):
             self.assertIn("## Page 2: P2", md)
             self.assertIn("- Solo", md)
 
+    def test_drawio2pptx_page_names(self):
+        tp = load("drawio2pptx")
+        doc = ('<mxfile>'
+               '<diagram name="Context"><mxGraphModel><root></root></mxGraphModel></diagram>'
+               '<diagram name="Containers"><mxGraphModel><root></root></mxGraphModel></diagram>'
+               '</mxfile>')
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "c4.drawio")
+            self._write(path, doc)
+            self.assertEqual(tp.page_names(path), ["Context", "Containers"])
+
+    def test_drawio2pptx_png_size(self):
+        tp = load("drawio2pptx")
+        import struct
+        blob = b"\x00" * 16 + struct.pack(">II", 1280, 720)      # IHDR w/h at [16:24]
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "x.png")
+            with open(path, "wb") as f:
+                f.write(blob)
+            self.assertEqual(tp.png_size(path), (1280, 720))
+
+    def test_drawio2pptx_deck(self):
+        import shutil
+        try:
+            import pptx  # noqa: F401
+        except ImportError:
+            self.skipTest("python-pptx not installed")
+        if not (shutil.which("drawio") and shutil.which("dot")):
+            self.skipTest("draw.io CLI / Graphviz not installed")
+        graph = {"direction": "TB",
+                 "nodes": [{"id": "a", "label": "A"}, {"id": "b", "label": "B"}],
+                 "edges": [{"source": "a", "target": "b"}]}
+        with tempfile.TemporaryDirectory() as d:
+            gj = os.path.join(d, "g.json")
+            self._write(gj, json.dumps(graph))
+            dr = os.path.join(d, "g.drawio")
+            self.assertEqual(run("autolayout.py", gj, "-o", dr).returncode, 0)
+            out = os.path.join(d, "g.pptx")
+            r = run("drawio2pptx.py", dr, "-o", out)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            from pptx import Presentation
+            prs = Presentation(out)
+            self.assertEqual(len(prs.slides), 1)
+
     SQL = ("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(255));\n"
            "CREATE TABLE orders (\n"
            "  id INT,\n"
