@@ -170,6 +170,9 @@ python3 scripts/sqlerd.py      schema.sql   -o graph.json   # SQL DDL → ER dia
 python3 scripts/seqlayout.py   seq.json  -o sequence.drawio # sequence diagram, direct to .drawio
 python3 scripts/c4.py          c4.json   -o c4.drawio       # C4 model, multi-page + drill-down
 
+# Diff two diagrams / snapshots → colour-coded "what changed"
+python3 scripts/drawiodiff.py old.drawio new.drawio -o graph.json # +added -removed ~changed
+
 # any extractor → auto-layout → editable .drawio
 python3 scripts/autolayout.py  graph.json -o diagram.drawio
 ```
@@ -177,6 +180,7 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 | Piece | What it does |
 |---|---|
 | **11 extractors** | import graphs for **Python · JS/TS · Go · Rust**, **Python class inheritance**, **Terraform / Kubernetes / docker-compose** resource graphs (official cloud icons), **SQL DDL → ERD**, and **live** infra from `terraform show -json` / `docker inspect` / `kubectl get -o json` (draw what's actually deployed) |
+| **Diagram diff** | `drawiodiff.py` compares two `.drawio` (or two live snapshots) into one colour-coded graph — added=green, removed=red, changed=orange — so you can see architecture / infra **drift** at a glance |
 | **Sequence engine** | `seqlayout.py` computes lifeline / activation-bar / arrow geometry from a message list — no Graphviz, no hand placement |
 | **Auto-layout** | Graphviz places nodes and routes orthogonal edges *around* them — removes the manual-coordinate ceiling for large graphs. `--tune` tries both directions and keeps the more readable one |
 | **Transitive reduction** | drops edges implied by a longer path, turning a dense hairball into a traceable graph (asyncio: 149 → 46 edges) |

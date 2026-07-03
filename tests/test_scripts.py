@@ -651,6 +651,65 @@ class TestImportersCli(unittest.TestCase):
         self.assertEqual({n["id"] for n in graph["nodes"]},
                          {"shop/Service/web", "shop/Deployment/web", "shop/ConfigMap/cfg"})
 
+    @staticmethod
+    def _drawio(nodes, edges):
+        """Minimal .drawio XML from (id, label) nodes and (src, tgt) edges."""
+        cells = ['<mxCell id="0"/>', '<mxCell id="1" parent="0"/>']
+        for i, (cid, label) in enumerate(nodes):
+            cells.append(f'<mxCell id="{cid}" value="{label}" vertex="1" parent="1" '
+                         f'style="rounded=1;"><mxGeometry x="{i*200}" y="0" '
+                         'width="120" height="60" as="geometry"/></mxCell>')
+        for i, (s, t) in enumerate(edges):
+            cells.append(f'<mxCell id="e{i}" edge="1" parent="1" source="{s}" '
+                         'target="{}"><mxGeometry relative="1" as="geometry"/></mxCell>'.format(t))
+        return ('<mxfile><diagram name="P"><mxGraphModel><root>'
+                + "".join(cells) + "</root></mxGraphModel></diagram></mxfile>")
+
+    @staticmethod
+    def _status(style):
+        for tag, hue in (("added", "82b366"), ("removed", "b85450"),
+                         ("changed", "d79b00"), ("same", "999999")):
+            if hue in style:
+                return tag
+        return "?"
+
+    def test_drawiodiff_by_id(self):
+        # api label moves (changed), cache removed, worker added, db unchanged.
+        old = self._drawio([("api", "api v1"), ("db", "db"), ("cache", "cache")],
+                           [("api", "db"), ("api", "cache")])
+        new = self._drawio([("api", "api v2"), ("db", "db"), ("worker", "worker")],
+                           [("api", "db"), ("api", "worker")])
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "old.drawio"), old)
+            self._write(os.path.join(d, "new.drawio"), new)
+            graph = json.loads(run("drawiodiff.py", os.path.join(d, "old.drawio"),
+                                   os.path.join(d, "new.drawio")).stdout)
+            status = {n["id"]: self._status(n["style"]) for n in graph["nodes"]}
+            self.assertEqual(status, {"api": "changed", "db": "same",
+                                      "cache": "removed", "worker": "added"})
+            estatus = {(e["source"], e["target"]): self._status(e["style"])
+                       for e in graph["edges"]}
+            self.assertEqual(estatus, {("api", "db"): "same",
+                                       ("api", "cache"): "removed",
+                                       ("api", "worker"): "added"})
+
+    def test_drawiodiff_by_label(self):
+        # ids differ across versions; --by-label matches on the visible text.
+        old = self._drawio([("x1", "API"), ("x2", "DB")], [])
+        new = self._drawio([("y9", "API"), ("y8", "Cache")], [])
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "old.drawio"), old)
+            self._write(os.path.join(d, "new.drawio"), new)
+            base = run("drawiodiff.py", os.path.join(d, "old.drawio"),
+                       os.path.join(d, "new.drawio"))
+            # Without --by-label the random ids make everything add/remove.
+            self.assertNotIn("same", {self._status(n["style"])
+                                      for n in json.loads(base.stdout)["nodes"]})
+            graph = json.loads(run("drawiodiff.py", os.path.join(d, "old.drawio"),
+                                   os.path.join(d, "new.drawio"), "--by-label").stdout)
+            status = {n["id"]: self._status(n["style"]) for n in graph["nodes"]}
+            self.assertEqual(status, {"API": "same", "DB": "removed", "Cache": "added"})
+
     SQL = ("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(255));\n"
            "CREATE TABLE orders (\n"
            "  id INT,\n"

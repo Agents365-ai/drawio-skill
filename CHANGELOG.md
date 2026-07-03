@@ -4,6 +4,20 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.21.0] — 2026-07-03
+### Added
+- **Diagram diff** (`scripts/drawiodiff.py`) — compare two `.drawio` files into a
+  single colour-coded "what changed" graph for autolayout: nodes/edges **added**
+  (green), **removed** (red, dashed), **changed** (orange — a matched node whose
+  label moved), **unchanged** (grey).
+  - Matches by cell **id** by default (stable for importer/live-snapshot output,
+    so *snapshot → change → snapshot → diff* shows **drift** directly — pairs with
+    the v1.20 live importers); `--by-label` matches on visible text for
+    hand-drawn diagrams. Leaf vertices + their edges only; multi-page flattened.
+  - `drawiodiff.py old.drawio new.drawio -o diff.json` → `autolayout.py diff.json`.
+  - Documented in `references/autolayout.md`; SKILL.md router + READMEs updated.
+    Suite now 52.
+
 ## [1.20.0] — 2026-07-03
 ### Added
 - **Live-infrastructure importers** — draw what's *actually running / deployed*,
