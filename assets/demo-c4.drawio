@@ -1,0 +1,87 @@
+<mxfile>
+  <diagram id="system-context" name="System Context">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="customer" value="Personal Customer&#xa;[Person]&#xa;A customer of the bank" style="shape=mxgraph.c4.person2;html=1;whiteSpace=wrap;fontSize=12;fontColor=#ffffff;align=center;fillColor=#083F75;strokeColor=#06315C;" vertex="1" parent="1">
+          <mxGeometry x="160" y="0" width="200" height="180" as="geometry"/>
+        </mxCell>
+        <UserObject label="Internet Banking System&#xa;[Software System]&#xa;Lets customers view accounts and make payments" link="data:page/id,containers" id="ibs">
+          <mxCell style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fontSize=12;fontColor=#ffffff;align=center;fillColor=#1061B0;strokeColor=#0D5091;" vertex="1" parent="1">
+          <mxGeometry x="140" y="250" width="240" height="120" as="geometry"/>
+        </mxCell>
+        </UserObject>
+        <mxCell id="mainframe" value="Mainframe Banking&#xa;[Software System]&#xa;Stores core banking data" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fontSize=12;fontColor=#ffffff;align=center;fillColor=#8C8496;strokeColor=#736782;" vertex="1" parent="1">
+          <mxGeometry x="0" y="430" width="240" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="email" value="E-mail System&#xa;[Software System]&#xa;Microsoft Exchange" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fontSize=12;fontColor=#ffffff;align=center;fillColor=#8C8496;strokeColor=#736782;" vertex="1" parent="1">
+          <mxGeometry x="280" y="430" width="240" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="e0" value="Views accounts via" style="endArrow=blockThin;endFill=1;endSize=10;html=1;fontSize=11;fontColor=#404040;strokeColor=#828282;labelBackgroundColor=#ffffff;rounded=0;" edge="1" parent="1" source="customer" target="ibs">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="260" y="180"/><mxPoint x="260" y="230"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e1" value="Gets data from" style="endArrow=blockThin;endFill=1;endSize=10;html=1;fontSize=11;fontColor=#404040;strokeColor=#828282;labelBackgroundColor=#ffffff;rounded=0;" edge="1" parent="1" source="ibs" target="mainframe">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="190" y="370"/><mxPoint x="190" y="420"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="Sends e-mail via" style="endArrow=blockThin;endFill=1;endSize=10;html=1;fontSize=11;fontColor=#404040;strokeColor=#828282;labelBackgroundColor=#ffffff;rounded=0;" edge="1" parent="1" source="ibs" target="email">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="330" y="370"/><mxPoint x="330" y="420"/></Array></mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="containers" name="Containers">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="spa" value="Single-Page App&#xa;[Container: React]&#xa;Banking UI in the browser" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fontSize=12;fontColor=#ffffff;align=center;fillColor=#23A2D9;strokeColor=#0E7DAD;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="240" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="mobile" value="Mobile App&#xa;[Container: Flutter]&#xa;iOS / Android client" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fontSize=12;fontColor=#ffffff;align=center;fillColor=#23A2D9;strokeColor=#0E7DAD;" vertex="1" parent="1">
+          <mxGeometry x="280" y="0" width="240" height="120" as="geometry"/>
+        </mxCell>
+        <UserObject label="API Application&#xa;[Container: Java / Spring MVC]&#xa;Business logic via JSON/HTTPS API" link="data:page/id,components" id="api">
+          <mxCell style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fontSize=12;fontColor=#ffffff;align=center;fillColor=#23A2D9;strokeColor=#0E7DAD;" vertex="1" parent="1">
+          <mxGeometry x="140" y="190" width="240" height="120" as="geometry"/>
+        </mxCell>
+        </UserObject>
+        <mxCell id="db" value="Database&#xa;[Container: PostgreSQL]&#xa;Accounts, transactions" style="shape=cylinder3;size=15;boundedLbl=1;html=1;whiteSpace=wrap;fontSize=12;fontColor=#ffffff;align=center;fillColor=#23A2D9;strokeColor=#0E7DAD;" vertex="1" parent="1">
+          <mxGeometry x="140" y="370" width="240" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="e0" value="JSON/HTTPS" style="endArrow=blockThin;endFill=1;endSize=10;html=1;fontSize=11;fontColor=#404040;strokeColor=#828282;labelBackgroundColor=#ffffff;rounded=0;" edge="1" parent="1" source="spa" target="api">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="190" y="120"/><mxPoint x="190" y="170"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e1" value="JSON/HTTPS" style="endArrow=blockThin;endFill=1;endSize=10;html=1;fontSize=11;fontColor=#404040;strokeColor=#828282;labelBackgroundColor=#ffffff;rounded=0;" edge="1" parent="1" source="mobile" target="api">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="330" y="120"/><mxPoint x="330" y="170"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="JDBC" style="endArrow=blockThin;endFill=1;endSize=10;html=1;fontSize=11;fontColor=#404040;strokeColor=#828282;labelBackgroundColor=#ffffff;rounded=0;" edge="1" parent="1" source="api" target="db">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="260" y="310"/><mxPoint x="260" y="360"/></Array></mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="components" name="Components">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="signin" value="Sign-In Controller&#xa;[Component: Spring MVC]&#xa;Auth endpoints" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fontSize=12;fontColor=#ffffff;align=center;fillColor=#63BEF2;strokeColor=#2086C9;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="240" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="accounts" value="Accounts Controller&#xa;[Component: Spring MVC]&#xa;Account summary endpoints" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fontSize=12;fontColor=#ffffff;align=center;fillColor=#63BEF2;strokeColor=#2086C9;" vertex="1" parent="1">
+          <mxGeometry x="280" y="0" width="240" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="security" value="Security Component&#xa;[Component: Spring Bean]&#xa;Credentials check" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fontSize=12;fontColor=#ffffff;align=center;fillColor=#63BEF2;strokeColor=#2086C9;" vertex="1" parent="1">
+          <mxGeometry x="140" y="190" width="240" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="e0" value="Uses" style="endArrow=blockThin;endFill=1;endSize=10;html=1;fontSize=11;fontColor=#404040;strokeColor=#828282;labelBackgroundColor=#ffffff;rounded=0;" edge="1" parent="1" source="signin" target="security">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="190" y="120"/><mxPoint x="190" y="170"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e1" value="Uses" style="endArrow=blockThin;endFill=1;endSize=10;html=1;fontSize=11;fontColor=#404040;strokeColor=#828282;labelBackgroundColor=#ffffff;rounded=0;" edge="1" parent="1" source="accounts" target="security">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="330" y="120"/><mxPoint x="330" y="170"/></Array></mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

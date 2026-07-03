@@ -27,6 +27,7 @@
 - **IaC → 架构图** —— 把 **Terraform** 配置、**Kubernetes** manifest 或 **docker-compose** 文件直接变成架构图，每个资源渲染为**官方 AWS / Azure / GCP / K8s 图标**，连线来自真实引用（role ARN、selector、volume 挂载）
 - **SQL DDL → ER 图** —— 解析 `CREATE TABLE` 语句，生成带 PK/FK 标记的表节点和鸦爪外键连线
 - **确定性时序图** —— 用 JSON 描述参与者 + 消息序列，lifeline、自动追踪的激活条、箭头几何全部计算得出，无需手摆坐标
+- **C4 模型 + 下钻** —— 一条命令生成多页 System Context → Container → Component 全套，官方 C4 形状配色，父元素**点击跳转**到子层页面
 - **搜索 10,000+ 个官方形状** —— 直接拿到 AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN 图标的精确 style，不靠猜（杜绝 `shape=mxgraph.*` 拼错变空白框）
 - **AI / LLM 品牌图标** —— 321 个 draw.io 自身没有的 logo（OpenAI、Claude、Gemini、Mistral、Llama、Ollama、LangChain……），专为 LLM 应用架构图准备
 - **自检 + 自动修复** —— 读取自己导出的 PNG，自动修复重叠、截断标签、连线堆叠等问题（最多 2 轮）
@@ -149,7 +150,23 @@ python3 scripts/composeimports.py compose.yml -o graph.json # 服务 + 命名卷
 # 数据与交互
 python3 scripts/sqlerd.py      schema.sql   -o graph.json   # SQL DDL → ER 图
 python3 scripts/seqlayout.py   seq.json  -o sequence.drawio # 时序图，直接生成 .drawio
+python3 scripts/c4.py          c4.json   -o c4.drawio       # C4 模型，多页 + 下钻
 ```
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="assets/demo-c4-context.png" alt="C4 系统上下文" width="100%"><br>
+      <b>C4 第 1 层</b> · System Context<br>
+      <sub>在 draw.io 里点击蓝色系统框即可下钻到……</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="assets/demo-c4-containers.png" alt="C4 容器层" width="100%"><br>
+      <b>C4 第 2 层</b> · Containers<br>
+      <sub>……容器层页面 —— 一份 <a href="assets/demo-c4-input.json">JSON</a>，一个多页 <a href="assets/demo-c4.drawio">.drawio</a>。</sub>
+    </td>
+  </tr>
+</table>
 
 <p align="center">
   <img src="assets/demo-terraform.png" width="820" alt="由 Terraform 直接生成的 serverless 架构图 —— 每个资源渲染为官方 AWS 图标">
@@ -254,6 +271,7 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 | IaC → 架构图 | ❌ | ✅ Terraform / K8s / compose → 官方云图标 |
 | SQL DDL → ER 图 | ❌ | ✅ `CREATE TABLE` → PK/FK 表节点 + 鸦爪连线 |
 | 时序图 | ❌ 手摆坐标易出错 | ✅ 确定性几何引擎（`seqlayout.py`） |
+| C4 模型 | ❌ | ✅ 多页 Context→Container→Component + 点击下钻 |
 | 大图自动布局 | ❌ 手动摆放、易重叠 | ✅ Graphviz 布点、正交路由、嵌套容器 |
 | 结构校验 | ❌ | ✅ 确定性 `.drawio` linter |
 | 官方形状搜索 | ❌ 靠猜、变空白框 | ✅ 1 万+ AWS/Azure/GCP/UML 形状的精确 style |

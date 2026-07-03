@@ -27,6 +27,7 @@ A skill that turns natural-language descriptions into `.drawio` XML and exports 
 - **IaC → architecture diagram** — turn **Terraform** configs, **Kubernetes** manifests, or **docker-compose** files into an architecture diagram where every resource renders as its **official AWS / Azure / GCP / K8s icon**, edges derived from actual references (role ARNs, selectors, volume mounts)
 - **SQL DDL → ER diagram** — parse `CREATE TABLE` statements into per-table nodes with PK/FK markers and crow's-foot foreign-key edges
 - **Deterministic sequence diagrams** — describe participants + messages as JSON; lifelines, auto-tracked activation bars, and arrows are computed, never hand-placed
+- **C4 model with drill-down** — one command generates the multi-page System Context → Container → Component set with official C4 shapes; parent elements **click through** to their child page
 - **Search 10,000+ official shapes** — resolve the exact AWS / Azure / GCP / Cisco / Kubernetes / UML / BPMN icon style instead of guessing (no more blank-box `shape=mxgraph.*` typos)
 - **AI / LLM brand logos** — 321 logos (OpenAI, Claude, Gemini, Mistral, Llama, Ollama, LangChain…) that draw.io has none of, for LLM-app architecture diagrams
 - **Self-check + auto-fix** — reads its own PNG output and auto-fixes overlaps, clipped labels, stacked edges, and more (up to 2 rounds)
@@ -151,7 +152,23 @@ python3 scripts/composeimports.py compose.yml -o graph.json # services + named v
 # Data & interactions
 python3 scripts/sqlerd.py      schema.sql   -o graph.json   # SQL DDL → ER diagram
 python3 scripts/seqlayout.py   seq.json  -o sequence.drawio # sequence diagram, direct to .drawio
+python3 scripts/c4.py          c4.json   -o c4.drawio       # C4 model, multi-page + drill-down
 ```
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="assets/demo-c4-context.png" alt="C4 System Context" width="100%"><br>
+      <b>C4 Level 1</b> · System Context<br>
+      <sub>Clicking the blue system box in draw.io drills down to…</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="assets/demo-c4-containers.png" alt="C4 Containers" width="100%"><br>
+      <b>C4 Level 2</b> · Containers<br>
+      <sub>…the Containers page — one <a href="assets/demo-c4-input.json">JSON</a>, one multi-page <a href="assets/demo-c4.drawio">.drawio</a>.</sub>
+    </td>
+  </tr>
+</table>
 
 <p align="center">
   <img src="assets/demo-terraform.png" width="820" alt="Serverless architecture diagram generated from Terraform — every resource rendered as its official AWS icon">
@@ -256,6 +273,7 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 | IaC → architecture diagram | ❌ | ✅ Terraform / K8s / compose → official cloud icons |
 | SQL DDL → ER diagram | ❌ | ✅ `CREATE TABLE` → PK/FK tables, crow's-foot edges |
 | Sequence diagrams | ❌ hand-placed coordinates | ✅ deterministic geometry engine (`seqlayout.py`) |
+| C4 model | ❌ | ✅ multi-page Context→Container→Component with click-to-drill-down |
 | Auto-layout for large graphs | ❌ hand-places, overlaps | ✅ Graphviz placement, ortho routing, nested containers |
 | Structural validation | ❌ | ✅ deterministic `.drawio` linter |
 | Official shape search | ❌ guesses, blank boxes | ✅ exact style for 10k+ AWS/Azure/GCP/UML shapes |
