@@ -174,6 +174,9 @@ python3 scripts/drawiodiff.py old.drawio new.drawio -o graph.json # +新增 -删
 # 架构时间轴 → 从 git 历史生成「代码怎么长出来的」自包含 HTML 播放器
 python3 scripts/timelapse.py src --importer pyimports # → architecture-evolution.html
 
+# 反向：把已有的 .drawio 描述成结构化 Markdown（README / PR 摘要）
+python3 scripts/explain.py    architecture.drawio -o architecture.md
+
 # 任一提取器 → 自动布局 → 可编辑的 .drawio
 python3 scripts/autolayout.py  graph.json -o diagram.drawio
 ```
@@ -183,6 +186,7 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 | **11 个提取器** | **Python · JS/TS · Go · Rust** 的导入关系图、**Python 类继承**、**Terraform / Kubernetes / docker-compose** 资源图（自动配官方云图标）、**SQL DDL → ER 图**，以及从 `terraform show -json` / `docker inspect` / `kubectl get -o json` 提取的**实时**基础设施（画出真正已部署的样子） |
 | **图对比 (diff)** | `drawiodiff.py` 把两张 `.drawio`（或两个实时快照）对比成一张彩色图 —— 新增=绿、删除=红、变更=橙 —— 一眼看出架构 / 基础设施**漂移** |
 | **架构时间轴** | `timelapse.py` 沿 git 历史逐个提交重跑提取器，拼成一个自包含 HTML 播放器 —— 看着模块和依赖边随时间长出来（▶ 播放 / ‹ › 单步） |
+| **图 → Markdown** | `explain.py` 把一张 `.drawio` 反向描述成结构化文档 —— 按层级列出组件、关系、C4 多页分节 —— 方便把架构摘要塞进 README 或 PR |
 | **时序图引擎** | `seqlayout.py` 从消息列表直接算出 lifeline / 激活条 / 箭头几何 —— 不需要 Graphviz，不需要手摆 |
 | **自动布局** | Graphviz 自动布点，正交连线**绕开**节点 —— 大图不再需要手动摆坐标。`--tune` 双向各排一次取更可读的 |
 | **传递约简** | 删掉被更长路径蕴含的边，把密集的"毛线团"变成可读图（asyncio：149 → 46 条边） |

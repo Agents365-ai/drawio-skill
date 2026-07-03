@@ -734,6 +734,51 @@ class TestImportersCli(unittest.TestCase):
         self.assertIn('"n": 9', html)
         self.assertIn('"e": 12', html)
 
+    # A container ("Tier") holding A + B, an ungrouped cylinder DB, one labeled edge.
+    EXPLAIN_PAGE = (
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        '<mxCell id="grp" value="Tier" vertex="1" parent="1" style="group">'
+        '<mxGeometry x="0" y="0" width="240" height="120" as="geometry"/></mxCell>'
+        '<mxCell id="a" value="A" vertex="1" parent="grp" style="rounded=1;">'
+        '<mxGeometry x="10" y="30" width="80" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="b" value="B" vertex="1" parent="grp" style="rounded=1;">'
+        '<mxGeometry x="120" y="30" width="80" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="c" value="DB" vertex="1" parent="1" style="shape=cylinder3;">'
+        '<mxGeometry x="400" y="0" width="80" height="80" as="geometry"/></mxCell>'
+        '<mxCell id="e1" value="reads" edge="1" parent="1" source="a" target="c">'
+        '<mxGeometry relative="1" as="geometry"/></mxCell>')
+
+    def test_explain_groups_shapes_relations(self):
+        doc = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
+               + self.EXPLAIN_PAGE + "</root></mxGraphModel></diagram></mxfile>")
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "arch.drawio")
+            self._write(path, doc)
+            md = run("explain.py", path).stdout
+            self.assertIn("### Components (3)", md)       # A, B, DB (grp is a container)
+            self.assertIn("- **Tier**", md)              # container -> grouping heading
+            self.assertIn("- A", md)
+            self.assertIn("DB _data store_", md)         # cylinder -> data store
+            self.assertIn("A —reads→ DB", md)            # labeled relation
+            self.assertNotIn("- Tier _", md)             # container itself isn't a component
+
+    def test_explain_multipage(self):
+        doc = ('<mxfile>'
+               '<diagram name="P1"><mxGraphModel><root>' + self.EXPLAIN_PAGE
+               + '</root></mxGraphModel></diagram>'
+               '<diagram name="P2"><mxGraphModel><root>'
+               '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+               '<mxCell id="x" value="Solo" vertex="1" parent="1" style="rounded=1;">'
+               '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+               '</root></mxGraphModel></diagram></mxfile>')
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "multi.drawio")
+            self._write(path, doc)
+            md = run("explain.py", path).stdout
+            self.assertIn("## Page 1: P1", md)
+            self.assertIn("## Page 2: P2", md)
+            self.assertIn("- Solo", md)
+
     SQL = ("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(255));\n"
            "CREATE TABLE orders (\n"
            "  id INT,\n"

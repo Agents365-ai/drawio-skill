@@ -176,6 +176,9 @@ python3 scripts/drawiodiff.py old.drawio new.drawio -o graph.json # +added -remo
 # Architecture time-lapse → self-contained HTML player of how a codebase grew
 python3 scripts/timelapse.py src --importer pyimports # → architecture-evolution.html
 
+# Reverse: describe an existing .drawio as structured Markdown (README / PR summary)
+python3 scripts/explain.py    architecture.drawio -o architecture.md
+
 # any extractor → auto-layout → editable .drawio
 python3 scripts/autolayout.py  graph.json -o diagram.drawio
 ```
@@ -185,6 +188,7 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 | **11 extractors** | import graphs for **Python · JS/TS · Go · Rust**, **Python class inheritance**, **Terraform / Kubernetes / docker-compose** resource graphs (official cloud icons), **SQL DDL → ERD**, and **live** infra from `terraform show -json` / `docker inspect` / `kubectl get -o json` (draw what's actually deployed) |
 | **Diagram diff** | `drawiodiff.py` compares two `.drawio` (or two live snapshots) into one colour-coded graph — added=green, removed=red, changed=orange — so you can see architecture / infra **drift** at a glance |
 | **Architecture time-lapse** | `timelapse.py` re-runs an importer across a repo's git history and assembles a self-contained HTML player — watch modules & edges appear over time (▶ play / ‹ › step) |
+| **Diagram → Markdown** | `explain.py` reverses a `.drawio` into a structured description — components by tier, relations, per-page for C4 — for dropping an architecture summary into a README or PR |
 | **Sequence engine** | `seqlayout.py` computes lifeline / activation-bar / arrow geometry from a message list — no Graphviz, no hand placement |
 | **Auto-layout** | Graphviz places nodes and routes orthogonal edges *around* them — removes the manual-coordinate ceiling for large graphs. `--tune` tries both directions and keeps the more readable one |
 | **Transitive reduction** | drops edges implied by a longer path, turning a dense hairball into a traceable graph (asyncio: 149 → 46 edges) |

@@ -1,6 +1,6 @@
 ---
 name: drawio-skill
-version: 1.22.0
+version: 1.23.0
 description: Use when the user requests diagrams, flowcharts, architecture diagrams, ER diagrams, UML / sequence / class diagrams, network topology, cloud architecture from Terraform or Kubernetes manifests, ML/DL model figures (Transformer/CNN/LSTM), mind maps, or any visualization. Also use proactively when explaining systems with 3+ components, complex data flows, or relationships that benefit from visual representation. Best suited when the diagram needs custom styling, rich shape vocabulary, swimlanes, or exportable images (PNG/SVG/PDF/JPG). Generates .drawio XML and exports locally via the native draw.io desktop CLI.
 license: MIT
 homepage: https://github.com/Agents365-ai/drawio-skill
@@ -51,6 +51,7 @@ When the workflow references one of these, read it on demand — none of them ne
 | `scripts/tfstate.py` · `dockerimports.py` (+ `k8simports.py`) | The user wants to draw **what is ACTUALLY running / deployed** — pipe `terraform show -json` (deployed state), `docker inspect $(docker ps -q)` (live containers), or `kubectl get all,ing,cm,secret,pvc -o json` (live cluster, via k8simports) and get the real topology with the same official icons. See `references/live-infra.md` |
 | `scripts/drawiodiff.py` | The user wants to **compare / diff two diagrams or two snapshots** ("what changed", infra drift) — `drawiodiff.py old.drawio new.drawio -o diff.json` emits a colour-coded graph (added=green, removed=red, changed=orange, same=grey) for autolayout. Matches by cell id (importer/live-snapshot output) or `--by-label` (hand-drawn) |
 | `scripts/timelapse.py` | The user wants an **architecture time-lapse / to see how a codebase's structure evolved over git history** — `timelapse.py <dir> --importer pyimports` re-runs an importer at each sampled commit and assembles a self-contained HTML player (embedded frames, play/step controls). Best on a package with real import edges (point `<dir>` at the module root) |
+| `scripts/explain.py` | The user wants to **describe / document / summarize an existing `.drawio` in words** (reverse of generating one) — `explain.py diagram.drawio` emits structured Markdown: components grouped by container/tier, relations (`A —label→ B`), per-page sections for multi-page/C4. Good for a README/PR summary or a text-only read-out |
 | `scripts/sqlerd.py` | The user wants an **ER diagram from SQL DDL** — parses `CREATE TABLE` statements into per-table nodes (columns with PK/FK markers) and crow's-foot FK edges for autolayout |
 | `scripts/seqlayout.py` | The user wants a **sequence diagram** — describe participants + messages as JSON and the script computes all lifeline/activation/arrow geometry deterministically (no hand-placed coordinates, no Graphviz needed) |
 | `scripts/c4.py` | The user wants a **C4 model** (System Context / Container / Component) — levels JSON in, one multi-page `.drawio` out with official C4 shapes/colors and **click-to-drill-down** links between levels |

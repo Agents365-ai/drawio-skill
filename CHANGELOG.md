@@ -4,6 +4,18 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.23.0] — 2026-07-03
+### Added
+- **Diagram → Markdown** (`scripts/explain.py`) — the inverse of the generators:
+  read a `.drawio` and describe it as structured Markdown. Lists components
+  grouped by their container / swimlane / tier, relations (`A —label→ B`, the
+  edge label becomes the verb), and a section per page for multi-page / C4
+  files. A handful of common shapes are named (data store, actor, decision,
+  queue, cloud, AWS/Azure/GCP/Kubernetes). Handy for dropping an architecture
+  summary into a README or PR, or a text-only read-out of a handed-over diagram.
+  - `explain.py diagram.drawio` (Markdown to stdout) or `-o out.md`.
+  - SKILL.md router + READMEs updated. Suite now 56.
+
 ## [1.22.0] — 2026-07-03
 ### Added
 - **Architecture time-lapse** (`scripts/timelapse.py`) — animate how a codebase's
