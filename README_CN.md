@@ -165,6 +165,7 @@ kubectl get all,ing,cm,secret,pvc -o json | python3 scripts/k8simports.py - -o g
 
 # 数据与交互
 python3 scripts/sqlerd.py      schema.sql   -o graph.json   # SQL DDL → ER 图
+python3 scripts/openapiimports.py openapi.yaml -o graph.json # OpenAPI/Swagger → API 图（按方法着色）
 python3 scripts/seqlayout.py   seq.json  -o sequence.drawio # 时序图，直接生成 .drawio
 python3 scripts/c4.py          c4.json   -o c4.drawio       # C4 模型，多页 + 下钻
 
@@ -186,14 +187,18 @@ python3 scripts/svgflow.py    architecture.drawio -o flow.svg
 # 反向：.drawio → Mermaid 流程图（GitHub 原生渲染的 diagrams-as-code）
 python3 scripts/drawio2mermaid.py architecture.drawio --fenced -o arch.md
 
+# 按数据给已有 .drawio 上色 → 成本 / 延迟 / 流量热力图
+python3 scripts/heatmap.py    architecture.drawio -m latency.csv --size -o hot.drawio
+
 # 任一提取器 → 自动布局 → 可编辑的 .drawio
 python3 scripts/autolayout.py  graph.json -o diagram.drawio
 ```
 
 | 组件 | 作用 |
 |---|---|
-| **11 个提取器** | **Python · JS/TS · Go · Rust** 的导入关系图、**Python 类继承**、**Terraform / Kubernetes / docker-compose** 资源图（自动配官方云图标）、**SQL DDL → ER 图**，以及从 `terraform show -json` / `docker inspect` / `kubectl get -o json` 提取的**实时**基础设施（画出真正已部署的样子） |
+| **12 个提取器** | **Python · JS/TS · Go · Rust** 的导入关系图、**Python 类继承**、**Terraform / Kubernetes / docker-compose** 资源图（自动配官方云图标）、**SQL DDL → ER 图**、**OpenAPI / Swagger → API 图**（按 HTTP 方法着色的接口 + schema），以及从 `terraform show -json` / `docker inspect` / `kubectl get -o json` 提取的**实时**基础设施（画出真正已部署的样子） |
 | **图对比 (diff)** | `drawiodiff.py` 把两张 `.drawio`（或两个实时快照）对比成一张彩色图 —— 新增=绿、删除=红、变更=橙 —— 一眼看出架构 / 基础设施**漂移** |
+| **指标热力图** | `heatmap.py` 按一份「节点→数值」的 CSV/JSON 给已有 `.drawio` 重新着色 —— 成本 / 延迟 / 流量 / 错误率沿渐变由低到高上色（可选按值缩放节点 + 自动图例），按 cell id 或标签匹配 |
 | **架构时间轴** | `timelapse.py` 沿 git 历史逐个提交重跑提取器，拼成一个自包含 HTML 播放器 —— 看着模块和依赖边随时间长出来（▶ 播放 / ‹ › 单步） |
 | **图 → Markdown** | `explain.py` 把一张 `.drawio` 反向描述成结构化文档 —— 按层级列出组件、关系、C4 多页分节 —— 方便把架构摘要塞进 README 或 PR |
 | **图 → PowerPoint** | `drawio2pptx.py` 把多页图变成 16:9 幻灯片（每页一张、页名当标题）—— C4 模型一键变成可演示的 slideshow |

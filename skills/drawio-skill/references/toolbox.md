@@ -1,6 +1,6 @@
 # Toolbox — every bundled script, by use-case
 
-A map of the 25 bundled scripts grouped by what you're trying to do. The
+A map of the 27 bundled scripts grouped by what you're trying to do. The
 per-task routing table in `SKILL.md` says *when* to reach for each; this says
 *how they fit together*. Read it when you're not sure which script a request
 maps to, or you want to chain several.
@@ -23,6 +23,8 @@ exports it:
 | Terraform/K8s/compose files | the **declared** architecture | `tfimports` · `k8simports` · `composeimports` |
 | a running cluster/stack/cloud | what's **actually deployed** | `tfstate` · `dockerimports` · `k8simports -` |
 | a SQL schema | an ER diagram | `sqlerd` |
+| an OpenAPI / Swagger spec | an API diagram (by method) | `openapiimports` |
+| a diagram + a metrics file | it coloured by the data | `heatmap` |
 | a sequence of interactions | a UML sequence diagram | `seqlayout` |
 | a system at 3 zoom levels | a C4 model with drill-down | `c4` |
 | two diagrams / two snapshots | what changed (drift) | `drawiodiff` |
@@ -53,6 +55,7 @@ All emit graph JSON → `autolayout.py`.
 - **`k8simports.py`** — K8s manifests → objects as official kind icons (edges: Ingress→Service→workload→ConfigMap/Secret/PVC).
 - **`composeimports.py`** — docker-compose → service boxes + volume cylinders.
 - **`sqlerd.py`** — SQL DDL (`CREATE TABLE`) → ERD with crow's-foot FK edges.
+- **`openapiimports.py`** — OpenAPI 3 / Swagger 2 spec → API diagram: one node per operation (coloured by HTTP method) + one per component schema, with edges to the schemas each operation uses and between nested schemas. `--group` by tag.
 
 ## 4. Live infrastructure → diagram (actually running)
 
@@ -66,6 +69,7 @@ The **actual** counterpart to §3 — see `references/live-infra.md`.
 
 - **`drawiodiff.py`** — diff two `.drawio` (or two live snapshots) → colour-coded graph (added=green, removed=red, changed=orange). Pairs with §4 for drift.
 - **`timelapse.py`** — re-run an extractor across git history → a self-contained HTML player of how the architecture grew.
+- **`heatmap.py`** — recolour any `.drawio` by a metrics file (CSV/JSON): each node shaded low→high on a gradient by its value (`--palette`, optional `--size`, auto legend). Turns a static architecture into a cost / latency / traffic / error-rate heat map.
 
 ## 6. Diagram → other formats (reverse / interop)
 

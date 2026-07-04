@@ -970,6 +970,111 @@ class TestImportersCli(unittest.TestCase):
             self.assertEqual(len(graph["edges"]), 1)
             self.assertEqual(graph["edges"][0], {"source": "a", "target": "b"})
 
+    def test_openapiimports_operations_and_schemas(self):
+        spec = {
+            "openapi": "3.0.0",
+            "paths": {"/pets": {
+                "get": {"tags": ["pets"], "summary": "List",
+                        "responses": {"200": {"content": {"application/json":
+                            {"schema": {"$ref": "#/components/schemas/Pet"}}}}}},
+                "post": {"tags": ["pets"],
+                         "requestBody": {"content": {"application/json":
+                            {"schema": {"$ref": "#/components/schemas/Pet"}}}},
+                         "responses": {"201": {"description": "ok"}}},
+            }},
+            "components": {"schemas": {
+                "Pet": {"properties": {"owner": {"$ref": "#/components/schemas/Owner"}}},
+                "Owner": {"properties": {"id": {"type": "integer"}}},
+            }},
+        }
+        with tempfile.TemporaryDirectory() as d:
+            p = os.path.join(d, "api.json")
+            self._write(p, json.dumps(spec))
+            graph = json.loads(run("openapiimports.py", p, "--group").stdout)
+            ops = [n for n in graph["nodes"] if n["id"].startswith("op")]
+            schemas = [n for n in graph["nodes"] if n["id"].startswith("S:")]
+            self.assertEqual(len(ops), 2)
+            self.assertEqual({n["id"] for n in schemas}, {"S:Pet", "S:Owner"})
+            get = next(n for n in ops if n["label"].startswith("GET"))
+            post = next(n for n in ops if n["label"].startswith("POST"))
+            self.assertIn("fillColor=#dae8fc", get["style"])       # GET blue
+            self.assertIn("fillColor=#d5e8d4", post["style"])      # POST green
+            pairs = {(e["source"], e["target"]) for e in graph["edges"]}
+            self.assertIn((get["id"], "S:Pet"), pairs)             # operation -> schema
+            self.assertIn(("S:Pet", "S:Owner"), pairs)            # schema nesting
+            self.assertEqual({n.get("group") for n in ops}, {"pets"})
+            self.assertEqual(next(iter(schemas)).get("group"), "schemas")
+
+    def test_openapiimports_no_schemas(self):
+        spec = {"openapi": "3.0.0",
+                "paths": {"/x": {"get": {"responses": {"200": {"description": "ok"}}}}},
+                "components": {"schemas": {"Y": {"properties": {"z": {"type": "string"}}}}}}
+        with tempfile.TemporaryDirectory() as d:
+            p = os.path.join(d, "api.json")
+            self._write(p, json.dumps(spec))
+            graph = json.loads(run("openapiimports.py", p, "--no-schemas").stdout)
+            self.assertEqual(len(graph["nodes"]), 1)
+            self.assertTrue(graph["nodes"][0]["id"].startswith("op"))
+            self.assertEqual(graph["edges"], [])
+
+
+class TestHeatmap(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.m = load("heatmap")
+
+    @staticmethod
+    def _write(path, text):
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(text)
+
+    def test_ramp_hits_anchors(self):
+        a = self.m.PALETTES["heat"]
+        self.assertEqual(self.m.ramp(a, 0.0), "#57bb8a")          # low
+        self.assertEqual(self.m.ramp(a, 0.5), "#ffd666")          # mid
+        self.assertEqual(self.m.ramp(a, 1.0), "#e67c73")          # high
+
+    def test_set_style_replaces_colours_once(self):
+        s = self.m.set_style("rounded=1;fillColor=#111111;strokeColor=#222222;",
+                             "#abcdef", "#123456")
+        self.assertIn("fillColor=#abcdef", s)
+        self.assertIn("strokeColor=#123456", s)
+        self.assertNotIn("#111111", s)
+        self.assertEqual(s.count("fillColor="), 1)
+
+    def test_load_metrics_csv_and_json(self):
+        with tempfile.TemporaryDirectory() as d:
+            csvp = os.path.join(d, "m.csv")
+            self._write(csvp, "service,ms\nweb,10\ndb,90\n")     # header auto-skipped
+            self.assertEqual(self.m.load_metrics(csvp), {"web": 10.0, "db": 90.0})
+            jp = os.path.join(d, "m.json")
+            self._write(jp, '{"web":10,"db":90}')
+            self.assertEqual(self.m.load_metrics(jp), {"web": 10.0, "db": 90.0})
+
+    def test_recolors_matched_nodes(self):
+        drawio = (
+            '<mxfile><diagram id="p" name="P"><mxGraphModel><root>'
+            '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+            '<mxCell id="web" value="Web" style="rounded=1;fillColor=#dddddd;'
+            'strokeColor=#999999;" vertex="1" parent="1">'
+            '<mxGeometry x="200" y="40" width="80" height="40" as="geometry"/></mxCell>'
+            '<mxCell id="db" value="Database" style="rounded=1;fillColor=#dddddd;'
+            'strokeColor=#999999;" vertex="1" parent="1">'
+            '<mxGeometry x="360" y="40" width="80" height="40" as="geometry"/></mxCell>'
+            '</root></mxGraphModel></diagram></mxfile>')
+        with tempfile.TemporaryDirectory() as d:
+            dp, mp, out = (os.path.join(d, n) for n in ("a.drawio", "m.csv", "out.drawio"))
+            self._write(dp, drawio)
+            self._write(mp, "web,10\ndb,90\n")
+            r = run("heatmap.py", dp, "-m", mp, "-o", out)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("2/2 metrics matched", r.stderr)
+            import xml.etree.ElementTree as ET
+            cells = {c.get("id"): c.get("style") for c in ET.parse(out).getroot().iter("mxCell")}
+            self.assertIn("fillColor=#57bb8a", cells["web"])       # min -> green
+            self.assertIn("fillColor=#e67c73", cells["db"])        # max -> red
+            self.assertIn("hm-title", cells)                       # legend injected
+
 
 if __name__ == "__main__":
     unittest.main()

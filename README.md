@@ -167,6 +167,7 @@ kubectl get all,ing,cm,secret,pvc -o json | python3 scripts/k8simports.py - -o g
 
 # Data & interactions
 python3 scripts/sqlerd.py      schema.sql   -o graph.json   # SQL DDL → ER diagram
+python3 scripts/openapiimports.py openapi.yaml -o graph.json # OpenAPI/Swagger → API diagram (by method)
 python3 scripts/seqlayout.py   seq.json  -o sequence.drawio # sequence diagram, direct to .drawio
 python3 scripts/c4.py          c4.json   -o c4.drawio       # C4 model, multi-page + drill-down
 
@@ -188,14 +189,18 @@ python3 scripts/svgflow.py    architecture.drawio -o flow.svg
 # Reverse: .drawio → Mermaid flowchart (diagrams-as-code GitHub renders)
 python3 scripts/drawio2mermaid.py architecture.drawio --fenced -o arch.md
 
+# Colour an existing .drawio by data → cost / latency / traffic heat map
+python3 scripts/heatmap.py    architecture.drawio -m latency.csv --size -o hot.drawio
+
 # any extractor → auto-layout → editable .drawio
 python3 scripts/autolayout.py  graph.json -o diagram.drawio
 ```
 
 | Piece | What it does |
 |---|---|
-| **11 extractors** | import graphs for **Python · JS/TS · Go · Rust**, **Python class inheritance**, **Terraform / Kubernetes / docker-compose** resource graphs (official cloud icons), **SQL DDL → ERD**, and **live** infra from `terraform show -json` / `docker inspect` / `kubectl get -o json` (draw what's actually deployed) |
+| **12 extractors** | import graphs for **Python · JS/TS · Go · Rust**, **Python class inheritance**, **Terraform / Kubernetes / docker-compose** resource graphs (official cloud icons), **SQL DDL → ERD**, **OpenAPI / Swagger → API diagram** (operations coloured by HTTP method + schemas), and **live** infra from `terraform show -json` / `docker inspect` / `kubectl get -o json` (draw what's actually deployed) |
 | **Diagram diff** | `drawiodiff.py` compares two `.drawio` (or two live snapshots) into one colour-coded graph — added=green, removed=red, changed=orange — so you can see architecture / infra **drift** at a glance |
+| **Metric heat map** | `heatmap.py` recolours an existing `.drawio` from a CSV/JSON of per-node values — cost / latency / traffic / error-rate shaded low→high on a gradient (optional size-by-value + legend), matched by cell id or label |
 | **Architecture time-lapse** | `timelapse.py` re-runs an importer across a repo's git history and assembles a self-contained HTML player — watch modules & edges appear over time (▶ play / ‹ › step) |
 | **Diagram → Markdown** | `explain.py` reverses a `.drawio` into a structured description — components by tier, relations, per-page for C4 — for dropping an architecture summary into a README or PR |
 | **Diagram → PowerPoint** | `drawio2pptx.py` turns a multi-page diagram into a 16:9 deck (one page per slide, page name as title) — a C4 model becomes a ready-to-present slideshow |

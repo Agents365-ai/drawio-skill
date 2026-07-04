@@ -4,6 +4,28 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.27.0] — 2026-07-04
+### Added
+- **OpenAPI / Swagger → API diagram** (`scripts/openapiimports.py`) — turn an
+  OpenAPI 3 or Swagger 2 spec (JSON, or YAML with PyYAML) into a graph for
+  autolayout: one node per operation **coloured by HTTP method** (GET blue, POST
+  green, PUT/PATCH orange, DELETE red) plus one node per component schema, with
+  edges from each operation to the schemas it references (request/response
+  bodies) and between schemas that nest one another. `--group` boxes operations
+  by tag; `--no-schemas` shows just the endpoint surface. `$ref`s resolve to
+  their final name; only schemas under `components`/`definitions` become nodes.
+- **Metric heat map** (`scripts/heatmap.py`) — recolour an existing `.drawio` by
+  data: pass a metrics file (CSV `key,value` or JSON `{key: value}`) and each
+  node is matched by cell id or label and shaded along a gradient from the
+  lowest value to the highest — a cost / latency / traffic / error-rate heat map
+  over any architecture diagram. `--palette heat|cool|warm`, `--reverse`,
+  `--size` (scale nodes by value), and an auto legend placed clear of the
+  content. Unmatched nodes keep their style; post-processes any diagram, export
+  as usual.
+  - Both verified end-to-end (spec → grouped API PNG; architecture + latency CSV
+    → heat map PNG with legend + sizing). SKILL.md router + toolbox.md + READMEs
+    updated; script count 25 → 27. Suite now 69.
+
 ## [1.26.1] — 2026-07-04
 ### Added
 - **`references/toolbox.md`** — a use-case map of all 25 bundled scripts
