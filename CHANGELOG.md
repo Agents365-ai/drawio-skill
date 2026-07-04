@@ -4,6 +4,22 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.28.0] — 2026-07-04
+### Added
+- **Interactive HTML viewer** (`scripts/drawiohtml.py`) — publish a `.drawio` as
+  ONE self-contained `.html`: every page exported to SVG via the draw.io CLI and
+  inlined with page tabs, drag-pan, wheel-zoom (cursor-anchored), node search
+  (matches glow, Enter cycles + centres) and **working links** — external links
+  open normally, internal `data:page/id,…` links (e.g. a C4 model's drill-down)
+  switch tabs inside the viewer. No server, no external requests; share the file
+  with anyone, no draw.io needed.
+  - Internal page links survive SVG export by being rewritten to `#page-<id>`
+    fragments first (draw.io drops raw `data:page/id` links); search targets the
+    `<g data-cell-id>` groups draw.io wraps every cell in.
+  - Verified in a real browser (Playwright): C4 Context→Container→Component
+    drill-down chain, search hit/centre, wheel zoom, tab switching. SKILL.md
+    router + toolbox.md + READMEs updated; script count 27 → 28. Suite now 73.
+
 ## [1.27.0] — 2026-07-04
 ### Added
 - **OpenAPI / Swagger → API diagram** (`scripts/openapiimports.py`) — turn an

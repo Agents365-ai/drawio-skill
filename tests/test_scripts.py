@@ -1018,6 +1018,68 @@ class TestImportersCli(unittest.TestCase):
             self.assertEqual(graph["edges"], [])
 
 
+class TestDrawioHtml(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.m = load("drawiohtml")
+
+    TWO_PAGE = (
+        '<mxfile>'
+        '<diagram id="pg1" name="Context"><mxGraphModel><root>'
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        '<UserObject label="System" link="data:page/id,pg2" id="sys">'
+        '<mxCell style="rounded=1;" vertex="1" parent="1">'
+        '<mxGeometry x="40" y="40" width="120" height="60" as="geometry"/></mxCell>'
+        '</UserObject></root></mxGraphModel></diagram>'
+        '<diagram id="pg2" name="Container"><mxGraphModel><root>'
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        '<mxCell id="app" value="App" style="rounded=1;" vertex="1" parent="1">'
+        '<mxGeometry x="40" y="40" width="120" height="60" as="geometry"/></mxCell>'
+        '</root></mxGraphModel></diagram></mxfile>')
+
+    def test_rewrite_page_links(self):
+        import xml.etree.ElementTree as ET
+        import io
+        tree = ET.parse(io.StringIO(self.TWO_PAGE))
+        self.assertEqual(self.m.rewrite_page_links(tree), 1)
+        links = [el.get("link") for el in tree.getroot().iter() if el.get("link")]
+        self.assertEqual(links, ["#page-pg2"])
+
+    def test_strip_prolog(self):
+        svg = '<?xml version="1.0"?>\n<!DOCTYPE svg>\n<svg><g/></svg>'
+        self.assertEqual(self.m.strip_prolog(svg), "<svg><g/></svg>")
+
+    def test_build_html_self_contained(self):
+        html = self.m.build_html("t", [("pg1", "Context"), ("pg2", "Container")],
+                                 ['<svg width="10" height="10"/>',
+                                  '<svg width="10" height="10"/>'])
+        self.assertEqual(html.count('class="page"'), 2)
+        self.assertIn('data-pgid="pg1"', html)
+        self.assertIn('"name": "Container"', html)
+        self.assertIn("#page-", html)                          # link interception
+        for banned in ("<script src=", "<link ", "@import", "https://cdn"):
+            self.assertNotIn(banned, html)                     # no external requests
+
+    def test_viewer_end_to_end(self):
+        import shutil
+        if not shutil.which("drawio"):
+            self.skipTest("draw.io CLI not installed")
+        with tempfile.TemporaryDirectory() as d:
+            src = os.path.join(d, "two.drawio")
+            with open(src, "w", encoding="utf-8") as f:
+                f.write(self.TWO_PAGE)
+            out = os.path.join(d, "two.html")
+            r = run("drawiohtml.py", src, "-o", out)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("2 pages", r.stderr)
+            self.assertIn("1 drill-down link", r.stderr)
+            with open(out, encoding="utf-8") as f:
+                html = f.read()
+            self.assertEqual(html.count("<svg"), 2)            # both pages inlined
+            self.assertIn("#page-pg2", html)                   # drill-down survived
+            self.assertIn("data-cell-id", html)                # searchable cells
+
+
 class TestHeatmap(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

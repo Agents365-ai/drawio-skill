@@ -1,6 +1,6 @@
 ---
 name: drawio-skill
-version: 1.27.0
+version: 1.28.0
 description: Use when the user requests diagrams, flowcharts, architecture diagrams, ER diagrams, UML / sequence / class diagrams, network topology, cloud architecture from Terraform or Kubernetes manifests, ML/DL model figures (Transformer/CNN/LSTM), mind maps, or any visualization. Also use proactively when explaining systems with 3+ components, complex data flows, or relationships that benefit from visual representation. Best suited when the diagram needs custom styling, rich shape vocabulary, swimlanes, or exportable images (PNG/SVG/PDF/JPG). Generates .drawio XML and exports locally via the native draw.io desktop CLI.
 license: MIT
 homepage: https://github.com/Agents365-ai/drawio-skill
@@ -34,7 +34,7 @@ When the workflow references one of these, read it on demand — none of them ne
 
 | File | Read it when |
 |---|---|
-| `references/toolbox.md` | You're **not sure which bundled script fits** a request, or want to chain several — a map of all 27 scripts grouped by use-case (author / import code / import IaC / import API spec / live infra / compare / annotate / reverse-export / utilities) with an "I have X, I want Y → use Z" guide |
+| `references/toolbox.md` | You're **not sure which bundled script fits** a request, or want to chain several — a map of all 28 scripts grouped by use-case (author / import code / import IaC / import API spec / live infra / compare / annotate / reverse-export / utilities) with an "I have X, I want Y → use Z" guide |
 | `references/xml-authoring.md` | You're about to **hand-write `.drawio` XML** (workflow step 3) — file skeleton, shape/edge cells, containers, connection distribution, palette, spacing/grid rules. Not needed when a bundled generator writes the XML |
 | `references/mermaid-authoring.md` | The diagram is a **standard type with no custom styling/icon needs** (flowchart, state, gantt, mindmap, timeline, journey, pie, …) and the CLI is **≥ v30** — author it as Mermaid text and let the CLI convert to native `.drawio` (structure only, layout free). Also documents the CLI's ELK `--layout` pass for XML |
 | `references/diagram-types.md` | The user names a specific diagram type (ERD, UML class, sequence, C4, architecture, ML/DL, flowchart) |
@@ -54,6 +54,7 @@ When the workflow references one of these, read it on demand — none of them ne
 | `scripts/timelapse.py` | The user wants an **architecture time-lapse / to see how a codebase's structure evolved over git history** — `timelapse.py <dir> --importer pyimports` re-runs an importer at each sampled commit and assembles a self-contained HTML player (embedded frames, play/step controls). Best on a package with real import edges (point `<dir>` at the module root) |
 | `scripts/explain.py` | The user wants to **describe / document / summarize an existing `.drawio` in words** (reverse of generating one) — `explain.py diagram.drawio` emits structured Markdown: components grouped by container/tier, relations (`A —label→ B`), per-page sections for multi-page/C4. Good for a README/PR summary or a text-only read-out |
 | `scripts/drawio2pptx.py` | The user wants a **PowerPoint deck / slides from a diagram** — `drawio2pptx.py diagram.drawio -o deck.pptx` puts each page on its own 16:9 slide (page name as title), so a multi-page **C4 model** becomes a ready-to-present deck. Needs `python-pptx` (`pip install python-pptx`) + the draw.io CLI |
+| `scripts/drawiohtml.py` | The user wants a **shareable interactive viewer** for a diagram (pan / zoom / search, no draw.io needed) — `drawiohtml.py diagram.drawio -o viewer.html` inlines every page's SVG into ONE self-contained HTML with page tabs, drag-pan, wheel-zoom, node search (Enter cycles + centres matches) and **working drill-down links** (a C4 model's `data:page/id` links switch tabs). No server, no external requests — send the file to anyone |
 | `scripts/svgflow.py` | The user wants an **animated / "flowing" diagram** (data-flow, moving edges) — `svgflow.py diagram.drawio -o flow.svg` exports to SVG and makes every edge a marching-ants animation (dashes travel along the arrows). Self-contained looping `.svg` that renders on GitHub / any browser; `--speed` / `--dash` / `--reverse` |
 | `scripts/drawio2mermaid.py` | The user wants to **convert a `.drawio` into Mermaid text** (diagrams-as-code for a Markdown file that GitHub renders) — `drawio2mermaid.py diagram.drawio` emits a `flowchart` (containers → `subgraph`s, edge labels kept, cylinder/rhombus shapes mapped); `--fenced` wraps in ```mermaid, multi-page → one graph per page. Structural only (styling/icons don't survive) |
 | `scripts/sqlerd.py` | The user wants an **ER diagram from SQL DDL** — parses `CREATE TABLE` statements into per-table nodes (columns with PK/FK markers) and crow's-foot FK edges for autolayout |

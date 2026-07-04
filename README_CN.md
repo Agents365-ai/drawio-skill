@@ -181,6 +181,9 @@ python3 scripts/explain.py    architecture.drawio -o architecture.md
 # 图 → PowerPoint 幻灯片（每页一张；C4 模型 → 演示稿）
 python3 scripts/drawio2pptx.py c4.drawio -o c4.pptx   # 需要: pip install python-pptx
 
+# 交互式 HTML 查看器 —— 平移/缩放/搜索/页签 + 可用的下钻链接，单文件
+python3 scripts/drawiohtml.py c4.drawio -o c4.html
+
 # 数据流动画 SVG —— 让边「流动」起来（marching ants）；GitHub 可直接渲染
 python3 scripts/svgflow.py    architecture.drawio -o flow.svg
 
@@ -201,6 +204,7 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 | **指标热力图** | `heatmap.py` 按一份「节点→数值」的 CSV/JSON 给已有 `.drawio` 重新着色 —— 成本 / 延迟 / 流量 / 错误率沿渐变由低到高上色（可选按值缩放节点 + 自动图例），按 cell id 或标签匹配 |
 | **架构时间轴** | `timelapse.py` 沿 git 历史逐个提交重跑提取器，拼成一个自包含 HTML 播放器 —— 看着模块和依赖边随时间长出来（▶ 播放 / ‹ › 单步） |
 | **图 → Markdown** | `explain.py` 把一张 `.drawio` 反向描述成结构化文档 —— 按层级列出组件、关系、C4 多页分节 —— 方便把架构摘要塞进 README 或 PR |
+| **交互式查看器** | `drawiohtml.py` 把 `.drawio` 发布成一个自包含 HTML —— 页签、拖拽平移、滚轮缩放、节点搜索，C4 模型的下钻链接照常可点。发一个文件即可分享；不需要 draw.io，也不需要服务器 |
 | **图 → PowerPoint** | `drawio2pptx.py` 把多页图变成 16:9 幻灯片（每页一张、页名当标题）—— C4 模型一键变成可演示的 slideshow |
 | **数据流动画** | `svgflow.py` 让图里的边「流动」起来（沿箭头方向的 marching-ants 动画）—— 自包含循环 SVG，可在 GitHub、文档或幻灯片背景里直接播放 |
 | **图 → Mermaid** | `drawio2mermaid.py` 把 `.drawio` 转成 Mermaid `flowchart`（容器变 subgraph、保留边标签）—— 粘进 Markdown 就是 GitHub 原生渲染的 diagrams-as-code |

@@ -1,6 +1,6 @@
 # Toolbox — every bundled script, by use-case
 
-A map of the 27 bundled scripts grouped by what you're trying to do. The
+A map of the 28 bundled scripts grouped by what you're trying to do. The
 per-task routing table in `SKILL.md` says *when* to reach for each; this says
 *how they fit together*. Read it when you're not sure which script a request
 maps to, or you want to chain several.
@@ -29,6 +29,7 @@ exports it:
 | a system at 3 zoom levels | a C4 model with drill-down | `c4` |
 | two diagrams / two snapshots | what changed (drift) | `drawiodiff` |
 | a repo's git history | how its architecture grew | `timelapse` |
+| a `.drawio` | a shareable interactive viewer | `drawiohtml` (→ HTML: pan/zoom/search/tabs) |
 | a `.drawio` | a written description | `explain` (→ Markdown) |
 | a `.drawio` | a slide deck | `drawio2pptx` (→ PPTX) |
 | a `.drawio` | an animated data-flow | `svgflow` (→ SVG) |
@@ -75,6 +76,7 @@ The **actual** counterpart to §3 — see `references/live-infra.md`.
 
 The skill runs both directions — these turn a `.drawio` back into something else:
 
+- **`drawiohtml.py`** — → a self-contained **interactive HTML viewer**: every page inlined as SVG with tabs, drag-pan, wheel-zoom, node search, and working drill-down links (C4 `data:page/id` links switch tabs). Share one file; no draw.io, no server.
 - **`explain.py`** — → structured **Markdown** (components by tier, relations, per-page C4).
 - **`drawio2pptx.py`** — → a 16:9 **PowerPoint** deck, one page per slide (needs `python-pptx`).
 - **`svgflow.py`** — → an **animated SVG** (edges flow as marching ants); renders on GitHub.
