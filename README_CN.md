@@ -312,9 +312,9 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 
 | 功能 | drawio-skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp)（官方）<br>![stars](https://img.shields.io/github/stars/jgraph/drawio-mcp?style=flat-square&logo=github&v=2) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills)<br>![stars](https://img.shields.io/github/stars/bahayonghang/drawio-skills?style=flat-square&logo=github) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio)<br>![stars](https://img.shields.io/github/stars/GBSOSS/ai-drawio?style=flat-square&logo=github) |
 |------|------|------|------|------|
-| **方式** | 纯 SKILL.md | SKILL.md / MCP / Project | YAML DSL + CLI（MCP 可选） | Claude Code 插件 |
+| **方式** | 纯 SKILL.md | MCP 服务 / Claude Code 插件 / Project | YAML DSL + CLI（MCP 可选） | Claude Code 插件 |
 | **依赖** | 仅 draw.io 桌面版 | draw.io 桌面版 | draw.io 桌面版（MCP 可选） | draw.io 插件 + 浏览器 |
-| **多智能体支持** | ✅ 6 个平台 | ❌ 仅 Claude 系列 | ✅ Claude / Gemini / Codex | ❌ 仅 Claude Code |
+| **多智能体支持** | ✅ 6 个平台 | ⚠️ MCP 宿主（Claude、Cursor、VS Code） | ✅ Claude / Gemini / Codex | ❌ 仅 Claude Code |
 | **自检 + 自动修复** | ✅ 2 轮（读取 PNG） | ❌ | ✅ 校验 + 严格模式 | ❌ 仅截图 |
 | **迭代审查** | ✅ 5 轮循环 | ❌ 一次生成 | ✅ 3 种工作流 | ❌ |
 | **图表预设** | ✅ 7 种 | ❌ | ✅ 论文模式分类 | ❌ |
@@ -323,8 +323,10 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 | **配色系统** | ✅ 7 色语义 | ❌ | ✅ 6 种主题 | ❌ |
 | **官方形状搜索** | ✅ 1 万+ 形状（本地） | ✅ 1 万+ 形状（MCP） | ❌ | ❌ |
 | **AI/LLM 品牌图标** | ✅ 321 + 18 数据存储 | ❌ | ❌ | ❌ |
-| **浏览器降级** | ✅ diagrams.net URL（查看 + 可编辑） | ❌ 仅内联预览 | ✅ 通过可选 MCP | ✅ diagrams.net viewer（主要） |
+| **浏览器降级** | ✅ diagrams.net URL（查看 + 可编辑） | ✅ diagrams.net URL（插件）+ 内联预览 | ✅ 通过可选 MCP | ✅ diagrams.net viewer（主要） |
 | **零配置** | ✅ 复制 `skills/drawio-skill/` | ✅ | ✅ 桌面版模式 | ❌ 需安装插件 |
+
+> **在用官方 jgraph 插件？** [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp) 现已提供官方 Claude Code 插件（`/plugin install drawio@drawio`），同样生成 `.drawio` 并通过桌面版 CLI 导出。drawio-skill 与之互补 —— 当你需要代码 / IaC / SQL / OpenAPI 导入器、AI 品牌图标、确定性时序图与 C4 生成器、自检 + 审查循环以及交互式 HTML 查看器，且只想用单个 SKILL.md、无需 MCP 服务时，选它。
 
 完整对比 + 核心优势总结见 [docs/COMPARISON_CN.md](docs/COMPARISON_CN.md)（含核查时间戳）。
 

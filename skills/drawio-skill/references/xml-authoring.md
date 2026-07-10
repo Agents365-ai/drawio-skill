@@ -121,6 +121,7 @@ For architecture diagrams with nested elements, use draw.io's parent-child conta
 - Pin `exitX/exitY/entryX/entryY` on every edge when a node has 2+ connections — distributes lines across the shape perimeter
 - Add `<Array as="points">` waypoints when an edge must detour around an intermediate shape
 - **Leave room for arrowheads:** the final straight segment between the last bend and the target shape must be ≥20px long. If too short, the arrowhead overlaps the bend and looks broken. Fix by increasing node spacing or adding explicit waypoints
+- **libavoid obstacle-avoiding routing (editor-side, draw.io ≥ 30):** draw.io has a newer connector router that recomputes edge paths to run *around* shapes (fanning out parallel edges) without moving any node; re-routed edges are stamped `libavoidRouting=1` in their style so the geometry stays sticky on reopen. It runs interactively in the draw.io desktop editor (or via jgraph's MCP app-server `routing:"libavoid"`) — it is **not** a headless CLI flag (the CLI `--layout` presets are ELK *node* layouts, a different thing; see `mermaid-authoring.md`). For CLI-authored files keep the orthogonal rules above; if a dense diagram still has crossings after export, open the `.drawio` in draw.io desktop once and let libavoid re-route. Don't stack it on an ELK `--layout` pass — pick one router, not both.
 
 ### Distributing connections on a shape
 

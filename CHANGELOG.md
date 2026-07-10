@@ -4,6 +4,23 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.28.1] — 2026-07-10
+### Changed
+- **Refreshed the `vs Other draw.io Skills & Tools` comparison** (README, README_CN,
+  `docs/COMPARISON.md`, `docs/COMPARISON_CN.md`) to match the current state of the
+  official [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp), which has grown
+  into a four-approach project. Corrected three now-stale cells that overclaimed in our
+  favour: **Approach** (it now ships an official Claude Code plugin), **Multi-agent**
+  (its MCP servers run in Claude, Cursor and VS Code — no longer "Claude apps only"),
+  and **Browser fallback** (its Claude Code plugin now emits a diagrams.net `url`, not
+  just an inline preview). Added a pointer to the official plugin's install command with
+  a one-line statement of how drawio-skill stays complementary. Bumped the audit date.
+### Added
+- **libavoid routing note** in `references/xml-authoring.md` — documents draw.io's newer
+  editor-side obstacle-avoiding connector router (`libavoidRouting=1`), clarifies it is
+  not a headless CLI `--layout` flag (those are ELK node layouts), and gives the practical
+  path for CLI-authored files. Also noted in the comparison's edge-routing row.
+
 ## [1.28.0] — 2026-07-04
 ### Added
 - **Interactive HTML viewer** (`scripts/drawiohtml.py`) — publish a `.drawio` as

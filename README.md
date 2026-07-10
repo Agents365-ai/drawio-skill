@@ -314,9 +314,9 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 
 | Feature | drawio-skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp) (official)<br>![stars](https://img.shields.io/github/stars/jgraph/drawio-mcp?style=flat-square&logo=github&v=2) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills)<br>![stars](https://img.shields.io/github/stars/bahayonghang/drawio-skills?style=flat-square&logo=github) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio)<br>![stars](https://img.shields.io/github/stars/GBSOSS/ai-drawio?style=flat-square&logo=github) |
 |---|---|---|---|---|
-| **Approach** | Pure SKILL.md | SKILL.md / MCP / Project | YAML DSL + CLI (MCP optional) | Claude Code plugin |
+| **Approach** | Pure SKILL.md | MCP servers / Claude Code plugin / Project | YAML DSL + CLI (MCP optional) | Claude Code plugin |
 | **Dependencies** | draw.io desktop only | draw.io desktop | draw.io desktop (MCP optional) | draw.io plugin + browser |
-| **Multi-agent** | ✅ 6 platforms | ❌ Claude apps only | ✅ Claude / Gemini / Codex | ❌ Claude Code only |
+| **Multi-agent** | ✅ 6 platforms | ⚠️ MCP hosts (Claude, Cursor, VS Code) | ✅ Claude / Gemini / Codex | ❌ Claude Code only |
 | **Self-check + auto-fix** | ✅ 2-round (reads PNG) | ❌ | ✅ validation + strict mode | ❌ screenshot only |
 | **Iterative review** | ✅ 5-round loop | ❌ generate once | ✅ 3 workflows | ❌ |
 | **Diagram presets** | ✅ 7 types | ❌ | ✅ paper-mode classifier | ❌ |
@@ -325,8 +325,10 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 | **Color system** | ✅ 7-color semantic | ❌ | ✅ 6 themes | ❌ |
 | **Official shape search** | ✅ 10k+ shapes (local) | ✅ 10k+ shapes (MCP) | ❌ | ❌ |
 | **AI/LLM brand logos** | ✅ 321 + 18 data-store | ❌ | ❌ | ❌ |
-| **Browser fallback** | ✅ diagrams.net URL (viewer + editable) | ❌ inline preview only | ✅ via optional MCP | ✅ diagrams.net viewer (primary) |
+| **Browser fallback** | ✅ diagrams.net URL (viewer + editable) | ✅ diagrams.net URL (plugin) + inline preview | ✅ via optional MCP | ✅ diagrams.net viewer (primary) |
 | **Zero-config** | ✅ copy `skills/drawio-skill/` | ✅ | ✅ desktop-only mode | ❌ needs plugin install |
+
+> **Using the official jgraph plugin?** [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp) now ships an official Claude Code plugin (`/plugin install drawio@drawio`) that also generates `.drawio` and exports via the desktop CLI. drawio-skill is complementary — reach for it when you want the code / IaC / SQL / OpenAPI importers, AI-brand logos, deterministic sequence & C4 generators, self-check + review loop, and the interactive HTML viewer, all from a single SKILL.md with no MCP server.
 
 Full comparison + key-advantages summary in [docs/COMPARISON.md](docs/COMPARISON.md) (with audit timestamp).
 

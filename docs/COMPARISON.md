@@ -31,9 +31,9 @@
 
 | Feature | This skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp) (official) ![stars](https://img.shields.io/github/stars/jgraph/drawio-mcp?style=flat-square&logo=github) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills) ![stars](https://img.shields.io/github/stars/bahayonghang/drawio-skills?style=flat-square&logo=github) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio) ![stars](https://img.shields.io/github/stars/GBSOSS/ai-drawio?style=flat-square&logo=github) |
 |---------|-----------|---------------|-------------------|--------------|
-| **Approach** | Pure SKILL.md | SKILL.md / MCP / Project | YAML DSL + CLI (MCP optional) | Claude Code plugin |
+| **Approach** | Pure SKILL.md | MCP servers / Claude Code plugin / Project | YAML DSL + CLI (MCP optional) | Claude Code plugin |
 | **Dependencies** | draw.io desktop only | draw.io desktop | draw.io desktop (MCP optional) | draw.io plugin + browser |
-| **Multi-agent** | ✅ 6 platforms | ❌ Claude apps only | ✅ Claude / Gemini / Codex | ❌ Claude Code only |
+| **Multi-agent** | ✅ 6 platforms | ⚠️ MCP hosts (Claude, Cursor, VS Code) | ✅ Claude / Gemini / Codex | ❌ Claude Code only |
 | **Self-check** | ✅ 2-round vision-based (reads PNG) | ❌ | ✅ validation + strict mode | ❌ screenshot only |
 | **Iterative review** | ✅ 5-round loop | ❌ generate once | ✅ 3 workflows (create/edit/replicate) | ❌ |
 | **Layout guidance** | ✅ complexity-scaled + grid snap | ✅ basic spacing | ✅ design-system | ❌ |
@@ -45,13 +45,13 @@
 | **AI/LLM brand logos** | ✅ 321 (lobe-icons) | ❌ | ❌ | ❌ |
 | **Container/group** | ✅ swimlane + group | ✅ detailed | ❌ | ❌ |
 | **Embed diagram** | ✅ `--embed-diagram` | ✅ | ❌ | ❌ |
-| **Edge routing** | ✅ corridors + waypoints | ✅ arrowhead rules | ❌ | ❌ |
-| **Browser fallback** | ✅ diagrams.net URL | ❌ inline preview only | ✅ via optional MCP | ✅ diagrams.net viewer (primary) |
+| **Edge routing** | ✅ corridors + waypoints | ✅ arrowhead rules + libavoid auto-routing | ❌ | ❌ |
+| **Browser fallback** | ✅ diagrams.net URL | ✅ diagrams.net URL (plugin) + inline preview | ✅ via optional MCP | ✅ diagrams.net viewer (primary) |
 | **Auto-launch** | ✅ opens desktop app | ❌ | ❌ | ✅ opens Chrome |
 | **Cloud icons** | AWS basic | ❌ | ✅ AWS/GCP/Azure/K8s | ✅ AWS basic |
 | **Zero-config** | ✅ copy skills/drawio-skill/ | ✅ | ✅ desktop-only mode | ❌ needs plugin install |
 
-_Last audited against competitor READMEs on 2026-05-17. Please open an issue or PR if anything is out of date — competitors evolve and table accuracy depends on community help._
+_Last audited against competitor READMEs on 2026-07-10. Please open an issue or PR if anything is out of date — competitors evolve and table accuracy depends on community help._
 
 ## Key advantages
 
