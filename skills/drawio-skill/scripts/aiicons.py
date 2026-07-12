@@ -164,7 +164,9 @@ def main():
                     continue
                 # Rewrite the 1em intrinsic size so draw.io scales the inlined SVG.
                 svg = svg.replace(b'width="1em"', b'width="24"').replace(b'height="1em"', b'height="24"')
-                image = "data:image/svg+xml;base64," + base64.b64encode(svg).decode()
+                # Marker-less base64: draw.io splits style values on ';', so a
+                # ';base64,' marker would truncate the image= value (issue #80).
+                image = "data:image/svg+xml," + base64.b64encode(svg).decode()
             else:
                 image = url
             results.append({"brand": base, "file": file, "w": args.size, "h": args.size,
@@ -179,7 +181,8 @@ def main():
             if args.embed:
                 try:
                     svg = urllib.request.urlopen(url, timeout=15).read()
-                    image = "data:image/svg+xml;base64," + base64.b64encode(svg).decode()
+                    # Marker-less base64 (see issue #80 note above).
+                    image = "data:image/svg+xml," + base64.b64encode(svg).decode()
                 except Exception as exc:                   # noqa: BLE001 - keep the CDN URL
                     sys.stderr.write(f"warning: could not fetch {url} ({exc}); using CDN URL\n")
             results.append({"brand": brand, "file": f"simpleicons:{slug}",
