@@ -1,0 +1,28 @@
+{
+  "page": {"w_in": 48, "h_in": 36, "px_per_in": 100},
+  "theme": {"brand": "#C00C3C", "overrides": {"tint": "#F7E3E9", "deep": "#8A0A2B"}},
+  "header": {
+    "title": "A Generic Study of Placeholder Systems",
+    "authors": "A. Author, B. Author, C. Author",
+    "affils": "Placeholder University · Example Institute",
+    "logo_left": "LOGO",
+    "logo_right": null,
+    "qr": true
+  },
+  "framework": {"title": "Framework Overview", "slots": 3},
+  "columns": [
+    [
+      {"title": "Motivation", "icon": "lightbulb", "weight": 1},
+      {"title": "Problem Setup", "icon": "puzzle-piece", "weight": 1.2}
+    ],
+    [
+      {"title": "Method", "icon": "gear", "weight": 1.4},
+      {"title": "Theory", "icon": "function", "weight": 0.8}
+    ],
+    [
+      {"title": "Experiments", "icon": "chart-bar", "weight": 1.4},
+      {"title": "Conclusion", "icon": "flag-checkered", "weight": 0.8}
+    ]
+  ],
+  "takeaway": {"text": "One-sentence takeaway that survives a hallway glance."}
+}

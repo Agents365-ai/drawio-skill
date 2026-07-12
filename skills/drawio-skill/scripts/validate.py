@@ -8,6 +8,7 @@ routing defects. Runs without launching draw.io, so it is a fast pre-check
 before the visual review step.
 
   python3 validate.py diagram.drawio
+  python3 validate.py poster.drawio --page 4800x3600 --margin 40
 
 Edge routing checks (warnings): an edge segment crossing a non-incident leaf
 vertex ("routes through vertex"), and two edges crossing each other ("edges X
@@ -26,9 +27,15 @@ Exit status is non-zero when any error (or, with --strict, any warning) is
 found, so it can gate a workflow. Compressed (non-XML) diagram pages are
 skipped with a warning — this skill always writes uncompressed XML.
 
-Usage: python3 validate.py <file.drawio> [--strict]
+--page WxH additionally resolves every vertex to ABSOLUTE coordinates (walking
+container parents) and errors on any cell outside the page rect — content past
+the page silently tiles onto extra PDF pages on export. --margin N warns when
+content intrudes into the outer N px margin.
+
+Usage: python3 validate.py <file.drawio> [--strict] [--page WxH] [--margin N]
 """
 import argparse
+import re
 import sys
 import xml.etree.ElementTree as ET
 
@@ -70,6 +77,25 @@ def overlap(a, b):
     ax, ay, aw, ah = a
     bx, by, bw, bh = b
     return ax < bx + bw and bx < ax + aw and ay < by + bh and by < ay + ah
+
+
+def contains(a, b):
+    """True if rect a fully contains rect b (layering, not a collision)."""
+    ax, ay, aw, ah = a
+    bx, by, bw, bh = b
+    return ax <= bx and ay <= by and ax + aw >= bx + bw and ay + ah >= by + bh
+
+
+def is_backing(cell):
+    """True for decorative backing cells (soft-shadow layers): near-transparent,
+    unlabeled, strokeless — visual depth, never a layout collision."""
+    if (cell.get("value") or "").strip():
+        return False
+    style = cell.get("style") or ""
+    if "strokeColor=none" not in style:
+        return False
+    m = re.search(r"opacity=(\d+)", style)
+    return m is not None and int(m.group(1)) <= 15
 
 
 # --- Edge routing geometry -------------------------------------------------
@@ -238,6 +264,32 @@ def geometry_warnings(cells, ids, parents):
     return warns
 
 
+def check_bounds(diagram, page_w, page_h, margin):
+    """Return (errors, warnings) for vertices outside the page / inside the margin."""
+    model = diagram.find("mxGraphModel")
+    if model is None:
+        return [], []
+    root = model.find("root")
+    cells = root.findall("mxCell") if root is not None else []
+    ids = {c.get("id"): c for c in cells}
+    errors, warns = [], []
+    for c in cells:
+        if c.get("vertex") != "1":
+            continue
+        r = abs_rect(c, ids)
+        if r is None or any(v != v for v in r):
+            continue  # geometry errors already reported by check_page
+        x, y, w, h = r
+        cid = c.get("id")
+        if x < 0 or y < 0 or x + w > page_w or y + h > page_h:
+            errors.append(f"vertex {cid!r} outside page: ({x:g},{y:g}) {w:g}x{h:g} "
+                          f"vs page {page_w:g}x{page_h:g} — exported PDF will tile extra pages")
+        elif margin and (x < margin or y < margin
+                         or x + w > page_w - margin or y + h > page_h - margin):
+            warns.append(f"vertex {cid!r} intrudes into the {margin:g}px page margin")
+    return errors, warns
+
+
 def check_page(diagram):
     """Return (errors, warnings) for one <diagram> page."""
     name = diagram.get("name", "?")
@@ -289,15 +341,35 @@ def check_page(diagram):
                 if x < 0 or y < 0:
                     warns.append(f"vertex {cid!r} negative position ({x:g},{y:g})")
     # Sibling overlap: only leaf vertices (containers legitimately wrap children).
+    # Deliberate layering is not a collision: skip pairs where one box fully
+    # CONTAINS the other (text/rule cells sit on their card by design), and skip
+    # decorative backing cells (shadow layers: near-transparent, unlabeled,
+    # strokeless) entirely.
     boxes = [(c.get("id"), c.get("parent"), rect(c)) for c in cells
              if c.get("vertex") == "1" and c.get("id") not in parents and rect(c)
-             and not any(v != v for v in rect(c))]
+             and not any(v != v for v in rect(c)) and not is_backing(c)]
     for i in range(len(boxes)):
         for j in range(i + 1, len(boxes)):
             (ia, pa, ra), (ib, pb, rb) = boxes[i], boxes[j]
-            if pa == pb and overlap(ra, rb):
+            if pa == pb and overlap(ra, rb) and not (contains(ra, rb) or contains(rb, ra)):
                 warns.append(f"vertices {ia!r} and {ib!r} overlap")
     warns += geometry_warnings(cells, ids, parents)
+    # Container-bounds: a child drawn past its parent's rect silently breaks the
+    # card/box layout (and only trips the page gate if it also crosses the page).
+    for c in cells:
+        if c.get("vertex") != "1" or is_edge_label(c):
+            continue
+        p = ids.get(c.get("parent"))
+        if p is None or p.get("vertex") != "1":
+            continue
+        cr, pr = rect(c), rect(p)
+        if not cr or not pr or any(v != v for v in cr + pr):
+            continue
+        x, y, w, h = cr
+        if x < 0 or y < 0 or x + w > pr[2] or y + h > pr[3]:
+            warns.append(f"vertex {c.get('id')!r} exceeds its container "
+                         f"{p.get('id')!r} bounds ({x:g},{y:g}) {w:g}x{h:g} "
+                         f"vs {pr[2]:g}x{pr[3]:g}")
     return errors, warns
 
 
@@ -308,7 +380,17 @@ def main():
     ap.add_argument("--score", action="store_true",
                     help="also print a readability score (lower is better) — "
                          "useful for comparing layout variants of the same graph")
+    ap.add_argument("--page", metavar="WxH", help="also error on content outside a WxH px page")
+    ap.add_argument("--margin", type=float, default=0,
+                    help="with --page: warn when content intrudes into the outer N px")
     args = ap.parse_args()
+    page_wh = None
+    if args.page:
+        try:
+            pw, ph = args.page.lower().split("x", 1)
+            page_wh = (float(pw), float(ph))
+        except ValueError:
+            ap.error("--page expects WxH, e.g. 4800x3600")
     try:
         tree = ET.parse(args.file)
     except (ET.ParseError, OSError) as exc:
@@ -319,6 +401,10 @@ def main():
         e, w = check_page(page)
         errors += e
         warns += w
+        if page_wh:
+            e, w = check_bounds(page, page_wh[0], page_wh[1], args.margin)
+            errors += e
+            warns += w
     for w in warns:
         print(f"warning: {w}")
     for e in errors:

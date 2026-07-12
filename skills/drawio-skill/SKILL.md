@@ -1,7 +1,7 @@
 ---
 name: drawio-skill
 version: 1.28.1
-description: Use when the user requests diagrams, flowcharts, architecture diagrams, ER diagrams, UML / sequence / class diagrams, network topology, cloud architecture from Terraform or Kubernetes manifests, ML/DL model figures (Transformer/CNN/LSTM), mind maps, or any visualization. Also use proactively when explaining systems with 3+ components, complex data flows, or relationships that benefit from visual representation. Best suited when the diagram needs custom styling, rich shape vocabulary, swimlanes, or exportable images (PNG/SVG/PDF/JPG). Generates .drawio XML and exports locally via the native draw.io desktop CLI.
+description: Use when the user requests diagrams, flowcharts, architecture diagrams, ER diagrams, UML / sequence / class diagrams, network topology, cloud architecture from Terraform or Kubernetes manifests, ML/DL model figures (Transformer/CNN/LSTM), mind maps, academic/conference posters (48x36, A0, page-exact PDF), or any visualization. Also use proactively when explaining systems with 3+ components, complex data flows, or relationships that benefit from visual representation. Best suited when the diagram needs custom styling, rich shape vocabulary, swimlanes, brand theming (one-hex rebrand), concept icons, or exportable images (PNG/SVG/PDF/JPG). Generates .drawio XML and exports locally via the native draw.io desktop CLI.
 license: MIT
 homepage: https://github.com/Agents365-ai/drawio-skill
 compatibility: Requires draw.io desktop app CLI on PATH (macOS/Linux/Windows). Self-check step requires a vision-enabled model (e.g., Claude Sonnet/Opus); gracefully skipped if unavailable. Optional auto-layout (scripts/autolayout.py) needs Graphviz (dot).
@@ -62,7 +62,12 @@ When the workflow references one of these, read it on demand — none of them ne
 | `scripts/heatmap.py` | The user wants to **colour an existing `.drawio` by data** (a cost / latency / traffic / error-rate heat map) — `heatmap.py diagram.drawio -m metrics.csv` matches each metric (CSV `key,value` or JSON `{key:value}`) to a node by id or label and recolours it along a gradient (`--palette heat\|cool\|warm`, `--reverse`), optionally scaling node size (`--size`) and adding a legend. Post-processes any diagram; export as usual |
 | `scripts/seqlayout.py` | The user wants a **sequence diagram** — describe participants + messages as JSON and the script computes all lifeline/activation/arrow geometry deterministically (no hand-placed coordinates, no Graphviz needed) |
 | `scripts/c4.py` | The user wants a **C4 model** (System Context / Container / Component) — levels JSON in, one multi-page `.drawio` out with official C4 shapes/colors and **click-to-drill-down** links between levels |
-| `scripts/validate.py` | You generated a `.drawio` (especially via autolayout or for a large hand-placed diagram) and want a fast deterministic structural lint (dangling edges, dup/reserved ids, broken parents, overlaps) before the vision self-check. `--score` prints a readability score for comparing layout variants |
+| `scripts/validate.py` | You generated a `.drawio` (especially via autolayout or for a large hand-placed diagram) and want a fast deterministic structural lint (dangling edges, dup/reserved ids, broken parents, overlaps) before the vision self-check. `--score` prints a readability score for comparing layout variants; `--page WxH` errors on content outside a page-exact rect (posters) |
+| `scripts/concepticons.py` | The diagram needs a **concept icon** (shield, brain, flask, gear, …) rather than a brand logo — Phosphor (MIT), line (`regular`) + solid (`fill`) weights, emitted as a self-contained baked-ink data-URI style. Brand logo → `aiicons.py`; concept glyph → this |
+| `scripts/theme.py` + `references/effects.md` | The user names a brand color / wants a themed palette from one hex (`theme.py derive`), or a card needs a **soft shadow** (`theme.py shadow`; native `shadow=1` is a hard grey offset) |
+| `scripts/retheme.py` | An existing themed `.drawio` must be **rebranded** — one command swaps every theme hex (styles, HTML label spans, embedded SVG ink) via the file's theme sidecar |
+| `scripts/poster.py` + `references/poster.md` | The user asks for an **academic/conference poster** (48x36, A0, …) — parametric page-exact skeleton (header band / framework band / N-column section cards / takeaway banner) from a config JSON |
+| `scripts/posterqa.py` | Before delivering any poster PDF — gates Pages==1 (overflow silently tiles), exact pt page size, absolute geometry bounds, font floors; exports the vision-check preview |
 
 ## Prerequisites
 
@@ -178,6 +183,10 @@ Once the user approves:
 - Report file paths for both the `.drawio` source file and exported image(s)
 - **Auto-launch:** offer to open the `.drawio` file in draw.io desktop for fine-tuning — `open diagram.drawio` (macOS), `xdg-open` (Linux), `start` (Windows)
 - Confirm files are saved and ready to use
+
+## Poster mode
+
+For academic/conference posters (48x36 in, A0, any page-exact size): read `references/poster.md` and drive `scripts/poster.py` (skeleton from config JSON; columns/gaps/fonts all knobs) → fill section-body groups → export plain `drawio -x -f pdf` (pageWidth/pageHeight are honored exactly at 0.72 pt/px; never `--crop`) → gate with `scripts/posterqa.py` before delivery. Theming, soft shadows, and concept icons come from `theme.py` / `retheme.py` / `concepticons.py` (see `references/effects.md`).
 
 ## Style Presets
 

@@ -14,6 +14,7 @@ import gzip
 import importlib.util
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -1136,6 +1137,533 @@ class TestHeatmap(unittest.TestCase):
             self.assertIn("fillColor=#57bb8a", cells["web"])       # min -> green
             self.assertIn("fillColor=#e67c73", cells["db"])        # max -> red
             self.assertIn("hm-title", cells)                       # legend injected
+
+
+class TestTheme(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.mod = load("theme")
+
+    def test_derive_slots_complete_and_valid(self):
+        preset, theme = self.mod.build_theme("#C00C3C")
+        hexre = self.mod.HEX_RE
+        self.assertEqual(preset["version"], 1)
+        for slot in ("primary", "success", "warning", "accent", "danger", "neutral", "secondary"):
+            pair = preset["palette"][slot]
+            self.assertTrue(hexre.match(pair["fillColor"]), slot)
+            self.assertTrue(hexre.match(pair["strokeColor"]), slot)
+        for tok in ("brand", "deep", "tint", "ink", "gray", "hair"):
+            self.assertTrue(hexre.match(theme["tokens"][tok]), tok)
+        self.assertEqual(preset["palette"]["primary"]["strokeColor"], "#C00C3C")
+        for k in ("name", "version", "palette", "roles", "shapes", "font", "edges"):
+            self.assertIn(k, preset)
+
+    def test_derive_default_ramp_math(self):
+        preset, theme = self.mod.build_theme("#C00C3C")
+        self.assertEqual(theme["tokens"]["tint"], self.mod.tint("#C00C3C", 0.12))
+        self.assertEqual(theme["tokens"]["deep"], self.mod.shade("#C00C3C", 0.28))
+        self.assertEqual(preset["palette"]["primary"]["fillColor"], theme["tokens"]["tint"])
+
+    def test_derive_brand_overrides_exact(self):
+        want = {"deep": "#8A0A2B", "tint": "#F7E3E9", "ink": "#141414",
+                "gray": "#5A6672", "hair": "#D8DEE4"}
+        preset, theme = self.mod.build_theme("#C00C3C", dict(want))
+        for k, v in want.items():
+            self.assertEqual(theme["tokens"][k], v)
+        self.assertEqual(preset["palette"]["primary"]["fillColor"], "#F7E3E9")
+        self.assertEqual(preset["palette"]["accent"]["strokeColor"], "#8A0A2B")
+
+    def test_derive_slot_override(self):
+        preset, _ = self.mod.build_theme("#C00C3C", {"danger.stroke": "#FF0000"})
+        self.assertEqual(preset["palette"]["danger"]["strokeColor"], "#FF0000")
+        with self.assertRaises(ValueError):
+            self.mod.build_theme("#C00C3C", {"nonsense.key": "#FF0000"})
+        with self.assertRaises(ValueError):
+            self.mod.build_theme("C00C3C")  # missing #
+
+    def test_shadow_cells_soft(self):
+        cells = self.mod.shadow_cells(100, 200, 400, 150, style="soft", canvas=1600)
+        self.assertEqual(len(cells), 3)
+        ops = [int(re.search(r"opacity=(\d+)", c).group(1)) for c in cells]
+        self.assertEqual(ops, sorted(ops))
+        for c in cells:
+            self.assertIn("fillColor=#000000", c)
+            self.assertIn("strokeColor=none", c)
+        big = self.mod.shadow_cells(100, 200, 400, 150, style="soft", canvas=4800)
+        x_small = float(re.search(r'mxGeometry x="([\d.]+)"', cells[-1]).group(1))
+        x_big = float(re.search(r'mxGeometry x="([\d.]+)"', big[-1]).group(1))
+        self.assertAlmostEqual(x_big - 100, (x_small - 100) * 3, places=5)
+
+    def test_cli_derive_writes_files(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = run("theme.py", "derive", "#C00C3C", "--name", "crimson",
+                    "--override", "tint=#F7E3E9", "--out-dir", d)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            with open(os.path.join(d, "crimson.json")) as f:
+                preset = json.load(f)
+            with open(os.path.join(d, "crimson.theme.json")) as f:
+                theme = json.load(f)
+            self.assertEqual(preset["name"], "crimson")
+            self.assertEqual(theme["tokens"]["tint"], "#F7E3E9")
+
+    def test_cli_help(self):
+        r = run("theme.py", "--help")
+        self.assertEqual(r.returncode, 0)
+
+
+class TestRetheme(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.theme = load("theme")
+        cls.retheme = load("retheme")
+
+    def _fixture(self, d, brand="#C00C3C", tint="#F7E3E9"):
+        """Write a tiny .drawio using brand in style, html span, and encoded SVG URI."""
+        svg_payload = urllib.parse.quote('<svg fill="%s"><path d="M0 0"/></svg>' % brand, safe="")
+        xml = (
+            '<mxfile><diagram><mxGraphModel><root>'
+            '<mxCell id="0" /><mxCell id="1" parent="0" />'
+            '<mxCell id="2" value="&lt;span style=&quot;color:%s&quot;&gt;T&lt;/span&gt;"'
+            ' style="rounded=1;fillColor=%s;strokeColor=%s;" vertex="1" parent="1">'
+            '<mxGeometry x="0" y="0" width="10" height="10" as="geometry" /></mxCell>'
+            '<mxCell id="3" value="" style="shape=image;image=data:image/svg+xml,%s;" vertex="1" parent="1">'
+            '<mxGeometry x="20" y="0" width="10" height="10" as="geometry" /></mxCell>'
+            '</root></mxGraphModel></diagram></mxfile>'
+            % (brand, tint, brand, svg_payload)
+        )
+        fpath = os.path.join(d, "fig.drawio")
+        with open(fpath, "w") as f:
+            f.write(xml)
+        _, theme_json = self.theme.build_theme(brand, {"tint": tint})
+        theme_json["name"] = "old"
+        spath = os.path.join(d, "fig.theme.json")
+        with open(spath, "w") as f:
+            json.dump(theme_json, f)
+        return fpath, spath
+
+    def test_swap_all_surfaces_and_idempotent(self):
+        with tempfile.TemporaryDirectory() as d:
+            fpath, _ = self._fixture(d)
+            r = run("retheme.py", fpath, "--to", "#7A0619")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            out = open(fpath).read()
+            self.assertNotIn("C00C3C", out)          # style + span swapped
+            self.assertNotIn("%23C00C3C", out)       # encoded SVG swapped
+            self.assertIn("#7A0619", out)
+            self.assertIn("%237A0619", out)
+            # idempotent: second run on updated sidecar changes nothing
+            r2 = run("retheme.py", fpath, "--to", "#7A0619")
+            self.assertEqual(r2.returncode, 0, r2.stderr)
+            self.assertEqual(open(fpath).read(), out)
+
+    def test_dry_run_untouched(self):
+        with tempfile.TemporaryDirectory() as d:
+            fpath, _ = self._fixture(d)
+            before = open(fpath).read()
+            r = run("retheme.py", fpath, "--to", "#7A0619", "--dry-run")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("->", r.stdout)
+            self.assertEqual(open(fpath).read(), before)
+
+    def test_swap_mode_without_sidecar(self):
+        with tempfile.TemporaryDirectory() as d:
+            fpath, spath = self._fixture(d)
+            os.remove(spath)
+            r = run("retheme.py", fpath, "--swap", "#C00C3C=#112233")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("no sidecar", r.stderr)
+            with open(fpath) as f:
+                self.assertIn("#112233", f.read())
+
+    def test_mode_required(self):
+        with tempfile.TemporaryDirectory() as d:
+            fpath, _ = self._fixture(d)
+            r = run("retheme.py", fpath)
+            self.assertNotEqual(r.returncode, 0)
+
+
+class TestConceptIcons(unittest.TestCase):
+    """Offline-only: search vs bundled index; style via --svg-file (no network)."""
+
+    FIXTURE_SVG = ('<?xml version="1.0"?><!-- c --><svg xmlns="http://www.w3.org/2000/svg" '
+                   'viewBox="0 0 256 256" width="256" height="256" fill="currentColor">'
+                   '<path d="M0 0h1"/></svg>')
+
+    @classmethod
+    def setUpClass(cls):
+        cls.mod = load("concepticons")
+
+    def test_index_pairing_contract(self):
+        idx = self.mod.load_index()
+        self.assertGreater(len(idx["names"]), 1000)
+        self.assertIn("shield-check", idx["names"])
+        self.assertTrue(idx["cdn"].startswith("https://"))
+
+    def test_search_ranking(self):
+        idx = self.mod.load_index()
+        hits = self.mod.search(idx["names"], "shield check", limit=5)
+        self.assertIn("shield-check", hits)
+        self.assertEqual(hits[0], "shield-check")
+        self.assertEqual(self.mod.search(idx["names"], "zzzznothing"), [])
+
+    def test_bake_ink(self):
+        baked = self.mod.bake_ink(self.FIXTURE_SVG, "#C00C3C")
+        self.assertNotIn("<?xml", baked)
+        self.assertNotIn("<!--", baked)
+        self.assertNotIn('width="256"', baked)
+        self.assertNotIn("currentColor", baked)
+        self.assertIn('fill="#C00C3C"', baked)
+        self.assertIn('viewBox="0 0 256 256"', baked)
+
+    def test_style_cli_offline(self):
+        with tempfile.TemporaryDirectory() as d:
+            svgp = os.path.join(d, "x.svg")
+            with open(svgp, "w") as f:
+                f.write(self.FIXTURE_SVG)
+            r = run("concepticons.py", "style", "shield-check", "--weight", "fill",
+                    "--ink", "#C00C3C", "--svg-file", svgp, "--json")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            rec = json.loads(r.stdout)
+            self.assertEqual(rec["weight"], "fill")
+            self.assertTrue(rec["style"].startswith("shape=image;"))
+            self.assertIn("data:image/svg+xml,", rec["style"])
+            self.assertNotIn(";base64,", rec["style"])
+            payload = rec["style"].split("data:image/svg+xml,", 1)[1].rstrip(";")
+            self.assertIn('fill="#C00C3C"', urllib.parse.unquote(payload))
+
+    def test_unknown_icon_hints(self):
+        r = run("concepticons.py", "style", "shield-chek")
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("shield-check", r.stderr)
+
+
+class TestPoster(unittest.TestCase):
+    DEMO = os.path.join(ROOT, "skills", "drawio-skill", "examples", "poster-demo.json")
+
+    def _gen(self, d, cfg=None):
+        cpath = self.DEMO
+        if cfg is not None:
+            cpath = os.path.join(d, "cfg.json")
+            with open(cpath, "w") as f:
+                json.dump(cfg, f)
+        out = os.path.join(d, "poster.drawio")
+        r = run("poster.py", cpath, "-o", out, "--no-icons")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return out, open(out).read()
+
+    def test_demo_structure_and_page(self):
+        with tempfile.TemporaryDirectory() as d:
+            out, xml = self._gen(d)
+            self.assertIn('pageWidth="4800"', xml)
+            self.assertIn('pageHeight="3600"', xml)
+            for cid in ("hdr-title", "fw-band", "c1s1-card", "c3s2-card", "tk-band",
+                        "c1s1-body", "fw-slot3"):
+                self.assertIn('id="%s"' % cid, xml)
+            self.assertTrue(os.path.isfile(os.path.join(d, "poster.theme.json")))
+            # theme colors flowed through
+            self.assertIn("#C00C3C", xml)
+            self.assertIn("#F7E3E9", xml)
+
+    def test_all_cells_inside_page(self):
+        with tempfile.TemporaryDirectory() as d:
+            _, xml = self._gen(d)
+            for m in re.finditer(r'<mxGeometry x="([-\d.]+)" y="([-\d.]+)" '
+                                 r'width="([\d.]+)" height="([\d.]+)"', xml):
+                x, y, w, h = map(float, m.groups())
+                self.assertGreaterEqual(x, 0)
+                self.assertGreaterEqual(y, 0)
+                # Exact page bounds — the same rule validate.py --page errors on
+                # (a slack here would let a shadow past the rect that the gate rejects).
+                self.assertLessEqual(x + w, 4800)
+                self.assertLessEqual(y + h, 3600)
+
+    def test_validate_clean(self):
+        with tempfile.TemporaryDirectory() as d:
+            out, _ = self._gen(d)
+            r = run("validate.py", out)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
+    def test_column_knob_and_no_framework(self):
+        cfg = {"header": {"title": "T"}, "framework": None,
+               "columns": [[{"title": "A"}], [{"title": "B"}]],
+               "takeaway": {"text": "x"}}
+        with tempfile.TemporaryDirectory() as d:
+            _, xml = self._gen(d, cfg)
+            self.assertNotIn("fw-band", xml)
+            self.assertIn("c2s1-card", xml)
+            self.assertNotIn("c3s1-card", xml)
+
+    def test_font_floor_warning(self):
+        cfg = {"header": {"title": "T"}, "framework": None,
+               "knobs": {"fs": {"body": 20}},
+               "columns": [[{"title": "A"}]], "takeaway": {"text": "x"}}
+        with tempfile.TemporaryDirectory() as d:
+            cpath = os.path.join(d, "cfg.json")
+            with open(cpath, "w") as f:
+                json.dump(cfg, f)
+            r = run("poster.py", cpath, "-o", os.path.join(d, "p.drawio"), "--no-icons")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("below poster floor", r.stderr)
+
+
+class TestValidatePageMode(unittest.TestCase):
+    XML = ('<mxfile><diagram name="p"><mxGraphModel pageWidth="1000" pageHeight="800">'
+           "<root>"
+           '<mxCell id="0" /><mxCell id="1" parent="0" />'
+           '<mxCell id="in" value="ok" style="rounded=1;" vertex="1" parent="1">'
+           '<mxGeometry x="100" y="100" width="200" height="100" as="geometry" /></mxCell>'
+           '<mxCell id="box" value="" style="group;" vertex="1" parent="1">'
+           '<mxGeometry x="800" y="600" width="150" height="150" as="geometry" /></mxCell>'
+           '<mxCell id="kid" value="rel" style="rounded=1;" vertex="1" parent="box">'
+           '<mxGeometry x="100" y="100" width="150" height="150" as="geometry" /></mxCell>'
+           "</root></mxGraphModel></diagram></mxfile>")
+
+    def _write(self, d):
+        p = os.path.join(d, "t.drawio")
+        with open(p, "w") as f:
+            f.write(self.XML)
+        return p
+
+    def test_relative_child_resolved_and_caught(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = self._write(d)
+            # kid absolute = (900, 700) + 100x100 -> exceeds 1000x800 page
+            r = run("validate.py", p, "--page", "1000x800")
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("kid", r.stdout)
+            self.assertIn("outside page", r.stdout)
+            # without --page the same file passes (structure is fine)
+            r2 = run("validate.py", p)
+            self.assertEqual(r2.returncode, 0, r2.stdout)
+
+    def test_margin_warns(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = self._write(d)
+            r = run("validate.py", p, "--page", "2000x2000", "--margin", "150")
+            self.assertEqual(r.returncode, 0, r.stdout)
+            self.assertIn("margin", r.stdout)
+
+
+class TestPosterQA(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.mod = load("posterqa")
+
+    def _fake_pdf(self, d, w, h, pages=1):
+        body = "%PDF-1.4\n"
+        body += "1 0 obj << /Type /Pages /MediaBox [0 0 %g %g] >> endobj\n" % (w, h)
+        for i in range(pages):
+            body += "%d 0 obj << /Type /Page /Parent 1 0 R >> endobj\n" % (i + 2)
+        body += "%%EOF\n"
+        p = os.path.join(d, "t.pdf")
+        with open(p, "wb") as f:
+            f.write(body.encode())
+        return p
+
+    def _poster(self, d):
+        cfg = {"page": {"w_in": 10, "h_in": 8, "px_per_in": 100},
+               "header": {"title": "T"}, "framework": None,
+               "knobs": {"header_h": 200, "takeaway_h": 100},
+               "columns": [[{"title": "A"}]], "takeaway": {"text": "x"}}
+        cpath = os.path.join(d, "cfg.json")
+        with open(cpath, "w") as f:
+            json.dump(cfg, f)
+        out = os.path.join(d, "p.drawio")
+        r = run("poster.py", cpath, "-o", out, "--no-icons")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return out
+
+    def test_raw_mediabox_parser(self):
+        with tempfile.TemporaryDirectory() as d:
+            pdf = self._fake_pdf(d, 720, 576, pages=4)
+            os.environ["POSTERQA_NO_PDFINFO"] = "1"
+            try:
+                pages, w, h = self.mod.pdf_pages_and_size(pdf)
+            finally:
+                del os.environ["POSTERQA_NO_PDFINFO"]
+            self.assertEqual((pages, w, h), (4, 720.0, 576.0))
+
+    def test_gate_pass_and_fail(self):
+        env = {**os.environ, "POSTERQA_NO_PDFINFO": "1"}
+        with tempfile.TemporaryDirectory() as d:
+            poster = self._poster(d)          # 1000x800 px -> 720x576 pt
+            good = self._fake_pdf(d, 720, 576, pages=1)
+            r = run("posterqa.py", poster, "--pdf", good, env=env)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            bad = self._fake_pdf(d, 720.96, 576.96, pages=4)
+            r = run("posterqa.py", poster, "--pdf", bad, env=env)
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("pages", r.stdout)
+
+    def test_font_floor_gate(self):
+        with tempfile.TemporaryDirectory() as d:
+            poster = self._poster(d)
+            with open(poster) as f:
+                xml = f.read()
+            xml = xml.replace("fontSize=120", "fontSize=12", 1)
+            with open(poster, "w") as f:
+                f.write(xml)
+            r = run("posterqa.py", poster)
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("hard floor", r.stdout)
+
+
+class TestAuditRepairs(unittest.TestCase):
+    """Regressions for the 2026-07-12 audit's fork-local repairs."""
+
+    WRAP = ('<mxfile><diagram name="P1"><mxGraphModel pageWidth="1000" pageHeight="800">'
+            "<root>"
+            '<mxCell id="0"/><mxCell id="1" parent="0"/>%s'
+            "</root></mxGraphModel></diagram></mxfile>")
+
+    def _write(self, d, cells):
+        p = os.path.join(d, "t.drawio")
+        with open(p, "w") as f:
+            f.write(self.WRAP % cells)
+        return p
+
+    def test_posterqa_missing_fontsize_fails(self):
+        # A text cell with NO fontSize renders at draw.io's default 12 px — the
+        # gate must treat it as 12, not skip it.
+        with tempfile.TemporaryDirectory() as d:
+            p = self._write(d, '<mxCell id="b" value="body text" style="text;html=1;" '
+                               'vertex="1" parent="1">'
+                               '<mxGeometry x="10" y="10" width="200" height="40" '
+                               'as="geometry"/></mxCell>')
+            r = run("posterqa.py", p)
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("no cell-style fontSize", r.stdout)
+
+    def test_posterqa_span_only_fontsize_counted(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = self._write(d, '<mxCell id="b" value="&lt;span style=\'font-size:40px\'&gt;'
+                               'big&lt;/span&gt;" style="text;html=1;" vertex="1" parent="1">'
+                               '<mxGeometry x="10" y="10" width="200" height="40" '
+                               'as="geometry"/></mxCell>')
+            r = run("posterqa.py", p)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            self.assertIn("HTML span", r.stdout)
+
+    def test_poster_escapes_user_text(self):
+        with tempfile.TemporaryDirectory() as d:
+            cfg = {"page": {"w_in": 10, "h_in": 8, "px_per_in": 100},
+                   "header": {"title": "A <Set> & B"}, "framework": {"title": "F <x>"},
+                   "knobs": {"header_h": 200, "framework_h": 150, "takeaway_h": 100},
+                   "columns": [[{"title": "Sec <1>"}]],
+                   "takeaway": {"text": "T <end> & done"}}
+            cpath = os.path.join(d, "cfg.json")
+            with open(cpath, "w") as f:
+                json.dump(cfg, f)
+            out = os.path.join(d, "p.drawio")
+            r = run("poster.py", cpath, "-o", out, "--no-icons")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            with open(out) as f:
+                xml = f.read()
+            self.assertNotIn("<Set>", xml)
+            self.assertIn("A &amp;lt;Set&amp;gt; &amp;amp; B", xml)   # escape() then quoteattr
+            self.assertNotIn("<end>", xml)
+            self.assertNotIn("<x>", xml)
+            self.assertNotIn("<1>", xml)
+
+    def test_poster_light_brand_uses_ink_for_takeaway(self):
+        with tempfile.TemporaryDirectory() as d:
+            cfg = {"page": {"w_in": 10, "h_in": 8, "px_per_in": 100},
+                   "theme": {"brand": "#FFE45E"},
+                   "header": {"title": "T"}, "framework": None,
+                   "knobs": {"header_h": 200, "takeaway_h": 100},
+                   "columns": [[{"title": "A"}]], "takeaway": {"text": "x"}}
+            cpath = os.path.join(d, "cfg.json")
+            with open(cpath, "w") as f:
+                json.dump(cfg, f)
+            out = os.path.join(d, "p.drawio")
+            r = run("poster.py", cpath, "-o", out, "--no-icons")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("too light", r.stderr)
+            with open(out) as f:
+                xml = f.read()
+            tk = re.search(r'<mxCell id="tk-band"[^>]*style="([^"]*)"', xml).group(1)
+            self.assertIn("fontColor=#141414", tk)
+            self.assertNotIn("fontColor=#FFFFFF", tk)
+
+    def test_validate_containment_and_backing_skipped(self):
+        with tempfile.TemporaryDirectory() as d:
+            cells = (
+                # shadow backing: near-transparent, strokeless, unlabeled
+                '<mxCell id="sh" value="" style="rounded=1;fillColor=#000000;'
+                'strokeColor=none;opacity=6;" vertex="1" parent="1">'
+                '<mxGeometry x="12" y="14" width="200" height="100" as="geometry"/></mxCell>'
+                # card + a title fully inside it (layering, not collision)
+                '<mxCell id="card" value="" style="rounded=1;" vertex="1" parent="1">'
+                '<mxGeometry x="10" y="10" width="200" height="100" as="geometry"/></mxCell>'
+                '<mxCell id="ttl" value="Title" style="text;html=1;fontSize=30;" '
+                'vertex="1" parent="1">'
+                '<mxGeometry x="20" y="20" width="100" height="30" as="geometry"/></mxCell>'
+                # genuine partial overlap between two labeled cells still warns
+                '<mxCell id="a" value="A" style="rounded=0;fontSize=30;" vertex="1" parent="1">'
+                '<mxGeometry x="400" y="10" width="100" height="60" as="geometry"/></mxCell>'
+                '<mxCell id="b2" value="B" style="rounded=0;fontSize=30;" vertex="1" parent="1">'
+                '<mxGeometry x="450" y="30" width="100" height="60" as="geometry"/></mxCell>')
+            p = self._write(d, cells)
+            r = run("validate.py", p)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            self.assertIn("'a' and 'b2' overlap", r.stdout)
+            self.assertNotIn("'card' and 'ttl'", r.stdout)
+            self.assertNotIn("'sh'", r.stdout)
+
+    def test_validate_child_exceeding_container_warns(self):
+        with tempfile.TemporaryDirectory() as d:
+            cells = ('<mxCell id="g" value="" style="group;pointerEvents=0;" vertex="1" '
+                     'parent="1"><mxGeometry x="10" y="10" width="100" height="50" '
+                     'as="geometry"/></mxCell>'
+                     '<mxCell id="c" value="big" style="rounded=1;fontSize=30;" vertex="1" '
+                     'parent="g"><mxGeometry x="90" y="5" width="40" height="20" '
+                     'as="geometry"/></mxCell>')
+            p = self._write(d, cells)
+            r = run("validate.py", p)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            self.assertIn("exceeds its container", r.stdout)
+
+    def test_retheme_alpha_hex_untouched(self):
+        mod = load("retheme")
+        xml = 'fillColor=#AABBCC;gradientColor=#AABBCC22;x=%23aabbcc;'
+        out, n = mod.apply_pairs(xml, {"#aabbcc": "#112233"})
+        self.assertEqual(n, 2)
+        self.assertIn("fillColor=#112233;", out)
+        self.assertIn("x=%23112233;", out)
+        self.assertIn("gradientColor=#AABBCC22;", out)   # 8-digit alpha hex untouched
+
+    def test_theme_schema_is_absolute(self):
+        mod = load("theme")
+        preset, _ = mod.build_theme("#C00C3C")
+        self.assertTrue(preset["$schema"].startswith("https://"))
+
+    def test_poster_rejects_traversal_icon_names(self):
+        # icon / icon_weight flow into a cache path and a URL path segment —
+        # anything not in the index must fall back to the placeholder slot.
+        with tempfile.TemporaryDirectory() as d:
+            cfg = {"page": {"w_in": 10, "h_in": 8, "px_per_in": 100},
+                   "header": {"title": "T"}, "framework": None,
+                   "knobs": {"header_h": 200, "takeaway_h": 100},
+                   "columns": [[{"title": "A", "icon": "../../evil",
+                                 "icon_weight": "../../../etc"}]],
+                   "takeaway": {"text": "x"}}
+            cpath = os.path.join(d, "cfg.json")
+            with open(cpath, "w") as f:
+                json.dump(cfg, f)
+            out = os.path.join(d, "p.drawio")
+            r = run("poster.py", cpath, "-o", out)   # note: NOT --no-icons
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("unknown icon", r.stderr)
+            with open(out) as f:
+                xml = f.read()
+            self.assertIn("dashed=1", xml)            # placeholder slot emitted
+            self.assertNotIn("data:image/svg", xml)   # nothing fetched/inlined
+
+    def test_theme_contrast_helper(self):
+        mod = load("theme")
+        self.assertAlmostEqual(mod.contrast("#FFFFFF", "#000000"), 21.0, places=1)
+        self.assertLess(mod.contrast("#FFE45E", "#FFFFFF"), 3.0)
+        self.assertGreater(mod.contrast("#C00C3C", "#FFFFFF"), 3.0)
 
 
 if __name__ == "__main__":

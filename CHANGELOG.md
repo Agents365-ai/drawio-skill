@@ -4,6 +4,39 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [Unreleased]
+### Added
+- **Poster mode**: `poster.py` generates page-exact academic-poster skeletons
+  (header band, optional full-width framework band, N-column section cards with
+  concept-icon headers, takeaway banner) from a config JSON — every coordinate
+  computed from margin/gutter/font knobs; column count is a knob. Demo config at
+  `examples/poster-demo.json`; guide in `references/poster.md`.
+- **Theme tokens**: `theme.py derive` turns ONE brand hex into a schema-valid
+  style preset plus an extended theme JSON (`ink`/`hair`/`deep` tokens), with
+  WCAG luminance/contrast helpers; `retheme.py` rebrands an existing `.drawio`
+  in one command via its theme sidecar (style attributes, HTML label spans,
+  url-encoded SVG ink — `%23hex`), with an alpha-hex (`#RRGGBBAA`) guard.
+- **Soft shadows**: `theme.py shadow` emits stacked backing-cell shadows
+  (subtle/academic, deterministic in every export format); see
+  `references/effects.md` for recipes and when not to shadow.
+- **Concept icons**: `concepticons.py` — 1512 Phosphor (MIT) glyphs with exact
+  line (`regular`) / solid (`fill`) weight pairs, emitted as self-contained
+  baked-ink url-encoded data-URI styles (complements `aiicons.py` brand logos);
+  offline name index + local fetch cache.
+- **Print-safety gate**: `posterqa.py` fails on PDF `Pages != 1` (content past
+  the page rect silently tiles onto extra pages), page-size drift from the
+  verified 0.72 pt/px mapping (catches `--crop`), out-of-page geometry, and
+  font-floor violations — including text cells with NO cell-style fontSize
+  (draw.io renders those at its default 12 px, unreadable in print); optionally
+  exports the width-capped vision preview.
+- `validate.py --page WxH [--margin N]`: absolute-coordinate page-bounds lint
+  (container-relative geometry resolved through parent chains); new
+  child-exceeds-container warning; the sibling-overlap warning now skips
+  deliberate layering (full containment) and decorative near-transparent
+  backing cells, so a generated poster lints clean without losing
+  genuine-collision detection.
+- Tests for all of the above (suite 73 -> 108).
+
 ## [1.28.1] — 2026-07-10
 ### Changed
 - **Refreshed the `vs Other draw.io Skills & Tools` comparison** (README, README_CN,
