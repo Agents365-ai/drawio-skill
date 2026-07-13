@@ -12,3 +12,4 @@ __pycache__/
 
 # Superpowers skill files (local-only)
 docs/superpowers
+.pi-subagents/

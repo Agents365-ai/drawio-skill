@@ -1,0 +1,270 @@
+{
+  "version": 1,
+  "rules": [],
+  "fingerprints": [
+    {
+      "hash": "sha256:3056deafca0a5370",
+      "rule_id": "AST4",
+      "file": "scripts/autolayout.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:fc4238dba4458e5d",
+      "rule_id": "AST4",
+      "file": "scripts/drawio2pptx.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:e0538884f0fb9343",
+      "rule_id": "AST4",
+      "file": "scripts/drawiohtml.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:c17aedd10330a376",
+      "rule_id": "AST4",
+      "file": "scripts/goimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:58b4a143a773720f",
+      "rule_id": "AST4",
+      "file": "scripts/jsimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:1fc27d359a49994a",
+      "rule_id": "AST4",
+      "file": "scripts/pyclasses.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:d2b709ed124b6d01",
+      "rule_id": "AST4",
+      "file": "scripts/pyimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:3e36e143a9af2b7e",
+      "rule_id": "AST4",
+      "file": "scripts/rustimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:3a7dd8b2a0070add",
+      "rule_id": "AST4",
+      "file": "scripts/svgflow.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:427df1f1f4f660c5",
+      "rule_id": "AST4",
+      "file": "scripts/tfimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:b637b9487731f3f5",
+      "rule_id": "AST4",
+      "file": "scripts/timelapse.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:f710d1621764a1f2",
+      "rule_id": "AST4",
+      "file": "scripts/timelapse.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:6463d8eea84087e3",
+      "rule_id": "AST4",
+      "file": "scripts/timelapse.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:da5f63b63fcf60c0",
+      "rule_id": "AST4",
+      "file": "scripts/timelapse.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:864c04cfd1ee89e9",
+      "rule_id": "TT4",
+      "file": "scripts/aiicons.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:b45f692df9bbe01b",
+      "rule_id": "TT4",
+      "file": "scripts/aiicons.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:0de16ec428a46dfb",
+      "rule_id": "LP3",
+      "file": "SKILL.md",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:f8714a46574b30ce",
+      "rule_id": "MP2",
+      "file": "scripts/composeimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:b587403f8c061503",
+      "rule_id": "MP2",
+      "file": "scripts/composeimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:ece8483b9ec46180",
+      "rule_id": "MP2",
+      "file": "scripts/drawio2pptx.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:1742aa3638be6736",
+      "rule_id": "MP2",
+      "file": "scripts/goimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:b4e05ce1903c073e",
+      "rule_id": "MP2",
+      "file": "scripts/heatmap.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:4a621288e287b1fc",
+      "rule_id": "MP2",
+      "file": "scripts/pyclasses.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:e798a280a30640f0",
+      "rule_id": "MP2",
+      "file": "scripts/relabel.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:3f6c38bfe313ea14",
+      "rule_id": "MP2",
+      "file": "scripts/restyle.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:ccea22d7f70c8544",
+      "rule_id": "MP2",
+      "file": "scripts/restyle.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:f8ac72dc206d4f08",
+      "rule_id": "MP2",
+      "file": "scripts/rustimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:8f8d6dad7970a22b",
+      "rule_id": "MP2",
+      "file": "scripts/rustimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:fcfb65261aee79ae",
+      "rule_id": "MP2",
+      "file": "scripts/shapesearch.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:b1fd63475d232c70",
+      "rule_id": "OH1",
+      "file": "scripts/autolayout.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:3b357839ce175b1a",
+      "rule_id": "OH1",
+      "file": "scripts/goimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:d75b218fee1da932",
+      "rule_id": "OH1",
+      "file": "scripts/jsimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:778bc3104e33573b",
+      "rule_id": "OH1",
+      "file": "scripts/pyclasses.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:6b07cd921b56d200",
+      "rule_id": "OH1",
+      "file": "scripts/pyimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:dae95edd6bbf9b29",
+      "rule_id": "OH1",
+      "file": "scripts/rustimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:6118ea5ff28c5978",
+      "rule_id": "OH1",
+      "file": "scripts/svgflow.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:bea4355383fbcf31",
+      "rule_id": "OH1",
+      "file": "scripts/tfimports.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:b41607919a1f83d9",
+      "rule_id": "OH1",
+      "file": "scripts/timelapse.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:492a3e26dc031505",
+      "rule_id": "OH1",
+      "file": "scripts/timelapse.py",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:f66b3d0819204bd9",
+      "rule_id": "PE3",
+      "file": "SKILL.md",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:41226ab4ff876ae8",
+      "rule_id": "P2",
+      "file": "references/xml-authoring.md",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:007eff6759752e34",
+      "rule_id": "P2",
+      "file": "references/xml-authoring.md",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:4b8f7e0296a72898",
+      "rule_id": "P2",
+      "file": "references/xml-authoring.md",
+      "reason": "Accepted finding (auto-generated baseline)"
+    },
+    {
+      "hash": "sha256:25e30d227f9fd2c4",
+      "rule_id": "TM1",
+      "file": "references/style-presets.md",
+      "reason": "Accepted finding (auto-generated baseline)"
+    }
+  ]
+}

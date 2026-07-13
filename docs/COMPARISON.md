@@ -12,7 +12,7 @@
 | Proactive triggers | No — only when explicitly asked | Yes — auto-suggests when 3+ components |
 | Layout guidelines | None — varies by run | Complexity-scaled spacing, routing corridors, hub placement |
 | Grid alignment | No | Yes — all coordinates snap to 10px multiples |
-| Diagram type presets | No | Yes — 6 presets (ERD, UML, Sequence, Architecture, ML/DL, Flowchart) |
+| Diagram type presets | No | Yes — 11 presets (ERD, UML Class, Sequence, C4, Architecture, ML/Deep Learning, Flowchart, SysML, BPMN, Network Topology, Cross-Functional Swimlane) |
 | Visualize a codebase | No | Yes — import graphs (Py/JS/Go/Rust) + class diagrams |
 | Auto-layout for large graphs | No — hand-places, overlaps | Yes — Graphviz placement, ortho routing, nested containers |
 | Structural validation | No | Yes — deterministic `.drawio` linter |
@@ -37,7 +37,7 @@
 | **Self-check** | ✅ 2-round vision-based (reads PNG) | ❌ | ✅ validation + strict mode | ❌ screenshot only |
 | **Iterative review** | ✅ 5-round loop | ❌ generate once | ✅ 3 workflows (create/edit/replicate) | ❌ |
 | **Layout guidance** | ✅ complexity-scaled + grid snap | ✅ basic spacing | ✅ design-system | ❌ |
-| **Diagram presets** | ✅ 6 types (ERD, UML, Seq, Arch, ML, Flow) | ❌ | ✅ paper-mode classifier (architecture/roadmap/workflow) | ❌ |
+| **Diagram presets** | ✅ 11 types (ERD, UML, Seq, C4, Arch, ML, Flow, SysML, BPMN, Network, Swimlane) | ❌ | ✅ paper-mode classifier (architecture/roadmap/workflow) | ❌ |
 | **Animated edges** | ✅ `flowAnimation=1` | ❌ | ❌ | ❌ |
 | **ML/DL diagrams** | ✅ tensor shapes, layer colors | ❌ | ❌ | ❌ |
 | **Color system** | ✅ 7-color semantic | ❌ | ✅ 6 themes | ❌ |
@@ -56,7 +56,7 @@ _Last audited against competitor READMEs on 2026-07-10. Please open an issue or 
 ## Key advantages
 
 1. **Self-check + iterative loop** — the only pure-SKILL.md solution that reads its own output and auto-fixes before showing the user, then supports multi-round refinement
-2. **6 diagram type presets** — ERD, UML Class, Sequence, Architecture, ML/Deep Learning, Flowchart — each with preset shapes, styles, and layout conventions
+2. **11 diagram type presets** — ERD, UML Class, Sequence, C4, Architecture, ML/Deep Learning, Flowchart, SysML, BPMN, Network Topology, Cross-Functional Swimlane — each with preset shapes, styles, and layout conventions
 3. **ML/DL model diagrams** — tensor shape annotations, layer-type color coding, encoder/decoder swimlanes — built for academic papers
 4. **Multi-agent, zero-config** — works across 6 platforms with just the `skills/drawio-skill/` directory + draw.io desktop. No MCP server, no Python, no Node.js, no browser
 5. **Production-grade layout** — grid-aligned coordinates, complexity-scaled spacing, routing corridors, hub-center strategy, animated connectors

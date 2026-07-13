@@ -1,0 +1,335 @@
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.3.11 ───────────────────────────────────╯
+
+Skill: drawio-skill
+Source: /Users/niehu/myagents/myskills/drawio-skill/skills/drawio-skill
+Scanned: 2026-07-13 16:28:47 UTC
+
+
+        Risk Assessment         
+ Score           100/100        
+ Severity        CRITICAL       
+ Recommendation  DO NOT INSTALL 
+
+
+                          Components (51)                          
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File                            ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md                        │ markdown │   338 │ No         │
+│ data/SHAPE-INDEX-NOTICE.md      │ markdown │    17 │ No         │
+│ data/lobe-icons.json            │ json     │   878 │ No         │
+│ data/shape-index.json.gz        │ other    │ 11700 │ No         │
+│ references/autolayout.md        │ markdown │   163 │ No         │
+│ references/diagram-types.md     │ markdown │   205 │ No         │
+│ references/live-infra.md        │ markdown │    71 │ No         │
+│ references/mermaid-authoring.md │ markdown │    56 │ No         │
+│ references/shapes.md            │ markdown │   151 │ No         │
+│ references/style-extraction.md  │ markdown │   255 │ No         │
+│ references/style-presets.md     │ markdown │   115 │ No         │
+│ references/toolbox.md           │ markdown │    95 │ No         │
+│ references/troubleshooting.md   │ markdown │    63 │ No         │
+│ references/xml-authoring.md     │ markdown │   205 │ No         │
+│ scripts/aiicons.py              │ python   │   204 │ Yes        │
+│ ... and 36 more                 │          │       │            │
+└─────────────────────────────────┴──────────┴───────┴────────────┘
+
+
+Issues (44)
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/autolayout.py:159–162
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/drawio2pptx.py:46–48
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/drawiohtml.py:57–58
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/goimports.py:82–83
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/jsimports.py:96–97
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/pyclasses.py:78–79
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/pyimports.py:97–98
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/rustimports.py:150–151
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/svgflow.py:38–39
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/tfimports.py:184–185
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/timelapse.py:46
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/timelapse.py:90–93
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/timelapse.py:102–104
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/timelapse.py:108–109
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  HIGH: TT4 - Tainted flow: 'url' from open (line 158, file read) → urllib...
+    Location: scripts/aiicons.py:161
+    Confidence: 80%
+    Remediation: Validate and filter file contents before sending over the 
+network. Ensure sensitive files (credentials, configs) are never transmitted to 
+external end...
+
+  HIGH: TT4 - Tainted flow: 'url' from open (line 158, file read) → urllib...
+    Location: scripts/aiicons.py:183
+    Confidence: 80%
+    Remediation: Validate and filter file contents before sending over the 
+network. Ensure sensitive files (credentials, configs) are never transmitted to 
+external end...
+
+  MEDIUM: LP3 - Skill has no declared permissions but code capabilities were...
+    Location: SKILL.md:1
+    Confidence: 70%
+    Remediation: Add a 'permissions' field to SKILL.md listing the capabilities 
+this skill requires....
+
+  MEDIUM: MP2 - Context Window Stuffing...
+    Location: scripts/composeimports.py:86
+    Confidence: 80%
+    Remediation: Implement context-window management that detects and rejects 
+padding or stuffing attempts. Prioritize system instructions over user-injected 
+content....
+
+  MEDIUM: MP2 - Context Window Stuffing...
+    Location: scripts/composeimports.py:87
+    Confidence: 80%
+    Remediation: Implement context-window management that detects and rejects 
+padding or stuffing attempts. Prioritize system instructions over user-injected 
+content....
+
+  MEDIUM: MP2 - Context Window Stuffing...
+    Location: scripts/drawio2pptx.py:89
+    Confidence: 80%
+    Remediation: Implement context-window management that detects and rejects 
+padding or stuffing attempts. Prioritize system instructions over user-injected 
+content....
+
+  MEDIUM: MP2 - Context Window Stuffing...
+    Location: scripts/goimports.py:18
+    Confidence: 80%
+    Remediation: Implement context-window management that detects and rejects 
+padding or stuffing attempts. Prioritize system instructions over user-injected 
+content....
+
+  MEDIUM: MP2 - Context Window Stuffing...
+    Location: scripts/heatmap.py:159
+    Confidence: 80%
+    Remediation: Implement context-window management that detects and rejects 
+padding or stuffing attempts. Prioritize system instructions over user-injected 
+content....
+
+  MEDIUM: MP2 - Context Window Stuffing...
+    Location: scripts/pyclasses.py:19
+    Confidence: 80%
+    Remediation: Implement context-window management that detects and rejects 
+padding or stuffing attempts. Prioritize system instructions over user-injected 
+content....
+
+  MEDIUM: MP2 - Context Window Stuffing...
+    Location: scripts/relabel.py:59
+    Confidence: 80%
+    Remediation: Implement context-window management that detects and rejects 
+padding or stuffing attempts. Prioritize system instructions over user-injected 
+content....
+
+  MEDIUM: MP2 - Context Window Stuffing...
+    Location: scripts/restyle.py:64
+    Confidence: 80%
+    Remediation: Implement context-window management that detects and rejects 
+padding or stuffing attempts. Prioritize system instructions over user-injected 
+content....
+
+  MEDIUM: MP2 - Context Window Stuffing...
+    Location: scripts/restyle.py:153
+    Confidence: 80%
+    Remediation: Implement context-window management that detects and rejects 
+padding or stuffing attempts. Prioritize system instructions over user-injected 
+content....
+
+  MEDIUM: MP2 - Context Window Stuffing...
+    Location: scripts/rustimports.py:25
+    Confidence: 80%
+    Remediation: Implement context-window management that detects and rejects 
+padding or stuffing attempts. Prioritize system instructions over user-injected 
+content....
+
+  MEDIUM: MP2 - Context Window Stuffing...
+    Location: scripts/rustimports.py:101
+    Confidence: 80%
+    Remediation: Implement context-window management that detects and rejects 
+padding or stuffing attempts. Prioritize system instructions over user-injected 
+content....
+
+  MEDIUM: MP2 - Context Window Stuffing...
+    Location: scripts/shapesearch.py:134
+    Confidence: 80%
+    Remediation: Implement context-window management that detects and rejects 
+padding or stuffing attempts. Prioritize system instructions over user-injected 
+content....
+
+  HIGH: OH1 - Unvalidated Output Injection...
+    Location: scripts/autolayout.py:159
+    Confidence: 95%
+    Remediation: Validate and sanitize all model output before using it in 
+downstream contexts. Use parameterized queries for SQL, shell quoting for 
+commands, and HTML...
+
+  HIGH: OH1 - Unvalidated Output Injection...
+    Location: scripts/goimports.py:82
+    Confidence: 95%
+    Remediation: Validate and sanitize all model output before using it in 
+downstream contexts. Use parameterized queries for SQL, shell quoting for 
+commands, and HTML...
+
+  HIGH: OH1 - Unvalidated Output Injection...
+    Location: scripts/jsimports.py:96
+    Confidence: 95%
+    Remediation: Validate and sanitize all model output before using it in 
+downstream contexts. Use parameterized queries for SQL, shell quoting for 
+commands, and HTML...
+
+  HIGH: OH1 - Unvalidated Output Injection...
+    Location: scripts/pyclasses.py:78
+    Confidence: 95%
+    Remediation: Validate and sanitize all model output before using it in 
+downstream contexts. Use parameterized queries for SQL, shell quoting for 
+commands, and HTML...
+
+  HIGH: OH1 - Unvalidated Output Injection...
+    Location: scripts/pyimports.py:97
+    Confidence: 95%
+    Remediation: Validate and sanitize all model output before using it in 
+downstream contexts. Use parameterized queries for SQL, shell quoting for 
+commands, and HTML...
+
+  HIGH: OH1 - Unvalidated Output Injection...
+    Location: scripts/rustimports.py:150
+    Confidence: 95%
+    Remediation: Validate and sanitize all model output before using it in 
+downstream contexts. Use parameterized queries for SQL, shell quoting for 
+commands, and HTML...
+
+  HIGH: OH1 - Unvalidated Output Injection...
+    Location: scripts/svgflow.py:38
+    Confidence: 95%
+    Remediation: Validate and sanitize all model output before using it in 
+downstream contexts. Use parameterized queries for SQL, shell quoting for 
+commands, and HTML...
+
+  HIGH: OH1 - Unvalidated Output Injection...
+    Location: scripts/tfimports.py:184
+    Confidence: 95%
+    Remediation: Validate and sanitize all model output before using it in 
+downstream contexts. Use parameterized queries for SQL, shell quoting for 
+commands, and HTML...
+
+  HIGH: OH1 - Unvalidated Output Injection...
+    Location: scripts/timelapse.py:46
+    Confidence: 95%
+    Remediation: Validate and sanitize all model output before using it in 
+downstream contexts. Use parameterized queries for SQL, shell quoting for 
+commands, and HTML...
+
+  HIGH: OH1 - Unvalidated Output Injection...
+    Location: scripts/timelapse.py:108
+    Confidence: 95%
+    Remediation: Validate and sanitize all model output before using it in 
+downstream contexts. Use parameterized queries for SQL, shell quoting for 
+commands, and HTML...
+
+  HIGH: PE3 - Credential Access...
+    Location: SKILL.md:94
+    Confidence: 70%
+    Remediation: Remove references to credential paths. Use environment 
+variables or secrets managers. For docs, use placeholder paths (e.g., 
+/path/to/config). Never l...
+
+  HIGH: P2 - Hidden Instructions...
+    Location: references/xml-authoring.md:16
+    Confidence: 21%
+    Remediation: Audit all comments and invisible characters. Remove any 
+instructions that direct the agent to perform unauthorized actions. Use plain, 
+reviewable cont...
+
+  HIGH: P2 - Hidden Instructions...
+    Location: references/xml-authoring.md:54
+    Confidence: 21%
+    Remediation: Audit all comments and invisible characters. Remove any 
+instructions that direct the agent to perform unauthorized actions. Use plain, 
+reviewable cont...
+
+  HIGH: P2 - Hidden Instructions...
+    Location: references/xml-authoring.md:108
+    Confidence: 21%
+    Remediation: Audit all comments and invisible characters. Remove any 
+instructions that direct the agent to perform unauthorized actions. Use plain, 
+reviewable cont...
+
+  HIGH: TM1 - Tool Parameter Abuse...
+    Location: references/style-presets.md:101
+    Confidence: 26%
+    Remediation: Validate all tool parameters against an allowlist. Reject 
+dangerous parameter values (shell=True, --force, -rf /) and use safe 
+defaults....
+
+Executable scripts: Yes
