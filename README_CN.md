@@ -21,7 +21,7 @@
 
 ## ✨ 核心亮点
 
-- **8 种图表类型预设** —— ER 图、UML 类图、序列图、C4、架构图、ML/深度学习、流程图、SysML（BDD / IBD / 需求图 / 参数图）
+- **11 种图表类型预设** —— ER 图、UML 类图、序列图、C4、架构图、ML/深度学习、流程图、SysML（BDD / IBD / 需求图 / 参数图）、BPMN、网络拓扑、跨职能泳道图
 - **Mermaid → 原生 .drawio**（draw.io ≥ 30）—— 28 种标准类型直接用 Mermaid 文本作图（**mindmap、gantt、timeline、journey、pie、sankey、kanban**……），CLI 原生转成已布局、可编辑的 `.drawio` —— 只管结构，布局白送
 - **可视化代码库** —— 提取并自动布局一个 Python / JS-TS / Go / Rust 项目的结构（导入关系图）或 Python 类继承层级 —— Graphviz 布点、传递约简、按子包嵌套的容器
 - **IaC → 架构图** —— 把 **Terraform** 配置、**Kubernetes** manifest 或 **docker-compose** 文件直接变成架构图，每个资源渲染为**官方 AWS / Azure / GCP / K8s 图标**，连线来自真实引用（role ARN、selector、volume 挂载）
@@ -225,6 +225,9 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 | 流程图 | 业务流程、工作流、决策树、状态机 | 语义形状（平行四边形 I/O、菱形判断） |
 | UML | 类图、序列图 | 继承 / 组合 / 聚合箭头；生命线 + 激活框 |
 | SysML / MBSE | 模块定义图（bdd）、内部模块图（ibd）、需求图（req）、参数图（par） | «block» / «requirement» 分栏、satisfy/derive/verify 依赖边、原生 `mxgraph.sysml.*` 端口与流 |
+| BPMN | 业务流程、泳池与泳道 | 原生 `mxgraph.bpmn.*` 事件/任务/网关，顺序流 vs 消息流 |
+| 网络拓扑 | LAN/WAN、子网、DMZ | `mxgraph.networks.*` 设备形状、区域容器、链路标注；Cisco/机架经形状搜索 |
+| 跨职能泳道图 | 谁在哪步做什么、交接流程 | 泳池 + 角色泳道、流程图形状、正交交接边 |
 | 数据图 | ER 图、数据流图（DFD） | 表容器、PK/FK 标记 |
 | Mermaid 作图 | 思维导图、甘特图、timeline、journey、饼图、桑基图、看板等 28 种 | CLI（≥ v30）原生转换 —— 只写结构，布局白送 |
 | 其他 | 组织架构图、线框图 | — |

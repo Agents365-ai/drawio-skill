@@ -21,7 +21,7 @@ A skill that turns natural-language descriptions into `.drawio` XML and exports 
 
 ## ✨ Highlights
 
-- **8 diagram type presets** — ERD, UML Class, Sequence, C4, Architecture, ML/Deep Learning, Flowchart, SysML (BDD / IBD / Requirement / Parametric)
+- **11 diagram type presets** — ERD, UML Class, Sequence, C4, Architecture, ML/Deep Learning, Flowchart, SysML (BDD / IBD / Requirement / Parametric), BPMN, Network Topology, Cross-Functional Swimlane
 - **Mermaid → native .drawio** (draw.io ≥ 30) — author 28 standard types as Mermaid text (**mindmap, gantt, timeline, journey, pie, sankey, kanban**…) and the CLI converts them into a laid-out, editable `.drawio` — structure in, layout free
 - **Visualize a codebase** — extract and auto-lay-out the structure of a Python / JS-TS / Go / Rust project (import graphs) or a Python class hierarchy — Graphviz placement, transitive reduction, nested module containers
 - **IaC → architecture diagram** — turn **Terraform** configs, **Kubernetes** manifests, or **docker-compose** files into an architecture diagram where every resource renders as its **official AWS / Azure / GCP / K8s icon**, edges derived from actual references (role ARNs, selectors, volume mounts)
@@ -227,6 +227,9 @@ Layout needs Graphviz (`brew install graphviz` / `apt install graphviz`) — opt
 | Flowcharts | business processes, workflows, decision trees, state machines | Semantic shapes (parallelogram I/O, diamond decisions) |
 | UML | class diagrams, sequence diagrams | Inheritance / composition / aggregation arrows; lifelines + activation boxes |
 | SysML / MBSE | block definition (bdd), internal block (ibd), requirement (req), parametric (par) | «block» / «requirement» compartments, satisfy/derive/verify edges, native `mxgraph.sysml.*` ports & flows |
+| BPMN | business processes, pools & lanes | Native `mxgraph.bpmn.*` events/tasks/gateways, sequence vs message flows |
+| Network topology | LAN/WAN, subnets, DMZ | `mxgraph.networks.*` device shapes, zone containers, link labels; Cisco/rack via shape search |
+| Cross-functional swimlane | who-does-what processes, handoffs | Pool + role lanes, flowchart vocabulary, orthogonal handoff edges |
 | Data | ER diagrams, data flow diagrams (DFD) | Table containers, PK/FK notation |
 | Mermaid-authored | mind maps, gantt, timeline, journey, pie, sankey, kanban + 20 more | Native CLI conversion (≥ v30) — structure only, layout free |
 | Other | org charts, wireframes | — |

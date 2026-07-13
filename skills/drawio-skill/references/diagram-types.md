@@ -3,7 +3,7 @@
 When the user requests a specific diagram type, apply the matching preset below for shapes, styles, and layout conventions. These presets set **structural** style keywords (e.g. ERD's `shape=table;childLayout=tableLayout`); a user style preset (see `references/style-presets.md`) layers color/font/edge/extras on top.
 
 Read this file when:
-- The user names one of these diagram types (ERD, UML class, sequence, C4, architecture, ML/DL model, flowchart, SysML)
+- The user names one of these diagram types (ERD, UML class, sequence, C4, architecture, ML/DL model, flowchart, SysML, BPMN, network topology, cross-functional/swimlane)
 - You're choosing shape vocabulary or layout direction for a new diagram
 
 ## ERD (Entity-Relationship Diagram)
@@ -136,6 +136,61 @@ draw.io ships a native SysML 1.x shape library (`mxgraph.sysml.*`, ~60 shapes) �
 | Binding connector | `html=1;endArrow=none;` | Solid, no arrows |
 | Value property | `rounded=0;whiteSpace=wrap;html=1;` | Label `name : Type` |
 | Layout | LR, value properties on the outside, constraints centered | |
+
+## BPMN (Business Process)
+
+draw.io ships ~200 native BPMN 2.0 shapes (`mxgraph.bpmn.*`). The official styles carry a long `points=[...]` connection-point list — run `python3 scripts/shapesearch.py "bpmn <element>"` for the full string; the styles below omit it for brevity and still render correctly.
+
+| Element | Style | Notes |
+|---------|-------|-------|
+| Pool | `swimlane;html=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;collapsible=0;` | Container; label rotated in the left header band |
+| Lane | `swimlane;html=1;startSize=30;horizontal=0;collapsible=0;fillColor=none;` | Child of the pool, `parent=poolId`, one per role |
+| Task | `shape=mxgraph.bpmn.task2;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;container=1;expand=0;collapsible=0;taskMarker=abstract;` | `taskMarker=user\|service\|script\|manual\|send\|receive\|businessRule` for typed tasks |
+| Start event | `shape=mxgraph.bpmn.event;html=1;perimeter=ellipsePerimeter;aspect=fixed;outline=standard;symbol=general;verticalLabelPosition=bottom;verticalAlign=top;align=center;labelBackgroundColor=#ffffff;` 50×50 | `symbol=message\|timer` for message/timer start |
+| Intermediate event | same, `outline=throwing` (send) or `outline=catching` (receive) | Double circle |
+| End event | same, `outline=end;symbol=general` | Thick circle; `symbol=terminate` for terminate end |
+| Gateway | `shape=mxgraph.bpmn.gateway2;html=1;perimeter=rhombusPerimeter;outline=none;symbol=none;gwType=exclusive;verticalLabelPosition=bottom;verticalAlign=top;align=center;labelBackgroundColor=#ffffff;` 50×50 | `gwType=exclusive\|parallel\|inclusive\|complex` |
+| Sequence flow | `edgeStyle=elbowEdgeStyle;html=1;endArrow=blockThin;endFill=1;` | Solid, filled thin arrow |
+| Conditional flow | same + `startArrow=diamondThin;startFill=0;startSize=10;endSize=6;` | Hollow diamond at source |
+| Default flow | same + `startArrow=dash;startFill=0;startSize=6;endSize=6;` | Tick at source |
+| Message flow | `dashed=1;dashPattern=8 4;endArrow=blockThin;endFill=1;startArrow=oval;startFill=0;startSize=4;endSize=6;html=1;` | Dashed, only **between** pools |
+| Data object | `shape=mxgraph.bpmn.data2;size=15;html=1;verticalLabelPosition=bottom;verticalAlign=top;align=center;` 40×60 | Dashed dotted-arrow association |
+| Annotation | `html=1;shape=mxgraph.flowchart.annotation_2;align=left;labelPosition=right;` | Open bracket + dashed line |
+| Layout | LR inside lanes, events/gateways vertically centered on the flow line | Sequence flows never cross pool borders; message flows never stay inside one |
+
+## Network Topology
+
+Generic vocabulary is the `mxgraph.networks` library — one shared style prefix, per-element `shape=`. For **vendor-specific** icons (Cisco `mxgraph.cisco19`/`cisco_safe`, rack `mxgraph.rack`, cloud vendors), run `python3 scripts/shapesearch.py "<vendor> <device>"` instead.
+
+Shared prefix (every node below): `fontColor=#0066CC;verticalAlign=top;verticalLabelPosition=bottom;labelPosition=center;align=center;html=1;outlineConnect=0;fillColor=#CCCCCC;strokeColor=#6881B3;gradientColor=none;gradientDirection=north;strokeWidth=2;`
+
+| Element | Append to prefix | Size |
+|---------|------------------|------|
+| Router | `shape=mxgraph.networks.router;` | 100×30 |
+| Switch | `shape=mxgraph.networks.switch;` | 100×30 |
+| Firewall | `shape=mxgraph.networks.firewall;` | 100×100 |
+| Load balancer | `shape=mxgraph.networks.load_balancer;` | 100×30 |
+| Server | `shape=mxgraph.networks.server;` | 90×100 |
+| Storage / NAS | `shape=mxgraph.networks.storage;` / `...nas_filer;` | 100×100 / 100×35 |
+| PC / Laptop | `shape=mxgraph.networks.pc;` / `...laptop;` | 100×70 / 100×55 |
+| Wireless AP | `shape=mxgraph.networks.wireless_hub;` | 100×100 |
+| Internet / WAN | `shape=mxgraph.networks.cloud;fontColor=#ffffff;` | 90×50 |
+| Zone (subnet/VLAN/DMZ) | `rounded=1;dashed=1;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=top;fontStyle=1;container=1;` | Container; label = CIDR / zone name |
+| Physical link | `html=1;endArrow=none;strokeWidth=2;` | Plain line; label = interface/VLAN |
+| Logical/VPN link | `html=1;endArrow=none;dashed=1;` | Dashed |
+| Layout | TB by tier: Internet → edge (router/firewall) → distribution (switch/LB) → servers/clients | Group each subnet in a zone container; label links with CIDR/port |
+
+## Cross-Functional Flowchart (Swimlane)
+
+A flowchart split by **who does what** — one lane per role/department. Node vocabulary reuses the Flowchart preset below; only the container skeleton differs.
+
+| Element | Style | Notes |
+|---------|-------|-------|
+| Pool (process) | `swimlane;html=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;collapsible=0;` | Outer container, label = process name |
+| Lane (role) | `swimlane;html=1;startSize=30;horizontal=0;collapsible=0;fillColor=none;` | Child of pool, one per role/team/system |
+| Steps | Flowchart preset styles (Start/End, Process, Decision, I/O) | Each step's `parent` = its lane id; coordinates relative to the lane |
+| Handoff edge | `edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;` | Edges crossing lanes are the handoffs — the diagram's point |
+| Layout | LR flow inside horizontal lanes; time flows left → right | Keep each step inside its actor's lane; ≥160px horizontal spacing |
 
 ## Flowchart (enhanced)
 

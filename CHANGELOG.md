@@ -4,6 +4,24 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.30.0] — 2026-07-13
+### Added
+- **Three new diagram-type presets** in `references/diagram-types.md`, filling gaps the
+  frontmatter description already promised (same pattern as the 1.29.0 SysML preset):
+  - **BPMN (Business Process)** — pools/lanes, `mxgraph.bpmn.task2` typed tasks
+    (`taskMarker=user|service|...`), `mxgraph.bpmn.event` start/intermediate/end events,
+    `mxgraph.bpmn.gateway2` gateways (`gwType=exclusive|parallel|inclusive|complex`),
+    sequence vs conditional vs default vs message flows, data objects, annotations.
+  - **Network Topology** — the `mxgraph.networks.*` device vocabulary (router, switch,
+    firewall, LB, server, NAS, wireless, cloud) with a shared style prefix, subnet/DMZ
+    zone containers, physical vs logical link styles; Cisco/rack/vendor icons routed
+    through `shapesearch.py`.
+  - **Cross-Functional Flowchart (Swimlane)** — pool + role-lane skeleton reusing the
+    Flowchart node vocabulary, with lane-crossing orthogonal handoff edges.
+- Trigger phrases ("BPMN", "business process", "network topology", "subnet",
+  "swimlane diagram", "cross-functional flowchart", …) in the SKILL.md description and
+  three new rows in the diagram-type dispatch table. Presets: 8 → 11.
+
 ## [1.29.0] — 2026-07-13
 ### Added
 - **SysML diagram preset** ([#83](https://github.com/Agents365-ai/drawio-skill/issues/83)) —
