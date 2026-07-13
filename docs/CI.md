@@ -10,6 +10,8 @@ source (.tf / manifests / schema.sql / seq.json / graph.json)
    → autolayout.py → validate.py --strict (gate) → drawio -x (render) → artifact
 ```
 
+Bonus: the pipeline itself can be the diagram — `ciimports.py <repo-root>` turns `.github/workflows/*.yml` + `.gitlab-ci.yml` into a jobs/`needs:` DAG (triggers, matrix sizes, reusable-workflow calls) for the same autolayout → validate → render loop.
+
 Importer node ids are stable (module paths, `type.name`, `kind/name`), so regenerated `.drawio` files produce reviewable diffs when the underlying code or infra changes.
 
 ## Option A — draw.io desktop + xvfb (GitHub Actions)

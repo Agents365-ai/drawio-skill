@@ -164,6 +164,7 @@ kubectl get all,ing,cm,secret,pvc -o json | python3 scripts/k8simports.py - -o g
 
 # 数据与交互
 python3 scripts/sqlerd.py      schema.sql   -o graph.json   # SQL DDL → ER 图
+python3 scripts/ciimports.py . -o graph.json              # GitHub Actions + GitLab CI -> 流水线 DAG
 python3 scripts/openapiimports.py openapi.yaml -o graph.json # OpenAPI/Swagger → API 图（按方法着色）
 python3 scripts/seqlayout.py   seq.json  -o sequence.drawio # 时序图，直接生成 .drawio
 python3 scripts/c4.py          c4.json   -o c4.drawio       # C4 模型，多页 + 下钻
@@ -205,7 +206,7 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 
 | 组件 | 作用 |
 |---|---|
-| **12 个提取器** | **Python · JS/TS · Go · Rust** 的导入关系图、**Python 类继承**、**Terraform / Kubernetes / docker-compose** 资源图（自动配官方云图标）、**SQL DDL → ER 图**、**OpenAPI / Swagger → API 图**（按 HTTP 方法着色的接口 + schema），以及从 `terraform show -json` / `docker inspect` / `kubectl get -o json` 提取的**实时**基础设施（画出真正已部署的样子） |
+| **13 个提取器** | **Python · JS/TS · Go · Rust** 的导入关系图、**Python 类继承**、**Terraform / Kubernetes / docker-compose** 资源图（自动配官方云图标）、**SQL DDL → ER 图**、**OpenAPI / Swagger → API 图**（按 HTTP 方法着色的接口 + schema），**CI 流水线 → DAG**（GitHub Actions `needs:` 依赖图 + GitLab 阶段，含触发器、matrix 规模、可复用工作流调用）、以及从 `terraform show -json` / `docker inspect` / `kubectl get -o json` 提取的**实时**基础设施（画出真正已部署的样子） |
 | **图对比 (diff)** | `drawiodiff.py` 把两张 `.drawio`（或两个实时快照）对比成一张彩色图 —— 新增=绿、删除=红、变更=橙 —— 一眼看出架构 / 基础设施**漂移** |
 | **语言变体** | `relabel.py` 按 JSON 映射批量换标签，布局/样式/id 全不动 —— `--extract` 导出全部标签，翻译值后 `--map` 应用。一张图 → 中英双胞胎，双语文档必备 |
 | **换主题** | `restyle.py` 给**已有** `.drawio` 应用风格预设（内置 `dark`/`corporate`/… 或自定义）—— 按色相重映射调色板，同色节点保持同组；布局与连线路由不动 |

@@ -10,6 +10,8 @@
    → autolayout.py → validate.py --strict（门禁）→ drawio -x（渲染）→ 产物
 ```
 
+彩蛋：流水线本身也能入图 —— `ciimports.py <仓库根目录>` 把 `.github/workflows/*.yml` + `.gitlab-ci.yml` 转成 jobs/`needs:` 依赖 DAG（含触发器、matrix 规模、可复用工作流调用），走同一条 autolayout → validate → 渲染流程。
+
 Importer 的节点 id 是稳定的(模块路径、`type.name`、`kind/name`),代码或基础设施变更后重新生成的 `.drawio` diff 可读、可 review。
 
 ## 方案 A —— draw.io 桌面版 + xvfb(GitHub Actions)

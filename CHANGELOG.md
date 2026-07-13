@@ -4,6 +4,20 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.32.0] — 2026-07-14
+### Added
+- **`scripts/ciimports.py`** — CI pipelines as diagrams. Reads GitHub Actions
+  workflows (`.github/workflows/*.yml`, or a repo root) and/or `.gitlab-ci.yml`
+  (auto-detected) and emits an autolayout graph: job nodes labeled with runner,
+  `matrix ×N` size, and reusable-workflow targets (purple); `needs:` dependency
+  edges; an `on:` trigger node per workflow feeding the root jobs; containers per
+  workflow (GitHub) or per stage (GitLab, including the implicit previous-stage
+  DAG for jobs without `needs`). Feeds `autolayout.py` like every other importer.
+  Requires PyYAML. Extractors: 12 → 13; scripts: 30 → 31.
+- Routing entries in SKILL.md step 3 + resources table, toolbox quick-guide/§3
+  rows, README/README_CN examples + extractor row, a cross-reference in
+  `docs/CI.md`/`CI_CN.md`, and 2 regression tests (81 total).
+
 ## [1.31.0] — 2026-07-13
 ### Added
 - **`scripts/relabel.py`** — language variants / bulk text swaps of an existing

@@ -1249,5 +1249,63 @@ class TestRestyle(unittest.TestCase):
             self.assertIn("dark", r.stderr + r.stdout)
 
 
+class TestCiImports(unittest.TestCase):
+    @staticmethod
+    def _write(path, text):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(text)
+
+    def _need_yaml(self):
+        try:
+            import yaml  # noqa: F401
+        except ImportError:
+            self.skipTest("PyYAML not installed")
+
+    ACTIONS = (
+        "name: CI\n"
+        "on: [push]\n"
+        "jobs:\n"
+        "  lint:\n    runs-on: ubuntu-latest\n    steps: [{run: make lint}]\n"
+        "  test:\n    runs-on: ubuntu-latest\n"
+        "    strategy:\n      matrix:\n        py: ['3.10', '3.11']\n"
+        "    steps: [{run: pytest}]\n"
+        "  deploy:\n    needs: [lint, test]\n"
+        "    uses: org/shared/.github/workflows/deploy.yml@main\n")
+
+    GITLAB = (
+        "stages: [build, test]\n"
+        "compile:\n  stage: build\n  script: [make]\n"
+        "unit:\n  stage: test\n  script: [make test]\n")
+
+    def test_actions_workflow(self):
+        self._need_yaml()
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, ".github", "workflows", "ci.yml"), self.ACTIONS)
+            graph = json.loads(run("ciimports.py", d).stdout)
+            by_id = {n["id"]: n for n in graph["nodes"]}
+            self.assertIn("ci//trigger", by_id)
+            self.assertEqual(by_id["ci//trigger"]["label"], "on: push")
+            self.assertIn("matrix \u00d72", by_id["ci//test"]["label"])
+            self.assertIn("uses: deploy.yml@main", by_id["ci//deploy"]["label"])
+            edges = {(e["source"], e["target"]) for e in graph["edges"]}
+            self.assertIn(("ci//trigger", "ci//lint"), edges)       # no needs -> trigger
+            self.assertIn(("ci//lint", "ci//deploy"), edges)
+            self.assertIn(("ci//test", "ci//deploy"), edges)
+            self.assertNotIn(("ci//trigger", "ci//deploy"), edges)  # has needs
+
+    def test_gitlab_stage_dag(self):
+        self._need_yaml()
+        with tempfile.TemporaryDirectory() as d:
+            p = os.path.join(d, ".gitlab-ci.yml")
+            self._write(p, self.GITLAB)
+            graph = json.loads(run("ciimports.py", p).stdout)
+            by_id = {n["id"]: n for n in graph["nodes"]}
+            self.assertEqual(by_id[".gitlab-ci//unit"]["group"], "stage: test")
+            edges = {(e["source"], e["target"]) for e in graph["edges"]}
+            # no needs -> previous stage DAG
+            self.assertEqual(edges, {(".gitlab-ci//compile", ".gitlab-ci//unit")})
+
+
 if __name__ == "__main__":
     unittest.main()

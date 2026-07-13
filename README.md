@@ -166,6 +166,7 @@ kubectl get all,ing,cm,secret,pvc -o json | python3 scripts/k8simports.py - -o g
 
 # Data & interactions
 python3 scripts/sqlerd.py      schema.sql   -o graph.json   # SQL DDL → ER diagram
+python3 scripts/ciimports.py . -o graph.json              # GitHub Actions + GitLab CI -> pipeline DAG
 python3 scripts/openapiimports.py openapi.yaml -o graph.json # OpenAPI/Swagger → API diagram (by method)
 python3 scripts/seqlayout.py   seq.json  -o sequence.drawio # sequence diagram, direct to .drawio
 python3 scripts/c4.py          c4.json   -o c4.drawio       # C4 model, multi-page + drill-down
@@ -207,7 +208,7 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 
 | Piece | What it does |
 |---|---|
-| **12 extractors** | import graphs for **Python · JS/TS · Go · Rust**, **Python class inheritance**, **Terraform / Kubernetes / docker-compose** resource graphs (official cloud icons), **SQL DDL → ERD**, **OpenAPI / Swagger → API diagram** (operations coloured by HTTP method + schemas), and **live** infra from `terraform show -json` / `docker inspect` / `kubectl get -o json` (draw what's actually deployed) |
+| **13 extractors** | import graphs for **Python · JS/TS · Go · Rust**, **Python class inheritance**, **Terraform / Kubernetes / docker-compose** resource graphs (official cloud icons), **SQL DDL → ERD**, **OpenAPI / Swagger → API diagram** (operations coloured by HTTP method + schemas), **CI pipelines → DAG** (GitHub Actions `needs:` graphs + GitLab stages, with triggers, matrix sizes, reusable-workflow calls), and **live** infra from `terraform show -json` / `docker inspect` / `kubectl get -o json` (draw what's actually deployed) |
 | **Diagram diff** | `drawiodiff.py` compares two `.drawio` (or two live snapshots) into one colour-coded graph — added=green, removed=red, changed=orange — so you can see architecture / infra **drift** at a glance |
 | **Language variants** | `relabel.py` swaps every label via a JSON map with layout/styles/ids untouched — `--extract` dumps all labels, translate the values, `--map` applies them. One diagram → EN + CN twins for bilingual docs |
 | **Re-theme** | `restyle.py` applies a style preset (built-in `dark`/`corporate`/… or your own) to an *existing* `.drawio` — palette remapped by hue so same-colored nodes stay grouped; layout and edge routing untouched |
