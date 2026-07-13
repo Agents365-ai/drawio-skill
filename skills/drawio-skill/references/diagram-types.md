@@ -3,7 +3,7 @@
 When the user requests a specific diagram type, apply the matching preset below for shapes, styles, and layout conventions. These presets set **structural** style keywords (e.g. ERD's `shape=table;childLayout=tableLayout`); a user style preset (see `references/style-presets.md`) layers color/font/edge/extras on top.
 
 Read this file when:
-- The user names one of these diagram types (ERD, UML class, sequence, C4, architecture, ML/DL model, flowchart)
+- The user names one of these diagram types (ERD, UML class, sequence, C4, architecture, ML/DL model, flowchart, SysML)
 - You're choosing shape vocabulary or layout direction for a new diagram
 
 ## ERD (Entity-Relationship Diagram)
@@ -90,6 +90,52 @@ For neural network architecture diagrams — ideal for papers targeting NeurIPS,
 | Layout | TB (data flows top→bottom), layers 150px apart | Group encoder/decoder as swimlanes |
 
 **Tensor shape convention:** annotate each layer with input/output tensor dimensions in `(B, C, H, W)` or `(B, T, D)` format. Place dimensions as the second line of the label using `&#xa;`.
+
+## SysML (Block Definition / Internal Block / Requirement / Parametric)
+
+draw.io ships a native SysML 1.x shape library (`mxgraph.sysml.*`, ~60 shapes) — run `python3 scripts/shapesearch.py "sysml <keyword>"` for any element not listed below. Stereotype labels use guillemets as the first label line: `&#171;block&#187;` (HTML entities for « »). SysML behavioral diagrams (activity, state machine, use case, sequence) reuse the UML presets above; search `shapesearch.py "sysml activity"` / `"sysml state"` for the SysML-specific variants.
+
+### Block Definition Diagram (bdd)
+
+| Element | Style | Notes |
+|---------|-------|-------|
+| Block | `swimlane;fontStyle=1;align=center;startSize=40;html=1;` | Label `&#171;block&#187;&#xa;Name`; compartments (values / parts / operations) like UML class |
+| Compartment separator | same `line;...` style as UML Class | Between compartments |
+| Composite association | `html=1;endArrow=none;startArrow=diamondThin;startFill=1;` | Filled diamond at the whole (owner) end |
+| Reference association | `html=1;endArrow=none;startArrow=diamondThin;startFill=0;` | Hollow diamond |
+| Generalization | `edgeStyle=none;html=1;endArrow=block;endFill=0;endSize=12;` | Hollow triangle pointing at the parent block |
+| Multiplicity | edge labels `1`, `0..1`, `1..*` near the ends | Offset with edge label geometry |
+| Layout | TB, whole block on top, part blocks below, 250px apart | Same convention as UML class |
+
+### Internal Block Diagram (ibd)
+
+| Element | Style | Notes |
+|---------|-------|-------|
+| Frame | `rounded=0;html=1;verticalAlign=top;align=left;spacingLeft=10;fontStyle=1;container=1;` | Label `ibd [block] Name`; parts are children |
+| Part | `rounded=0;whiteSpace=wrap;html=1;` | Label `partName : BlockType` |
+| Port | `html=1;shape=mxgraph.sysml.port;sysMLPortType=flowN;` 20×20 | Child of the part, relative geometry pinned to its border |
+| Connector | `html=1;endArrow=none;` | Solid line port-to-port |
+| Item flow direction | `shape=triangle;fillColor=strokeColor;` 10×10 on the connector + item label | Triangle points along the flow |
+
+### Requirement Diagram (req)
+
+| Element | Style | Notes |
+|---------|-------|-------|
+| Requirement | `swimlane;fontStyle=1;align=center;startSize=26;html=1;` | Title `&#171;requirement&#187;&#xa;Name`; body compartment `id="R1.1"&#xa;text="..."` |
+| Containment | `edgeStyle=none;html=1;startArrow=sysMLPackCont;startSize=12;endArrow=none;` | Crosshair-circle at the parent end |
+| deriveReqt / satisfy / verify / refine | `html=1;endArrow=open;endSize=12;dashed=1;` + edge label `&#171;satisfy&#187;` | Dashed open arrow pointing at the requirement |
+| Trace | same dashed style, label `&#171;trace&#187;` | |
+| Layout | TB, parent requirements above children, 200px apart | Satisfy/verify sources (blocks, test cases) at the bottom |
+
+### Parametric Diagram (par)
+
+| Element | Style | Notes |
+|---------|-------|-------|
+| Constraint block | `rounded=1;whiteSpace=wrap;html=1;` | Label `&#171;constraint&#187;&#xa;{F = m · a}` |
+| Parameter port | `rounded=0;html=1;fontSize=10;` 20×20 on the border | Label = parameter name (`m`, `a`, `F`) |
+| Binding connector | `html=1;endArrow=none;` | Solid, no arrows |
+| Value property | `rounded=0;whiteSpace=wrap;html=1;` | Label `name : Type` |
+| Layout | LR, value properties on the outside, constraints centered | |
 
 ## Flowchart (enhanced)
 

@@ -4,6 +4,21 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.29.0] — 2026-07-13
+### Added
+- **SysML diagram preset** ([#83](https://github.com/Agents365-ai/drawio-skill/issues/83)) —
+  new SysML section in `references/diagram-types.md` covering the four SysML-unique
+  diagram kinds: Block Definition (bdd, «block» compartments + composite/reference
+  associations), Internal Block (ibd, parts + `mxgraph.sysml.port` ports + item flows),
+  Requirement (req, id/text compartments + containment/satisfy/derive/verify/refine
+  edges), and Parametric (par, constraint blocks + binding connectors). Behavioral
+  SysML diagrams (activity, state machine, use case, sequence) reuse the UML presets;
+  the shape index already ships ~60 native `mxgraph.sysml.*` shapes, discoverable via
+  `shapesearch.py "sysml <keyword>"`.
+- SysML / MBSE trigger phrases in the SKILL.md frontmatter description and a SysML row
+  in the diagram-type dispatch table, so "SysML", "block definition diagram",
+  "requirement diagram", "parametric diagram", "MBSE" requests route to the new preset.
+
 ## [1.28.1] — 2026-07-10
 ### Changed
 - **Refreshed the `vs Other draw.io Skills & Tools` comparison** (README, README_CN,
