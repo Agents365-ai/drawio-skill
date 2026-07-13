@@ -189,6 +189,13 @@ python3 scripts/svgflow.py    architecture.drawio -o flow.svg
 # 反向：.drawio → Mermaid 流程图（GitHub 原生渲染的 diagrams-as-code）
 python3 scripts/drawio2mermaid.py architecture.drawio --fenced -o arch.md
 
+# 语言变体：提取标签 → 翻译值 → 应用（布局不动）
+python3 scripts/relabel.py architecture.drawio --extract -o labels.json
+python3 scripts/relabel.py architecture.drawio --map labels.json -o architecture_cn.drawio
+
+# 给已有 .drawio 换主题（如暗色模式）
+python3 scripts/restyle.py architecture.drawio --preset dark
+
 # 按数据给已有 .drawio 上色 → 成本 / 延迟 / 流量热力图
 python3 scripts/heatmap.py    architecture.drawio -m latency.csv --size -o hot.drawio
 
@@ -200,6 +207,8 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 |---|---|
 | **12 个提取器** | **Python · JS/TS · Go · Rust** 的导入关系图、**Python 类继承**、**Terraform / Kubernetes / docker-compose** 资源图（自动配官方云图标）、**SQL DDL → ER 图**、**OpenAPI / Swagger → API 图**（按 HTTP 方法着色的接口 + schema），以及从 `terraform show -json` / `docker inspect` / `kubectl get -o json` 提取的**实时**基础设施（画出真正已部署的样子） |
 | **图对比 (diff)** | `drawiodiff.py` 把两张 `.drawio`（或两个实时快照）对比成一张彩色图 —— 新增=绿、删除=红、变更=橙 —— 一眼看出架构 / 基础设施**漂移** |
+| **语言变体** | `relabel.py` 按 JSON 映射批量换标签，布局/样式/id 全不动 —— `--extract` 导出全部标签，翻译值后 `--map` 应用。一张图 → 中英双胞胎，双语文档必备 |
+| **换主题** | `restyle.py` 给**已有** `.drawio` 应用风格预设（内置 `dark`/`corporate`/… 或自定义）—— 按色相重映射调色板，同色节点保持同组；布局与连线路由不动 |
 | **指标热力图** | `heatmap.py` 按一份「节点→数值」的 CSV/JSON 给已有 `.drawio` 重新着色 —— 成本 / 延迟 / 流量 / 错误率沿渐变由低到高上色（可选按值缩放节点 + 自动图例），按 cell id 或标签匹配 |
 | **架构时间轴** | `timelapse.py` 沿 git 历史逐个提交重跑提取器，拼成一个自包含 HTML 播放器 —— 看着模块和依赖边随时间长出来（▶ 播放 / ‹ › 单步） |
 | **图 → Markdown** | `explain.py` 把一张 `.drawio` 反向描述成结构化文档 —— 按层级列出组件、关系、C4 多页分节 —— 方便把架构摘要塞进 README 或 PR |

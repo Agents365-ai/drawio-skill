@@ -21,6 +21,8 @@ Only user presets can have `"default": true`. When the user says *"make `<built-
 
 ## Applying a preset
 
+> **Existing diagrams:** these rules apply at generation time. To re-theme a `.drawio` that already exists, run `python3 scripts/restyle.py diagram.drawio --preset <name>` — it applies the palette (hue-mapped), font, and extras without touching layout or edge routing.
+
 When SKILL.md's Step 0 identified a preset, it fully replaces the built-in palette, shape keywords, edge defaults, and font for this diagram — do not mix values from the built-in color table.
 
 **Color lookup.** For each role a shape plays (service / database / queue / gateway / error / external / security), resolve `preset.roles[role]` to a slot name, then `preset.palette[<slot>]` to the `(fillColor, strokeColor)` pair. If `roles[role]` is unset or the resolved slot is `null`, follow this fallback ladder:

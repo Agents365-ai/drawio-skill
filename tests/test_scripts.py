@@ -1138,5 +1138,116 @@ class TestHeatmap(unittest.TestCase):
             self.assertIn("hm-title", cells)                       # legend injected
 
 
+FIXTURE_RELABEL = (
+    '<mxfile><diagram id="p" name="Flow"><mxGraphModel><root>'
+    '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+    '<mxCell id="a" value="Start" style="ellipse;" vertex="1" parent="1">'
+    '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+    '<UserObject id="b" label="Web Server" link="https://x">'
+    '<mxCell style="rounded=1;" vertex="1" parent="1">'
+    '<mxGeometry x="200" y="0" width="80" height="40" as="geometry"/></mxCell></UserObject>'
+    '<mxCell id="e" value="go" style="endArrow=classic;" edge="1" parent="1" '
+    'source="a" target="b"><mxGeometry relative="1" as="geometry"/></mxCell>'
+    '</root></mxGraphModel></diagram></mxfile>')
+
+
+class TestRelabel(unittest.TestCase):
+    @staticmethod
+    def _write(path, text):
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(text)
+
+    def test_extract_and_apply_roundtrip(self):
+        with tempfile.TemporaryDirectory() as d:
+            dp, lp, out = (os.path.join(d, n) for n in ("a.drawio", "l.json", "out.drawio"))
+            self._write(dp, FIXTURE_RELABEL)
+            r = run("relabel.py", dp, "--extract", "-o", lp)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            labels = json.load(open(lp, encoding="utf-8"))
+            # page name + vertex value + UserObject label + edge label
+            self.assertEqual(set(labels), {"Flow", "Start", "Web Server", "go"})
+            labels.update({"Start": "\u5f00\u59cb", "Web Server": "Web \u670d\u52a1\u5668"})
+            json.dump(labels, open(lp, "w", encoding="utf-8"), ensure_ascii=False)
+            r = run("relabel.py", dp, "--map", lp, "-o", out)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("4 labels replaced", r.stderr)
+            text = open(out, encoding="utf-8").read()
+            self.assertIn("\u5f00\u59cb", text)
+            self.assertIn("Web \u670d\u52a1\u5668", text)
+            self.assertNotIn('value="Start"', text)
+            # geometry untouched
+            self.assertIn('x="200"', text)
+
+    def test_unmatched_map_key_warns(self):
+        with tempfile.TemporaryDirectory() as d:
+            dp, lp, out = (os.path.join(d, n) for n in ("a.drawio", "l.json", "out.drawio"))
+            self._write(dp, FIXTURE_RELABEL)
+            self._write(lp, '{"Nope": "X"}')
+            r = run("relabel.py", dp, "--map", lp, "-o", out)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("matched no label", r.stderr)
+
+
+class TestRestyle(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.m = load("restyle")
+
+    def test_hue_slot_mapping(self):
+        palette = {k: {"fillColor": "#000000", "strokeColor": "#000000"}
+                   for k in ("primary", "success", "warning", "accent",
+                             "danger", "neutral", "secondary")}
+        self.assertEqual(self.m.hue_slot("#dae8fc", palette), "primary")    # blue
+        self.assertEqual(self.m.hue_slot("#d5e8d4", palette), "success")    # green
+        self.assertEqual(self.m.hue_slot("#f8cecc", palette), "danger")     # red
+        self.assertEqual(self.m.hue_slot("#f5f5f5", palette), "neutral")    # grey
+
+    def test_set_keys_replaces_and_appends(self):
+        s = self.m.set_keys("rounded=1;fillColor=#111111;", fillColor="#222222",
+                            fontFamily="Helvetica")
+        self.assertEqual(s.count("fillColor="), 1)
+        self.assertIn("fillColor=#222222", s)
+        self.assertIn("fontFamily=Helvetica", s)
+        self.assertIn("rounded=1", s)
+
+    def test_dark_preset_end_to_end(self):
+        drawio = (
+            '<mxfile><diagram id="p" name="P"><mxGraphModel><root>'
+            '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+            '<mxCell id="svc" value="Svc" style="rounded=1;fillColor=#dae8fc;'
+            'strokeColor=#6c8ebf;" vertex="1" parent="1">'
+            '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+            '<mxCell id="plain" value="Plain" style="rounded=1;" vertex="1" parent="1">'
+            '<mxGeometry x="200" y="0" width="80" height="40" as="geometry"/></mxCell>'
+            '<mxCell id="e" value="go" style="endArrow=classic;" edge="1" parent="1" '
+            'source="svc" target="plain"><mxGeometry relative="1" as="geometry"/></mxCell>'
+            '</root></mxGraphModel></diagram></mxfile>')
+        with tempfile.TemporaryDirectory() as d:
+            dp, out = os.path.join(d, "a.drawio"), os.path.join(d, "out.drawio")
+            with open(dp, "w", encoding="utf-8") as f:
+                f.write(drawio)
+            r = run("restyle.py", dp, "--preset", "dark", "-o", out)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            import xml.etree.ElementTree as ET
+            tree = ET.parse(out)
+            cells = {c.get("id"): c.get("style") for c in tree.getroot().iter("mxCell")}
+            self.assertIn("fillColor=#004870", cells["svc"])         # blue -> dark primary
+            self.assertIn("fontColor=#f0f0f0", cells["svc"])
+            self.assertNotIn("fontColor=", cells["plain"])           # default white fill kept dark text
+            self.assertIn("strokeColor=#bbbbbb", cells["e"])         # edgeColor
+            self.assertIn("labelBackgroundColor=none", cells["e"])
+            model = tree.getroot().find(".//mxGraphModel")
+            self.assertEqual(model.get("background"), "#1e1e1e")
+
+    def test_unknown_preset_lists_builtins(self):
+        with tempfile.TemporaryDirectory() as d:
+            dp = os.path.join(d, "a.drawio")
+            with open(dp, "w", encoding="utf-8") as f:
+                f.write(FIXTURE_RELABEL)
+            r = run("restyle.py", dp, "--preset", "nope")
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("dark", r.stderr + r.stdout)
+
+
 if __name__ == "__main__":
     unittest.main()

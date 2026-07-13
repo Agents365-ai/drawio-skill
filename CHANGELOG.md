@@ -4,6 +4,22 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.31.0] — 2026-07-13
+### Added
+- **`scripts/relabel.py`** — language variants / bulk text swaps of an existing
+  `.drawio` with layout, styles, and ids untouched. `--extract` dumps every label
+  (vertices, edges, UserObjects, page names) as an identity JSON map; translate the
+  values, then `--map` applies them. Built for bilingual EN/CN twins of one diagram.
+- **`scripts/restyle.py`** — re-theme an **existing** `.drawio` with a style preset
+  ("make this dark", "apply my corporate style"). Every vertex fill/stroke is remapped
+  to the preset palette by nearest hue (greys → neutral), so same-colored nodes stay
+  grouped; applies font family and dark-theme extras (fontColor, edgeColor +
+  `labelBackgroundColor=none`, page background, sketch, strokeWidth). Layout, shape
+  keywords, and edge routing are never touched; default-white and `fillColor=none`
+  cells keep readable text. Presets resolve like Step 0 (user dir → built-ins).
+- Routing entries in SKILL.md, toolbox sections, a cross-reference in
+  `style-presets.md`, and 6 new regression tests (79 total). Scripts: 28 → 30.
+
 ## [1.30.0] — 2026-07-13
 ### Added
 - **Three new diagram-type presets** in `references/diagram-types.md`, filling gaps the

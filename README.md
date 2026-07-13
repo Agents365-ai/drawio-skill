@@ -191,6 +191,13 @@ python3 scripts/svgflow.py    architecture.drawio -o flow.svg
 # Reverse: .drawio → Mermaid flowchart (diagrams-as-code GitHub renders)
 python3 scripts/drawio2mermaid.py architecture.drawio --fenced -o arch.md
 
+# Language variant: extract labels → translate values → apply (layout untouched)
+python3 scripts/relabel.py architecture.drawio --extract -o labels.json
+python3 scripts/relabel.py architecture.drawio --map labels.json -o architecture_cn.drawio
+
+# Re-theme an existing .drawio with a style preset (e.g. dark mode)
+python3 scripts/restyle.py architecture.drawio --preset dark
+
 # Colour an existing .drawio by data → cost / latency / traffic heat map
 python3 scripts/heatmap.py    architecture.drawio -m latency.csv --size -o hot.drawio
 
@@ -202,6 +209,8 @@ python3 scripts/autolayout.py  graph.json -o diagram.drawio
 |---|---|
 | **12 extractors** | import graphs for **Python · JS/TS · Go · Rust**, **Python class inheritance**, **Terraform / Kubernetes / docker-compose** resource graphs (official cloud icons), **SQL DDL → ERD**, **OpenAPI / Swagger → API diagram** (operations coloured by HTTP method + schemas), and **live** infra from `terraform show -json` / `docker inspect` / `kubectl get -o json` (draw what's actually deployed) |
 | **Diagram diff** | `drawiodiff.py` compares two `.drawio` (or two live snapshots) into one colour-coded graph — added=green, removed=red, changed=orange — so you can see architecture / infra **drift** at a glance |
+| **Language variants** | `relabel.py` swaps every label via a JSON map with layout/styles/ids untouched — `--extract` dumps all labels, translate the values, `--map` applies them. One diagram → EN + CN twins for bilingual docs |
+| **Re-theme** | `restyle.py` applies a style preset (built-in `dark`/`corporate`/… or your own) to an *existing* `.drawio` — palette remapped by hue so same-colored nodes stay grouped; layout and edge routing untouched |
 | **Metric heat map** | `heatmap.py` recolours an existing `.drawio` from a CSV/JSON of per-node values — cost / latency / traffic / error-rate shaded low→high on a gradient (optional size-by-value + legend), matched by cell id or label |
 | **Architecture time-lapse** | `timelapse.py` re-runs an importer across a repo's git history and assembles a self-contained HTML player — watch modules & edges appear over time (▶ play / ‹ › step) |
 | **Diagram → Markdown** | `explain.py` reverses a `.drawio` into a structured description — components by tier, relations, per-page for C4 — for dropping an architecture summary into a README or PR |

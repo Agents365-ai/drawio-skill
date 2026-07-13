@@ -1,6 +1,6 @@
 ---
 name: drawio-skill
-version: 1.30.0
+version: 1.31.0
 description: Use when the user requests diagrams, flowcharts, architecture diagrams, ER diagrams, UML / sequence / class diagrams, SysML / MBSE diagrams (block definition, internal block, requirement, parametric), BPMN business process diagrams, swimlane / cross-functional flowcharts, network topology, cloud architecture from Terraform or Kubernetes manifests, ML/DL model figures (Transformer/CNN/LSTM), mind maps, or any visualization. Also use proactively when explaining systems with 3+ components, complex data flows, or relationships that benefit from visual representation. Best suited when the diagram needs custom styling, rich shape vocabulary, swimlanes, or exportable images (PNG/SVG/PDF/JPG). Generates .drawio XML and exports locally via the native draw.io desktop CLI.
 license: MIT
 homepage: https://github.com/Agents365-ai/drawio-skill
@@ -34,7 +34,7 @@ When the workflow references one of these, read it on demand — none of them ne
 
 | File | Read it when |
 |---|---|
-| `references/toolbox.md` | You're **not sure which bundled script fits** a request, or want to chain several — a map of all 28 scripts grouped by use-case (author / import code / import IaC / import API spec / live infra / compare / annotate / reverse-export / utilities) with an "I have X, I want Y → use Z" guide |
+| `references/toolbox.md` | You're **not sure which bundled script fits** a request, or want to chain several — a map of all 30 scripts grouped by use-case (author / import code / import IaC / import API spec / live infra / compare / annotate / reverse-export / utilities) with an "I have X, I want Y → use Z" guide |
 | `references/xml-authoring.md` | You're about to **hand-write `.drawio` XML** (workflow step 3) — file skeleton, shape/edge cells, containers, connection distribution, palette, spacing/grid rules. Not needed when a bundled generator writes the XML |
 | `references/mermaid-authoring.md` | The diagram is a **standard type with no custom styling/icon needs** (flowchart, state, gantt, mindmap, timeline, journey, pie, …) and the CLI is **≥ v30** — author it as Mermaid text and let the CLI convert to native `.drawio` (structure only, layout free). Also documents the CLI's ELK `--layout` pass for XML |
 | `references/diagram-types.md` | The user names a specific diagram type (ERD, UML class, sequence, C4, architecture, ML/DL, flowchart, SysML, BPMN, network topology, swimlane) |
@@ -62,6 +62,8 @@ When the workflow references one of these, read it on demand — none of them ne
 | `scripts/heatmap.py` | The user wants to **colour an existing `.drawio` by data** (a cost / latency / traffic / error-rate heat map) — `heatmap.py diagram.drawio -m metrics.csv` matches each metric (CSV `key,value` or JSON `{key:value}`) to a node by id or label and recolours it along a gradient (`--palette heat\|cool\|warm`, `--reverse`), optionally scaling node size (`--size`) and adding a legend. Post-processes any diagram; export as usual |
 | `scripts/seqlayout.py` | The user wants a **sequence diagram** — describe participants + messages as JSON and the script computes all lifeline/activation/arrow geometry deterministically (no hand-placed coordinates, no Graphviz needed) |
 | `scripts/c4.py` | The user wants a **C4 model** (System Context / Container / Component) — levels JSON in, one multi-page `.drawio` out with official C4 shapes/colors and **click-to-drill-down** links between levels |
+| `scripts/relabel.py` | The user wants a **language variant or bulk text swap of an existing `.drawio`** (e.g. an EN diagram re-labelled in Chinese for a bilingual README) — `relabel.py diagram.drawio --extract -o labels.json` dumps every label as an identity JSON map; translate the values (keep the keys), then `relabel.py diagram.drawio --map labels.json -o diagram_cn.drawio` swaps them with layout/styles/ids untouched |
+| `scripts/restyle.py` | The user wants to **re-theme an EXISTING `.drawio`** ("make this dark", "apply my corporate style to this diagram") — `restyle.py diagram.drawio --preset <name>` remaps every vertex fill/stroke to the preset palette by hue, applies font/extras (dark fontColor, edge color, background), and leaves layout, shapes, and edge routing untouched. Presets resolve like Step 0 (user dir, then built-ins) |
 | `scripts/validate.py` | You generated a `.drawio` (especially via autolayout or for a large hand-placed diagram) and want a fast deterministic structural lint (dangling edges, dup/reserved ids, broken parents, overlaps) before the vision self-check. `--score` prints a readability score for comparing layout variants |
 
 ## Prerequisites
