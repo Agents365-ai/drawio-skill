@@ -24,6 +24,7 @@ PNG, SVG, and PDF exports support `--embed-diagram` (`-e`) — the exported file
 **Use this skill for:** polished, precise diagrams (architecture, network, strict UML, ERD), anything needing solid opaque fills, 10,000+ stock/branded shapes, swimlanes, or custom geometry, exported as editable PNG/SVG/PDF.
 
 **Do NOT use it — route elsewhere — for:**
+
 - A casual hand-drawn / whiteboard look → **excalidraw** or **tldraw**.
 - Diagrams-as-code that live in git / render in Markdown → **mermaid** (general) or **plantuml** (UML).
 - Freeform infinite-canvas sketching or freehand strokes → **tldraw**.
@@ -33,7 +34,7 @@ PNG, SVG, and PDF exports support `--embed-diagram` (`-e`) — the exported file
 When the workflow references one of these, read it on demand — none of them need to be in context up front.
 
 | File | Read it when |
-|---|---|
+| --- | --- |
 | `references/toolbox.md` | You're **not sure which bundled script fits** a request, or want to chain several — a map of all 31 scripts grouped by use-case (author / import code / import IaC / import API spec / live infra / compare / annotate / reverse-export / utilities) with an "I have X, I want Y → use Z" guide |
 | `references/xml-authoring.md` | You're about to **hand-write `.drawio` XML** (workflow step 3) — file skeleton, shape/edge cells, containers, connection distribution, palette, spacing/grid rules. Not needed when a bundled generator writes the XML |
 | `references/mermaid-authoring.md` | The diagram is a **standard type with no custom styling/icon needs** (flowchart, state, gantt, mindmap, timeline, journey, pie, …) and the CLI is **≥ v30** — author it as Mermaid text and let the CLI convert to native `.drawio` (structure only, layout free). Also documents the CLI's ELK `--layout` pass for XML |
@@ -95,13 +96,15 @@ drawio --version
 ```
 
 Install draw.io desktop if missing:
-- macOS: `brew install --cask drawio` or download from https://github.com/jgraph/drawio-desktop/releases
-- Windows: download installer from https://github.com/jgraph/drawio-desktop/releases
-- Linux: download `.deb`/`.rpm` from https://github.com/jgraph/drawio-desktop/releases — **do not use snap** (AppArmor sandbox denies secrets/keyring on servers, causes crash)
+
+- macOS: `brew install --cask drawio` or download from <https://github.com/jgraph/drawio-desktop/releases>
+- Windows: download installer from <https://github.com/jgraph/drawio-desktop/releases>
+- Linux: download `.deb`/`.rpm` from <https://github.com/jgraph/drawio-desktop/releases> — **do not use snap** (AppArmor sandbox denies secrets/keyring on servers, causes crash)
 
 ## Workflow
 
 Before starting the workflow, assess whether the user's request is specific enough. If key details are missing, ask 1-3 focused questions:
+
 - **Diagram type** — which preset? (ERD, UML, Sequence, Architecture, ML/DL, Flowchart, SysML, BPMN, Network, Swimlane, or general)
 - **Output format** — PNG (default), SVG, PDF, or JPG?
 - **Output location** — default is the user's working dir; honor any explicit path the user gives (e.g. "put it in `./artifacts/`"). Don't ask if they didn't mention one.
@@ -119,20 +122,22 @@ Load the preset JSON from `~/.drawio-skill/styles/<name>.json`, falling back to 
 
 When a preset loads successfully, mention it in the first line of the reply: *"Using preset `<name>` (confidence: `<level>`)."* See `references/style-presets.md` → "Applying a preset" for how the preset changes color/shape/edge/font decisions.
 
-1. **Check deps** — **resolve which name the binary has on this system** and use that name verbatim in every subsequent command in this workflow. Try in order: (a) `drawio --version` (the canonical name for Homebrew cask, jgraph `.deb`/`.rpm`, Arch AUR), (b) `draw.io --version` (older builds, some custom symlinks, some distro packages), (c) macOS `.app` direct: `/Applications/draw.io.app/Contents/MacOS/draw.io --version`, (d) Windows: `"C:\Program Files\draw.io\draw.io.exe" --version`. The first one that prints a version is your binary; remember the exact path/name and substitute it for `drawio` in every export command below. **Do not copy the example commands verbatim if your binary is named differently** — the examples use `drawio` only because it's the most common. On macOS-Homebrew, `drawio` is just a thin wrapper script that execs `/Applications/draw.io.app/Contents/MacOS/draw.io` — they run the same engine, so candidate (c) is only needed when the `drawio` wrapper is absent (e.g. the app was installed by drag-and-drop without the cask). **Also note the major version** the command printed: **≥ 30** unlocks Mermaid→`.drawio` conversion and the ELK `--layout` pass (see `references/mermaid-authoring.md`); on **≤ 29** both are unavailable — `.mmd` input fails and `--layout` corrupts argument parsing — so never emit those flags there.
+1. **Check deps** — **resolve which name the binary has on this system** and use that name verbatim in every subsequent command in this workflow. Try in order: (a) `drawio --version` (the canonical name for Homebrew cask, jgraph `.deb`/`.rpm`, Arch AUR), (b) `draw.io --version` (older builds, some custom symlinks, some distro packages), (c) macOS `.app` direct: `/Applications/draw.io.app/Contents/MacOS/draw.io --version`, (d) Windows: `"C:\Program Files\draw.io\draw.io.exe" --version`. The first one that prints a version is your binary; remember the exact path/name and substitute it for `drawio` in every export command below. **Do not copy the example commands verbatim if your binary is named differently** — the examples use `drawio` only because it's the most common. On macOS-Homebrew, `drawio` is just a thin wrapper script that execs `/Applications/draw.io.app/Contents/MacOS/draw.io` — they run the same engine, so candidate (c) is only needed when the `drawio` wrapper is absent (e.g. the app was installed by drag-and-drop without the cask). **Also note the major version** the command printed: **≥ 30** unlocks Mermaid→`.drawio` conversion and the `--layout` pass (ELK full re-layout or `libavoid` edge-only routing; see `references/mermaid-authoring.md`); on **≤ 29** both are unavailable — `.mmd` input fails and `--layout` corrupts argument parsing — so never emit those flags there.
 2. **Plan** — identify shapes, relationships, layout (LR or TB), group by tier/layer
-3. **Generate** — produce the `.drawio` file, choosing the authoring mode: **(a) Mermaid → CLI convert** when the diagram is a standard type with no custom styling/icon needs **and** the CLI is ≥ v30 — write a `.mmd` and run `drawio -x -f xml -o <name>.drawio <name>.mmd`, see `references/mermaid-authoring.md` (structure only; layout comes free; never `--layout` afterwards). **(b) Hand-written XML** for custom styling, vendor icons, swimlanes, precise geometry — **read `references/xml-authoring.md` first** (skeleton, cell forms, palette, spacing rules). **(c) A bundled generator** for the data-driven cases below. **For large or layout-heavy diagrams (dependency/call graphs, code structure, >~15 nodes), don't hand-place** — describe the graph as JSON and run `python3 <this-skill-dir>/scripts/autolayout.py graph.json -o <name>.drawio` to compute node positions + orthogonal edge routing via Graphviz (see `references/autolayout.md`; add `--tune` to auto-pick the more readable direction). For a **Python / JS-TS / Go / Rust project**, the matching importer (`scripts/pyimports.py`, `jsimports.py`, `goimports.py`, or `rustimports.py`) extracts the import graph (transitive-reduced; add `--group` to box modules by sub-package, nested for deep trees) ready for autolayout; for a **Python class hierarchy**, `scripts/pyclasses.py` extracts classes + inheritance instead; for **Terraform / Kubernetes / docker-compose** (`scripts/tfimports.py`, `k8simports.py`, `composeimports.py`), the importer extracts the resource/service reference graph — tf/k8s nodes resolve to their official cloud icons automatically; to draw **what is actually running** rather than the declared config, pipe `terraform show -json` into `scripts/tfstate.py` or `docker inspect $(docker ps -q)` into `scripts/dockerimports.py` (`k8simports.py` already accepts live `kubectl get ... -o json`) — see `references/live-infra.md`; for an **ER diagram from SQL DDL**, `scripts/sqlerd.py` parses `CREATE TABLE` into table nodes + crow's-foot FK edges; for an **API diagram from an OpenAPI / Swagger spec**, `scripts/openapiimports.py` maps operations (coloured by HTTP method) + component schemas into a graph for autolayout; for a **CI pipeline diagram** (GitHub Actions / GitLab CI), `scripts/ciimports.py` extracts jobs, `needs:` edges, triggers, and stage/workflow containers. To turn any generated `.drawio` into a **metric heat map** — recolour nodes by a CSV/JSON of cost/latency/traffic/errors — run `python3 <this-skill-dir>/scripts/heatmap.py <name>.drawio -m metrics.csv` (matches on cell id or label; `--palette`, `--size`, legend). For a **sequence diagram**, skip autolayout entirely — describe participants + messages as JSON and run `python3 <this-skill-dir>/scripts/seqlayout.py seq.json -o <name>.drawio` (deterministic lifeline/activation/arrow geometry; see the script docstring for the JSON schema). For a **C4 model**, `python3 <this-skill-dir>/scripts/c4.py c4.json -o <name>.drawio` emits the full multi-page Context→Container→Component set with drill-down links (schema in the script docstring). For complex architecture diagrams with many visible edge labels, give labels `labelBackgroundColor=#ffffff;fontSize=11` and use edge geometry `x`/`y` offsets plus `<mxPoint as="offset" />` to move long labels into nearby whitespace instead of relying on draw.io's default midpoint placement. After generating any `.drawio`, run `python3 <this-skill-dir>/scripts/validate.py <name>.drawio` for a fast structural lint (dangling edges, dup ids, overlaps) before exporting. Default output dir is the user's working dir; if the user specified an output path or directory (e.g. `./artifacts/`, `docs/images/`), use that instead — `mkdir -p` the target dir first. Apply the same dir choice to PNG/SVG/PDF exports in steps 4 and 7.
+3. **Generate** — produce the `.drawio` file, choosing the authoring mode: **(a) Mermaid → CLI convert** when the diagram is a standard type with no custom styling/icon needs **and** the CLI is ≥ v30 — write a `.mmd` and run `drawio -x -f xml -o <name>.drawio <name>.mmd`, see `references/mermaid-authoring.md` (structure only; layout comes free; never `--layout` afterwards). **(b) Hand-written XML** for custom styling, vendor icons, swimlanes, precise geometry — **read `references/xml-authoring.md` first** (skeleton, cell forms, palette, spacing rules). **(c) A bundled generator** for the data-driven cases below. **For large or layout-heavy diagrams (dependency/call graphs, code structure, >~15 nodes), don't hand-place** — describe the graph as JSON and run `python3 <this-skill-dir>/scripts/autolayout.py graph.json -o <name>.drawio` to compute node positions + orthogonal edge routing via Graphviz (see `references/autolayout.md`; add `--tune` to auto-pick the more readable direction). For a **Python / JS-TS / Go / Rust project**, the matching importer (`scripts/pyimports.py`, `jsimports.py`, `goimports.py`, or `rustimports.py`) extracts the import graph (transitive-reduced; add `--group` to box modules by sub-package, nested for deep trees) ready for autolayout; for a **Python class hierarchy**, `scripts/pyclasses.py` extracts classes + inheritance instead; for **Terraform / Kubernetes / docker-compose** (`scripts/tfimports.py`, `k8simports.py`, `composeimports.py`), the importer extracts the resource/service reference graph — tf/k8s nodes resolve to their official cloud icons automatically; to draw **what is actually running** rather than the declared config, pipe `terraform show -json` into `scripts/tfstate.py` or `docker inspect $(docker ps -q)` into `scripts/dockerimports.py` (`k8simports.py` already accepts live `kubectl get ... -o json`) — see `references/live-infra.md`; for an **ER diagram from SQL DDL**, `scripts/sqlerd.py` parses `CREATE TABLE` into table nodes + crow's-foot FK edges; for an **API diagram from an OpenAPI / Swagger spec**, `scripts/openapiimports.py` maps operations (coloured by HTTP method) + component schemas into a graph for autolayout; for a **CI pipeline diagram** (GitHub Actions / GitLab CI), `scripts/ciimports.py` extracts jobs, `needs:` edges, triggers, and stage/workflow containers. To turn any generated `.drawio` into a **metric heat map** — recolour nodes by a CSV/JSON of cost/latency/traffic/errors — run `python3 <this-skill-dir>/scripts/heatmap.py <name>.drawio -m metrics.csv` (matches on cell id or label; `--palette`, `--size`, legend). For a **sequence diagram**, skip autolayout entirely — describe participants + messages as JSON and run `python3 <this-skill-dir>/scripts/seqlayout.py seq.json -o <name>.drawio` (deterministic lifeline/activation/arrow geometry; see the script docstring for the JSON schema). For a **C4 model**, `python3 <this-skill-dir>/scripts/c4.py c4.json -o <name>.drawio` emits the full multi-page Context→Container→Component set with drill-down links (schema in the script docstring). For complex architecture diagrams with many visible edge labels, give labels `labelBackgroundColor=#ffffff;fontSize=11` and use edge geometry `x`/`y` offsets plus `<mxPoint as="offset" />` to move long labels into nearby whitespace instead of relying on draw.io's default midpoint placement. For hand-placed diagrams where edges cross shapes (architecture, network topology, deployment, UML), run `drawio --layout libavoid <name>.drawio -o <name>.drawio` after generation — it keeps every vertex position exactly as-is and only reroutes the connectors orthogonally around the shapes (obstacle-avoiding routing), with no Graphviz or `autolayout.py` needed. ELK `--layout` presets, by contrast, re-place vertices too — use them when you want a full canonical re-layout. After generating any `.drawio`, run `python3 <this-skill-dir>/scripts/validate.py <name>.drawio` for a fast structural lint (dangling edges, dup ids, overlaps) before exporting. Default output dir is the user's working dir; if the user specified an output path or directory (e.g. `./artifacts/`, `docs/images/`), use that instead — `mkdir -p` the target dir first. Apply the same dir choice to PNG/SVG/PDF exports in steps 4 and 7.
 4. **Export draft** — run CLI to produce a preview PNG. **Do NOT pass `-e`** at this step — the embedded `zTXt mxGraphModel` chunk it adds causes vision APIs (Claude included) to return 400 "Could not process image" in step 5. **Cap the preview width with `--width 2000` (not `-s 2`)** — Claude's vision API rejects images larger than 2576×2576px with "Unable to resize image — dimensions exceed the 2576x2576px limit", and `-s 2` on a medium-or-larger diagram easily overshoots that ceiling. Save the clean preview as `<name>.png` (single extension). Embedding and full-resolution scale are for the final export only (step 7).
 5. **Self-check** — use the agent's built-in vision capability to read the exported PNG, catch obvious issues, auto-fix before showing user (requires a vision-enabled model such as Claude Sonnet/Opus). If reading the PNG returns a 400 / "Could not process image" error, you almost certainly exported with `-e` by mistake — re-export without `-e` and retry once. If it still fails, skip self-check and continue to step 6.
 6. **Review loop** — show image to user, collect feedback, apply targeted XML edits, re-export, repeat until approved
 7. **Final export** — re-export the approved version to all requested formats. Use `-e` here (PNG/SVG/PDF) so the deliverable stays editable in draw.io; save as `<name>.drawio.png` to signal embedded XML. **For PNG with `-e`, run `python3 <this-skill-dir>/scripts/repair_png.py <name>.drawio.png` immediately after** — draw.io's CLI truncates the IEND chunk in `-e` PNG output (8 bytes missing), producing a corrupt file that vision APIs and strict PNG decoders reject (issue #8). Report file paths.
 
 **If `drawio --version` crashes or prints nothing (common in restricted macOS sandbox isolation like codex.app):**
+
 - Do not keep retrying CLI invocations inside the sandbox.
 - Skip steps 4, 5, 6, and 7 (CLI export + PNG-based review) and use **Browser fallback** (`scripts/encode_drawio_url.py`) or deliver the `.drawio` XML only.
 - If the user needs PNG/SVG/PDF outputs, ask them to run the export commands in a **non-sandboxed host environment** (outside sandbox isolation) and share the resulting files.
 
 Escalation rule:
+
 - If the binary exists on PATH (or known app path exists) but execution fails with abnormal exit, empty output, Electron startup failure, display/session error, or likely sandbox restriction, prefer one escalated retry before falling back.
 - If the binary is missing entirely, do not escalate just to search more aggressively; go to install guidance or fallback.
 
@@ -143,7 +148,7 @@ After exporting the draft PNG, use the agent's vision capability (e.g., Claude's
 **Important:** the draft PNG read here must have been exported **without** `-e`. Draw.io's `-e` flag emits a PNG with a truncated IEND chunk (8 bytes of type+CRC missing) that the Anthropic vision API rejects with 400 "Could not process image" (issue #8). The simplest fix for the preview step is to skip `-e` entirely; the final export in step 7 keeps `-e` and runs the repair snippet. If you see the 400 error here, re-export without `-e` and retry once; if it still fails (any other reason), skip self-check and proceed to step 6.
 
 | Check | What to look for | Auto-fix action |
-|-------|-----------------|-----------------|
+| ------- | ----------------- | ----------------- |
 | Overlapping shapes | Two or more shapes stacked on top of each other | Shift shapes apart by ≥200px |
 | Clipped labels | Text cut off at shape boundaries | Increase shape width/height to fit label |
 | Missing connections | Arrows that don't visually connect to shapes | Verify `source`/`target` ids match existing cells |
@@ -162,7 +167,7 @@ After self-check, show the exported image and ask the user for feedback.
 **Targeted edit rules** — for each type of feedback, apply the minimal XML change:
 
 | User request | XML edit action |
-|-------------|----------------|
+| ------------- | ---------------- |
 | Change color of X | Find `mxCell` by `value` matching X, update `fillColor`/`strokeColor` in `style` |
 | Add a new node | Append a new `mxCell` vertex with next available `id`, position near related nodes |
 | Remove a node | Delete the `mxCell` vertex and any edges with matching `source`/`target` |
@@ -173,6 +178,7 @@ After self-check, show the exported image and ask the user for feedback.
 | Change layout direction | **Full regeneration** — rebuild XML with new orientation |
 
 **Rules:**
+
 - For single-element changes: edit existing XML in place — preserves layout tuning from prior iterations
 - For layout-wide changes (e.g., swap LR↔TB, "start over"): regenerate full XML
 - Overwrite the same `{name}.png` (no `-e`) each iteration — do not create `v1`, `v2`, `v3` files. `-e` is reserved for the final export in step 7.
@@ -183,6 +189,7 @@ After self-check, show the exported image and ask the user for feedback.
 ### Step 7: Final Export
 
 Once the user approves:
+
 - Export to all requested formats (PNG, SVG, PDF, JPG) — default to PNG if not specified
 - Report file paths for both the `.drawio` source file and exported image(s)
 - **Auto-launch:** offer to open the `.drawio` file in draw.io desktop for fine-tuning — `open diagram.drawio` (macOS), `xdg-open` (Linux), `start` (Windows)
@@ -193,6 +200,7 @@ Once the user approves:
 A **style preset** is a named JSON file capturing a user's visual preferences (palette, shapes, font, edges). When active, it fully replaces the built-in color/shape conventions in this skill.
 
 **Lookup order** when SKILL.md's Step 0 resolves a preset name:
+
 1. `~/.drawio-skill/styles/<name>.json` — user presets (survive `git pull`)
 2. `<this-skill-dir>/styles/built-in/<name>.json` — shipped built-ins (`default`, `corporate`, `handdrawn`, `colorblind-safe`, `dark`)
 
@@ -260,13 +268,14 @@ python3 <this-skill-dir>/scripts/repair_png.py diagram.drawio.png
 The script's `endswith(IEND)` guard makes it a no-op once draw.io fixes the bug upstream — safe to run unconditionally.
 
 **Key flags:**
+
 - `-x` — export mode (required)
 - `-f` — format: `png`, `svg`, `pdf`, `jpg`
 - `-e` — embed diagram XML in output (PNG, SVG, PDF) — exported file remains editable in draw.io. **Skip for the preview PNG used in step 5 self-check** — `-e` PNGs have a truncated IEND chunk that vision APIs reject (issue #8). For final PNG export, keep `-e` and run `scripts/repair_png.py` (see Post-export PNG repair). SVG/PDF unaffected.
 - `-s` — scale: `1`, `2`, `3` (2 recommended for final PNG; do NOT use for the step-4 preview — see `--width`)
 - `--width <px>` — target width in pixels (no short form; `-w` does **not** exist and silently breaks the input-file parser). Use `--width 2000` for the step-4 preview to keep the PNG under Claude's 2576×2576 vision ceiling. There's also a `--height <px>` flag for tall-narrow diagrams. Don't combine `--width` with `-s`.
 - `-o` — output file path; accepts any directory (e.g. `./artifacts/diagram.drawio.png`) — `mkdir -p` the target dir first. Use `.drawio.png` double extension when embedding.
-- `--layout <preset|json>` — **CLI ≥ v30 only** — ELK auto-layout pass on XML input (`verticalFlow`, `horizontalFlow`, `verticalTree`, `horizontalTree`, `radialTree`, `organic`, or a custom ELK JSON array). Alternative to `autolayout.py` when Graphviz is missing; never combine with Mermaid-converted files (already laid out). On ≤ 29 this flag breaks argument parsing — don't emit it. See `references/mermaid-authoring.md`
+- `--layout <preset|json>` — **CLI ≥ v30 only** — Post-generate layout pass on XML input. Two modes: **(a) ELK** presets (`verticalFlow`, `horizontalFlow`, `verticalTree`, `horizontalTree`, `radialTree`, `organic`, or a custom ELK JSON array) re-place nodes + route edges; alternative to `autolayout.py` when Graphviz is missing. **(b) `libavoid`** keeps every vertex exactly where you placed it and only reroutes the connectors orthogonally around the shapes (obstacle-avoiding routing) — use it on architecture/network/deployment diagrams to keep your deliberate layout while cleaning up edge crossings. Never combine with Mermaid-converted files (already laid out). On ≤ 29 this flag breaks argument parsing — don't emit it. See `references/mermaid-authoring.md`
 - `-b` — border width around diagram (default: 0, recommend 10)
 - `-t` — transparent background (PNG only)
 - `--page-index <n>` — export one page of a multi-page file. **1-based** in current drawio-desktop (verified on 29.7.8: `--page-index 2` exports the second page; older docs claimed 0-based). Default: first page. `--page-range 2..3` also works
@@ -289,7 +298,7 @@ Open the URL with `open "$URL"` (macOS) / `xdg-open "$URL"` (Linux). On **WSL2 /
 When tools are unavailable, degrade gracefully:
 
 | Scenario | Behavior |
-|----------|----------|
+| ---------- | ---------- |
 | draw.io CLI missing, Python available | Use browser fallback (diagrams.net URL) |
 | draw.io CLI missing, Python missing | Generate `.drawio` XML only; instruct user to open in draw.io desktop or diagrams.net manually |
 | draw.io CLI crashes / no output in macOS sandbox isolation | Treat CLI as unavailable in-sandbox; use browser fallback / XML-only; ask user to run CLI exports in a non-sandboxed host environment |
@@ -328,7 +337,7 @@ When something looks wrong (export fails, vision rejects a PNG, layout broken, e
 When the user requests a specific diagram type, read `references/diagram-types.md` for the matching preset (shapes, edges, layout direction). Pick by user phrasing:
 
 | User says | Section in `references/diagram-types.md` |
-|---|---|
+| --- | --- |
 | "ER diagram", "schema diagram", "data model" | ERD |
 | "UML class diagram", "class diagram" | UML Class |
 | "sequence diagram", "interaction diagram", "lifeline" | Sequence |

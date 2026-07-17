@@ -47,7 +47,7 @@ It prints `wrote diagram.drawio (N nodes, M edges)` to stderr and writes a norma
 **Fields**
 
 | Field | Required | Default | Notes |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `direction` | no | `TB` | `TB` (top→bottom) or `LR` (left→right) — the layout rank direction |
 | `nodes[].id` | **yes** | — | Unique; must not be `0` or `1` (reserved for draw.io root cells) |
 | `nodes[].label` | no | the `id` | Display text; auto XML-escaped |
@@ -91,7 +91,7 @@ It catches dangling edge endpoints, duplicate/reserved ids, broken parent refere
 Bundled importers turn a codebase or an IaC configuration into a graph JSON ready for autolayout, so "visualize this project" is a two-step pipeline:
 
 | Source | Script | Node = | Edge = |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Python | `scripts/pyimports.py <dir>` | module / package (`ast`) | intra-project `import` / `from` |
 | JS / TS | `scripts/jsimports.py <dir>` | source file (`.ts/.tsx/.js/.jsx/.mjs/.cjs`) | resolved relative `import`/`export from`/`require()`/`import()` |
 | Go | `scripts/goimports.py <dir>` | package (directory, via `go.mod`) | intra-module package import |
@@ -154,6 +154,16 @@ The tf/k8s importers emit `ranksep`/`nodesep` in the graph JSON automatically (i
 **`--group`** assigns each node a container by its sub-package / directory path, so autolayout boxes related modules together — nested when the path has depth (see **Containers / grouping**). The fastest way to turn a large code graph into a tiered architecture view.
 
 For any other language, produce the same graph JSON from any analyzer (e.g. `dependency-cruiser` for richer JS/TS resolution, `go-callvis` for Go call graphs) and feed it to autolayout the same way.
+
+## Edge routing after auto-layout
+
+Dot already routes edges orthogonally as part of its layout pass (`splines=ortho`), so the result usually needs no further routing. When the output still has edges cutting across shapes (common in dense graphs with many inter-group edges), pass the produced `.drawio` through `drawio --layout libavoid` for a second routing-only pass — it keeps every autolayout vertex position and only reroutes the connectors around the shapes:
+
+```bash
+drawio --layout libavoid diagram.drawio -o diagram.drawio
+```
+
+This is a pure CLI operation (no Graphviz needed), but requires draw.io CLI ≥ v30.
 
 ## Limitations
 
