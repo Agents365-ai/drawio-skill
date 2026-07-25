@@ -157,13 +157,11 @@ For any other language, produce the same graph JSON from any analyzer (e.g. `dep
 
 ## Edge routing after auto-layout
 
-Dot already routes edges orthogonally as part of its layout pass (`splines=ortho`), so the result usually needs no further routing. When the output still has edges cutting across shapes (common in dense graphs with many inter-group edges), pass the produced `.drawio` through `drawio --layout libavoid` for a second routing-only pass — it keeps every autolayout vertex position and only reroutes the connectors around the shapes:
+Dot already routes edges orthogonally as part of its layout pass (`splines=ortho`), so the result usually needs no further routing.
 
-```bash
-drawio --layout libavoid diagram.drawio -o diagram.drawio
-```
+**There is no CLI flag that reroutes edges without moving nodes.** `--layout` only accepts ELK *node* layout presets (`verticalFlow`, `horizontalFlow`, `verticalTree`, `horizontalTree`, `radialTree`, `organic`) or a JSON layout array — every one of them re-places vertices. Passing an unrecognised value (e.g. `libavoid`) makes draw.io open a modal `Unknown layout:` error dialog, which **hangs a headless run until it is killed**.
 
-This is a pure CLI operation (no Graphviz needed), but requires draw.io CLI ≥ v30.
+When the output still has edges cutting across shapes, fix it at authoring time instead — pin `exitX/exitY/entryX/entryY`, add `<Array as="points">` waypoints, or increase node spacing (see `xml-authoring.md` "Edge style rules"). draw.io's obstacle-avoiding connector router is editor-side only: open the `.drawio` in draw.io desktop and re-route there.
 
 ## Limitations
 

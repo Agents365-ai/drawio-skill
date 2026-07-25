@@ -4,6 +4,21 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [1.34.1] — 2026-07-25
+### Fixed
+- **Removed the non-existent `--layout libavoid` CLI flag from the docs**
+  (regression from #95). draw.io desktop's `--layout` accepts only the ELK
+  presets `verticalFlow`, `horizontalFlow`, `verticalTree`, `horizontalTree`,
+  `radialTree`, `organic`, or a JSON layout array; `libavoid` is not among
+  them and the string does not appear anywhere in draw.io desktop 30.2.6.
+  Passing it opens a modal `Unknown layout: libavoid` dialog, which **hangs
+  headless/CI runs** until the process is killed. `SKILL.md` and
+  `references/autolayout.md` now state that no CLI flag reroutes edges without
+  moving nodes, and point to authoring-side fixes (`exitX`/`entryX` pinning,
+  `<Array as="points">` waypoints, node spacing) instead.
+  `references/xml-authoring.md` already had this right; its unverifiable
+  `libavoidRouting=1` style-stamp claim was dropped. Reported in #96.
+
 ## [1.34.0] — 2026-07-14
 ### Added
 - **`scripts/tubemap.py`** — Tube-Map Mode: restyle a graph as a London-
