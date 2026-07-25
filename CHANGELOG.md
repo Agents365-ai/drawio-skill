@@ -4,6 +4,25 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [2.1.0] — 2026-07-25
+### Added
+- **`scripts/edgeports.py`** — deterministic edge port assignment, the real
+  replacement for the `--layout libavoid` flag removed in 2.0.0. draw.io's
+  floating connections attach every edge to the middle of whichever side faces
+  the peer, so several edges leaving the same side stack into one line — the
+  usual swimlane / cross-functional complaint (#96). The pass resolves each
+  vertex to absolute coordinates (through swimlane parents), picks the side of
+  each node facing the other endpoint, then spreads that side's edges over
+  evenly-spaced slots **ordered by the far endpoint's position** so they keep
+  their relative order instead of crossing at the boundary. Ends already pinned
+  by hand are left alone and re-running is a no-op.
+
+  It is a **port assigner, not a router**: it separates lines where they meet a
+  shape, and does *not* stop an edge crossing an unrelated shape mid-run — add
+  waypoints for that. Verified on a 3-lane swimlane (8 ends pinned, stacked
+  handoffs separated); `validate.py --score` cannot measure the improvement,
+  since it only scores edges carrying explicit waypoints.
+
 ## [2.0.0] — 2026-07-25
 ### Removed
 - **`--layout libavoid` is gone from the documented interface.** It never
