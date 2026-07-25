@@ -4,7 +4,15 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
-## [1.34.1] — 2026-07-25
+## [2.0.0] — 2026-07-25
+### Removed
+- **`--layout libavoid` is gone from the documented interface.** It never
+  worked; anyone who copied it from `SKILL.md` or `references/autolayout.md`
+  hit a hang, not an error. There is **no CLI flag that reroutes edges without
+  moving nodes** — route edges at authoring time instead (`exitX`/`entryX`
+  pinning, `<Array as="points">` waypoints, node spacing), or open the file in
+  draw.io desktop and use its editor-side obstacle-avoiding router.
+
 ### Fixed
 - **Removed the non-existent `--layout libavoid` CLI flag from the docs**
   (regression from #95). draw.io desktop's `--layout` accepts only the ELK
