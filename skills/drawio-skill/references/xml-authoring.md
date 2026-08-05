@@ -2,7 +2,6 @@
 
 Read this **before hand-writing any `.drawio` XML** (workflow step 3). Skip it when a bundled generator writes the XML for you (`autolayout.py` + importers, `seqlayout.py`).
 
-
 ### File skeleton
 
 ```xml
@@ -21,6 +20,7 @@ Read this **before hand-writing any `.drawio` XML** (workflow step 3). Skip it w
 ```
 
 **Rules:**
+
 - `id="0"` and `id="1"` are required root cells — never omit them
 - User shapes start at `id="2"` and increment sequentially
 - All shapes have `parent="1"` (unless inside a container — then use container's id)
@@ -32,7 +32,7 @@ Read this **before hand-writing any `.drawio` XML** (workflow step 3). Skip it w
 ### Shape types (vertex)
 
 | Style keyword | Use for |
-|--------------|---------|
+| -------------- | --------- |
 | `rounded=0` | plain rectangle (default) |
 | `rounded=1` | rounded rectangle — services, modules |
 | `ellipse;` | circles/ovals — start/end, databases |
@@ -67,12 +67,13 @@ For **vendor/branded icons** (AWS/Azure/GCP/Cisco/Kubernetes) and any non-trivia
 For architecture diagrams with nested elements, use draw.io's parent-child containment — do **not** just place shapes on top of larger shapes.
 
 | Type | Style | When to use |
-|------|-------|-------------|
+| ------ | ------- | ------------- |
 | **Group** (invisible) | `group;pointerEvents=0;` | No visual border needed, container has no connections |
 | **Swimlane** (titled) | `swimlane;startSize=30;` | Container needs a visible title bar, or container itself has connections |
 | **Custom container** | Add `container=1;pointerEvents=0;` to any shape | Any shape acting as a container without its own connections |
 
 **Key rules:**
+
 - Add `pointerEvents=0;` to container styles that should not capture connections between children
 - Children set `parent="containerId"` and use coordinates **relative to the container**
 
@@ -116,19 +117,20 @@ For architecture diagrams with nested elements, use draw.io's parent-child conta
 ```
 
 **Edge style rules:**
+
 - **Animated connectors:** add `flowAnimation=1;` to any edge style to show a moving dot animation along the arrow. Works in SVG export and draw.io desktop — ideal for data-flow and pipeline diagrams. Example: `style="edgeStyle=orthogonalEdgeStyle;flowAnimation=1;rounded=1;..."`
 - **Always** include `rounded=1;orthogonalLoop=1;jettySize=auto` — these enable smart routing that avoids overlaps
 - Pin `exitX/exitY/entryX/entryY` on every edge when a node has 2+ connections — distributes lines across the shape perimeter. `scripts/edgeports.py <file>` does this for a whole diagram: it picks the side facing each peer and spreads that side's edges over even slots ordered by the far endpoint, so they don't stack or cross at the boundary. It skips ends you pinned by hand and is idempotent
 - Add `<Array as="points">` waypoints when an edge must detour around an intermediate shape
 - **Leave room for arrowheads:** the final straight segment between the last bend and the target shape must be ≥20px long. If too short, the arrowhead overlaps the bend and looks broken. Fix by increasing node spacing or adding explicit waypoints
-- **libavoid obstacle-avoiding routing (editor-side, draw.io ≥ 30):** draw.io has a newer connector router that recomputes edge paths to run *around* shapes (fanning out parallel edges) without moving any node. It runs interactively in the draw.io desktop editor (or via jgraph's MCP app-server `routing:"libavoid"`) — it is **not** a headless CLI flag. Passing `--layout libavoid` opens a modal `Unknown layout:` error dialog and hangs the run; the CLI `--layout` values are ELK *node* layout presets, a different thing (see `mermaid-authoring.md`). For CLI-authored files keep the orthogonal rules above; if a dense diagram still has crossings after export, open the `.drawio` in draw.io desktop once and let libavoid re-route. Don't stack it on an ELK `--layout` pass — pick one router, not both.
+- **libavoid obstacle-avoiding routing (editor-side, draw.io ≥ 30):** draw.io has a newer connector router that recomputes edge paths to run *around* shapes (fanning out parallel edges) without moving any node. It runs interactively in the draw.io desktop editor (or via jgraph's MCP app-server `routing:"libavoid"`) — it is **not** a headless CLI flag. Passing `--layout libavoid` opens a modal `Unknown layout:` error dialog and hangs the run (jgraph's own drawio-mcp plugin docs claim the CLI flag works — verified hang on 30.2.6, don't trust it); the CLI `--layout` values are ELK *node* layout presets, a different thing (see `mermaid-authoring.md`). For CLI-authored files keep the orthogonal rules above; if a dense diagram still has crossings after export, open the `.drawio` in draw.io desktop once and let libavoid re-route. Don't stack it on an ELK `--layout` pass — pick one router, not both.
 
 ### Distributing connections on a shape
 
 When multiple edges connect to the same shape, assign different entry/exit points to prevent stacking:
 
 | Position | exitX/entryX | exitY/entryY | Use when |
-|----------|-------------|-------------|----------|
+| ---------- | ------------- | ------------- | ---------- |
 | Top center | 0.5 | 0 | connecting to node above |
 | Top-left | 0.25 | 0 | 2nd connection from top |
 | Top-right | 0.75 | 0 | 3rd connection from top |
@@ -143,7 +145,7 @@ When multiple edges connect to the same shape, assign different entry/exit point
 *Used only when no user style preset is active (see `references/style-presets.md` → "Applying a preset").*
 
 | Color name | fillColor | strokeColor | Use for |
-|-----------|-----------|-------------|---------|
+| ----------- | ----------- | ------------- | --------- |
 | Blue | `#dae8fc` | `#6c8ebf` | services, clients |
 | Green | `#d5e8d4` | `#82b366` | success, databases |
 | Yellow | `#fff2cc` | `#d6b656` | queues, decisions |
@@ -177,7 +179,7 @@ Rules: swatch colors come from the active palette (preset or the table above) wi
 **Spacing — scale with complexity:**
 
 | Diagram complexity | Nodes | Horizontal gap | Vertical gap |
-|-------------------|-------|----------------|--------------|
+| ------------------- | ------- | ---------------- | -------------- |
 | Simple | ≤5 | 200px | 150px |
 | Medium | 6–10 | 280px | 200px |
 | Complex | >10 | 350px | 250px |
@@ -187,6 +189,7 @@ Rules: swatch colors come from the active palette (preset or the table above) wi
 **Grid alignment:** snap all `x`, `y`, `width`, `height` values to **multiples of 10** — this ensures shapes align cleanly on draw.io's default grid and makes manual editing easier.
 
 **General rules:**
+
 - Plan a grid before assigning x/y coordinates — sketch node positions on paper/mentally first
 - Group related nodes in the same horizontal or vertical band
 - Use `swimlane` cells for logical grouping with visible borders
@@ -198,8 +201,8 @@ Rules: swatch colors come from the active palette (preset or the table above) wi
 - Horizontal connections (`exitX=1` or `exitX=0`) never cross vertical nodes in the same row; use them for peer-to-peer and publish connections
 
 **Avoiding edge-shape overlap:**
+
 - Before finalizing coordinates, trace each edge path mentally — if it must cross an unrelated shape, either move the shape or add waypoints
 - For tree/hierarchical layouts: assign nodes to layers (rows), connect only between adjacent layers to minimize crossings
 - For star/hub layouts: place the hub center, satellites around it — edges stay short and radial
 - When an edge must span multiple rows/columns, route it along the outer corridor, not through the middle of the diagram
-

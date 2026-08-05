@@ -10,10 +10,12 @@ drawio -x -f xml -o diagram.drawio diagram.mmd
 
 **Version gate (critical):** on draw.io ≤ 29 the `.mmd` input fails with `Export failed`, and the `--layout` flag corrupts argument parsing entirely (like the `-w` pitfall). Resolve the CLI version in workflow step 1 (`drawio --version`); if it prints < 30, skip both this path and `--layout`, and author XML instead (optionally suggest `brew upgrade --cask drawio`).
 
+**Never export a `.mmd` straight to an image:** direct Mermaid → PNG with `-e` crashes current draw.io desktop builds (electron `UnhandledPromiseRejection`, then hang — verified on 30.2.6). Always convert to `.drawio` first (`-f xml`), then run the normal export on the `.drawio` — the two-step path embeds the diagram XML reliably.
+
 ## When to prefer which authoring mode
 
 | Author as | Best for | Why |
-|---|---|---|
+| --- | --- | --- |
 | **Mermaid → CLI convert** | flowchart, state, gantt, timeline, journey, pie, quadrant, sankey, gitGraph, **mindmap**, kanban, requirement, block, xychart, radar, wardley, C4 sketches | structure-only input, free layout, 28 types |
 | **XML (this skill's core path)** | anything needing **official vendor icons** (shapesearch/aiicons), **style presets**, swimlanes, precise positions, edge waypoint control, multi-page/drill-down | Mermaid can't express draw.io styles/shapes |
 | **Bundled generators** | code/IaC/SQL imports, sequence (seqlayout), C4 with drill-down (c4.py) | deterministic, data-driven |
@@ -46,7 +48,7 @@ drawio -x -f png -e -b 10 --layout verticalFlow -o diagram.drawio.png diagram.dr
 ```
 
 | Preset | Layout |
-|---|---|
+| --- | --- |
 | `verticalFlow` / `horizontalFlow` | layered — flowcharts, pipelines |
 | `verticalTree` / `horizontalTree` / `radialTree` | trees — hierarchies, org charts |
 | `organic` | force-directed — networks, mind maps |
