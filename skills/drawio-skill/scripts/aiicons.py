@@ -138,7 +138,8 @@ def main():
 
     if not os.path.exists(MANIFEST):
         sys.exit(f"error: manifest not found at {MANIFEST}")
-    manifest = json.load(open(MANIFEST, encoding="utf-8"))
+    with open(MANIFEST, encoding="utf-8") as f:
+        manifest = json.load(f)
     fam = families(manifest["icons"])
     cdn = manifest["cdn"]
 

@@ -61,7 +61,8 @@ def edges_of(name, path, modules):
     pkg = name if path.endswith("__init__.py") else name.rsplit(".", 1)[0] if "." in name else ""
     found = set()
     try:
-        tree = ast.parse(open(path, encoding="utf-8").read(), filename=path)
+        with open(path, encoding="utf-8") as f:
+            tree = ast.parse(f.read(), filename=path)
     except SyntaxError:
         return found
     for node in ast.walk(tree):
@@ -141,7 +142,8 @@ def main():
     }
     text = json.dumps(graph, indent=2)
     if args.output:
-        open(args.output, "w", encoding="utf-8").write(text)
+        with open(args.output, "w", encoding="utf-8") as f:
+            f.write(text)
         sys.stderr.write(f"wrote {args.output}\n")
     else:
         sys.stdout.write(text)

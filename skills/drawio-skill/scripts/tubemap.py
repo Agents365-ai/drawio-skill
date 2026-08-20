@@ -158,7 +158,11 @@ def main():
     ap.add_argument("--grid", type=int, default=110, help="grid pitch in px (default 110)")
     args = ap.parse_args()
 
-    raw = sys.stdin.read() if args.input == "-" else open(args.input, encoding="utf-8").read()
+    if args.input == "-":
+        raw = sys.stdin.read()
+    else:
+        with open(args.input, encoding="utf-8") as f:
+            raw = f.read()
     try:
         data = json.loads(raw)
     except json.JSONDecodeError as exc:

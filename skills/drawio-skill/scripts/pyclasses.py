@@ -59,7 +59,8 @@ def base_name(node):
 def classes_in(module, path):
     """Top-level classes of a module: list of (qualified_id, simple_name, [base names])."""
     try:
-        tree = ast.parse(open(path, encoding="utf-8").read(), filename=path)
+        with open(path, encoding="utf-8") as f:
+            tree = ast.parse(f.read(), filename=path)
     except SyntaxError:
         return []
     out = []
@@ -144,7 +145,8 @@ def main():
     }
     text = json.dumps(graph, indent=2)
     if args.output:
-        open(args.output, "w", encoding="utf-8").write(text)
+        with open(args.output, "w", encoding="utf-8") as f:
+            f.write(text)
         sys.stderr.write(f"wrote {args.output}\n")
     else:
         sys.stdout.write(text)
