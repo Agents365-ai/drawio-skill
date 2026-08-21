@@ -77,7 +77,8 @@ def edges_of(mid, path, root, modules):
     """Intra-project modules imported by module `mid`."""
     found = set()
     try:
-        src = open(path, encoding="utf-8", errors="ignore").read()
+        with open(path, encoding="utf-8", errors="ignore") as f:
+            src = f.read()
     except OSError:
         return found
     for m in SPEC.finditer(src):
@@ -150,7 +151,8 @@ def main():
     }
     text = json.dumps(graph, indent=2)
     if args.output:
-        open(args.output, "w", encoding="utf-8").write(text)
+        with open(args.output, "w", encoding="utf-8") as f:
+            f.write(text)
         sys.stderr.write(f"wrote {args.output}\n")
     else:
         sys.stdout.write(text)

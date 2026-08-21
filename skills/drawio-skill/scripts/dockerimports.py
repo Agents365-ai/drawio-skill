@@ -69,7 +69,11 @@ def main():
                     help="group containers by compose project (else first network)")
     args = ap.parse_args()
 
-    text = sys.stdin.read() if args.input == "-" else open(args.input, encoding="utf-8").read()
+    if args.input == "-":
+        text = sys.stdin.read()
+    else:
+        with open(args.input, encoding="utf-8") as f:
+            text = f.read()
     try:
         data = json.loads(text)
     except json.JSONDecodeError as exc:

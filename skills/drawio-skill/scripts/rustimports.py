@@ -37,8 +37,8 @@ USE = re.compile(r"\buse\s+([^;]+);")
 def crate_name(root):
     cargo = os.path.join(root, "Cargo.toml")
     if os.path.exists(cargo):
-        m = re.search(r'(?m)^\s*name\s*=\s*"([^"]+)"',
-                      open(cargo, encoding="utf-8", errors="ignore").read())
+        with open(cargo, encoding="utf-8", errors="ignore") as f:
+            m = re.search(r'(?m)^\s*name\s*=\s*"([^"]+)"', f.read())
         if m:
             return m.group(1)
     return "crate"
@@ -117,7 +117,8 @@ def edges_of(current, path, modules):
     """Intra-crate module paths used by the module at `current`."""
     found = set()
     try:
-        src = open(path, encoding="utf-8", errors="ignore").read()
+        with open(path, encoding="utf-8", errors="ignore") as f:
+            src = f.read()
     except OSError:
         return found
     for stmt in USE.findall(src):
@@ -191,7 +192,8 @@ def main():
     }
     text = json.dumps(graph, indent=2)
     if args.output:
-        open(args.output, "w", encoding="utf-8").write(text)
+        with open(args.output, "w", encoding="utf-8") as f:
+            f.write(text)
         sys.stderr.write(f"wrote {args.output}\n")
     else:
         sys.stdout.write(text)
