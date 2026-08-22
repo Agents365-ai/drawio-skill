@@ -17,6 +17,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import types
 import unittest
 import urllib.parse
 import zlib
@@ -847,6 +848,36 @@ class TestImportersCli(unittest.TestCase):
         sf = load("svgflow")
         out, _ = sf.animate(self.FLOW_SVG, 2, "8 2", reverse=True)
         self.assertIn("stroke-dashoffset:10", out)               # +(8+2), toward source
+
+    def test_svg_export_embeds_images(self):
+        # Without --embed-svg-images the CLI writes file:/// references to the
+        # icon files inside the draw.io application bundle, so vendor icons
+        # render only on the exporting machine. Assert the flag reaches argv.
+        for name, call in (
+            ("svgflow", lambda m: m.to_svg("d.drawio")),
+            ("drawiohtml", lambda m: m.export_svg("d.drawio", 1, "out.svg")),
+        ):
+            with self.subTest(script=name):
+                mod = load(name)
+                seen = []
+
+                def fake_run(argv, *a, **kw):
+                    seen.append(argv)
+                    return types.SimpleNamespace(returncode=1, stdout=b"", stderr=b"")
+
+                real_run, mod.subprocess.run = mod.subprocess.run, fake_run
+                try:
+                    try:
+                        call(mod)
+                    except SystemExit:
+                        pass            # export "fails"; argv is what matters
+                finally:
+                    mod.subprocess.run = real_run
+
+                self.assertTrue(seen, "the draw.io CLI was never invoked")
+                argv = seen[0]
+                self.assertIn("--embed-svg-images", argv)
+                self.assertEqual(argv[:4], ["drawio", "-x", "-f", "svg"])
 
     def test_drawio2mermaid_flowchart(self):
         # Reuses EXPLAIN_PAGE: container "Tier" with A/B, cylinder DB, edge a->c "reads".
