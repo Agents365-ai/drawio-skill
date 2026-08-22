@@ -54,7 +54,8 @@ def rewrite_page_links(tree):
 
 def export_svg(drawio_file, index, out_svg):
     """Export one page (1-based index) to SVG via the draw.io CLI."""
-    r = subprocess.run(["drawio", "-x", "-f", "svg", "--page-index", str(index),
+    r = subprocess.run(["drawio", "-x", "-f", "svg", "--embed-svg-images",
+                        "--page-index", str(index),
                         "-o", out_svg, drawio_file], capture_output=True)
     return r.returncode == 0 and os.path.exists(out_svg)
 

@@ -35,7 +35,7 @@ def to_svg(path):
             return f.read()
     with tempfile.TemporaryDirectory() as tmp:
         out = os.path.join(tmp, "d.svg")
-        r = subprocess.run(["drawio", "-x", "-f", "svg", "-o", out, path],
+        r = subprocess.run(["drawio", "-x", "-f", "svg", "--embed-svg-images", "-o", out, path],
                            capture_output=True)
         if r.returncode != 0 or not os.path.exists(out):
             sys.exit("error: draw.io SVG export failed (is the draw.io CLI installed?)")
