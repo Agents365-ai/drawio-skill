@@ -4,6 +4,15 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [2.1.1] — 2026-08-23
+### Fixed
+- **Embed images in SVG exports** (`--embed-svg-images` in `scripts/svgflow.py`,
+  `scripts/drawiohtml.py`, and the documented export command in `SKILL.md`):
+  without the flag draw.io wrote `file:///` references into its app bundle, so
+  `img/lib/...` vendor icons (AWS/Azure/GCP, via `scripts/tfimports.py`) rendered
+  only on the exporting machine. Adds a regression test asserting the flag in
+  the `argv` of both Python call sites. (Thanks to @rjain21, PR #104.)
+
 ## [2.1.0] — 2026-07-25
 ### Added
 - **`scripts/edgeports.py`** — deterministic edge port assignment, the real
