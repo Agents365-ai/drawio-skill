@@ -4,6 +4,23 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [Unreleased]
+### Added
+- **`scripts/dbxicons.py`** — Databricks product icon resolver, following the
+  `aiicons.py` pattern. draw.io has no Databricks shape set, so lakehouse
+  architectures rendered as generic boxes; only the bare Databricks logo
+  resolved (via the `aiicons.py` simple-icons supplement, which is unchanged).
+  Resolves 71 products from the community
+  [databricks-architecture-icons](https://github.com/oieduardorabelo/databricks-architecture-icons)
+  project (official Databricks artwork, referenced by URL — no artwork bundled,
+  trademarks of Databricks, Inc.). Former product names resolve through aliases
+  (DLT → `spark-declarative-pipelines`, Workflows → `lakeflow-jobs`, Vector
+  Search → `ai-search`), `--variant color|tile|outline`, `--embed` inlines a
+  marker-less base64 data URI fetched from a commit pinned in
+  `data/databricks-icons.json`, and `--refresh-manifest` regenerates that
+  manifest from the upstream catalog. Brand guidance (zone colors, category
+  accents, capability-node style) in `references/databricks.md`.
+
 ## [2.1.1] — 2026-08-23
 ### Fixed
 - **Embed images in SVG exports** (`--embed-svg-images` in `scripts/svgflow.py`,

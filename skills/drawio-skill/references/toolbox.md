@@ -37,7 +37,7 @@ exports it:
 | a `.drawio` | diagrams-as-code | `drawio2mermaid` (→ Mermaid) |
 | a `.drawio` | the same diagram in another language | `relabel` (extract → translate → apply) |
 | a `.drawio` | it re-themed (dark / corporate preset) | `restyle` |
-| a shape/icon need | the exact style string | `shapesearch` · `aiicons` (AI/LLM logos) |
+| a shape/icon need | the exact style string | `shapesearch` · `aiicons` (AI/LLM logos) · `dbxicons` (Databricks products) |
 | a photo/screenshot of a diagram | an editable `.drawio` | `raster2drawio` (your vision → JSON → draw.io) |
 | ONE `.drawio` | it building itself, as a video/GIF | `buildup` (→ HTML player; `--gif`) |
 | a big/sprawling diagram | a boardroom exec summary + drill-down | `compress` |
@@ -51,7 +51,7 @@ exports it:
 - **`seqlayout.py`** — participants + messages JSON → sequence diagram with computed lifelines/activation bars (no Graphviz).
 - **`c4.py`** — levels JSON → one multi-page `.drawio` (Context→Container→Component) with click-to-drill-down links.
 - **`tubemap.py`** — metro JSON (coloured lines + grid-placed stations) → a London-Underground-style **tube map**: octilinear (H/V/45°) routing, white interchange circles, station stops. No Graphviz. See `references/tubemap.md`.
-- **`shapesearch.py`** — search 10k+ official shapes for their exact `style=` string. **`aiicons.py`** — draw.io `image` styles for AI/LLM brand logos.
+- **`shapesearch.py`** — search 10k+ official shapes for their exact `style=` string. **`aiicons.py`** — draw.io `image` styles for AI/LLM brand logos. **`dbxicons.py`** — draw.io `image` styles for Databricks product icons (see `references/databricks.md`).
 - **`raster2drawio.py`** — a vision-extracted image graph JSON (from a whiteboard photo / legacy PNG / Visio screenshot) → editable `.drawio` honouring the read coordinates; missing positions fall back to `autolayout.py`. See `references/derasterize.md`.
 
 ## 2. Code → diagram
