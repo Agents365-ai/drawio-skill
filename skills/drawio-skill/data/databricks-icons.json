@@ -1,0 +1,581 @@
+{
+ "source": "https://github.com/oieduardorabelo/databricks-architecture-icons",
+ "hostedBase": "https://oieduardorabelo.github.io/databricks-architecture-icons",
+ "pinnedRef": "6d5419cbb5ad0dbb8ab29a7f95e2b196d836a62a",
+ "canvas": "48x48",
+ "categories": {
+  "platform": {
+   "label": "Platform & Compute",
+   "color": "#FF3621"
+  },
+  "engineering": {
+   "label": "Data Engineering",
+   "color": "#2272B4"
+  },
+  "storage": {
+   "label": "Storage & Databases",
+   "color": "#00875C"
+  },
+  "analytics": {
+   "label": "Analytics & BI",
+   "color": "#1B5162"
+  },
+  "ai": {
+   "label": "AI & Agents",
+   "color": "#98102A"
+  },
+  "governance": {
+   "label": "Governance & Security",
+   "color": "#1B3139"
+  },
+  "sharing": {
+   "label": "Sharing & Collaboration",
+   "color": "#BA7B23"
+  },
+  "devtools": {
+   "label": "Developer Tools & Apps",
+   "color": "#618794"
+  }
+ },
+ "products": [
+  {
+   "slug": "databricks",
+   "name": "Databricks",
+   "aliases": [],
+   "category": "platform",
+   "categoryColor": "#FF3621"
+  },
+  {
+   "slug": "data-intelligence-platform",
+   "name": "Data Intelligence Platform",
+   "aliases": [],
+   "category": "platform",
+   "categoryColor": "#FF3621"
+  },
+  {
+   "slug": "lakehouse",
+   "name": "Lakehouse Architecture",
+   "aliases": [],
+   "category": "platform",
+   "categoryColor": "#FF3621"
+  },
+  {
+   "slug": "apache-spark",
+   "name": "Apache Spark",
+   "aliases": [],
+   "category": "platform",
+   "categoryColor": "#FF3621"
+  },
+  {
+   "slug": "photon",
+   "name": "Photon",
+   "aliases": [],
+   "category": "platform",
+   "categoryColor": "#FF3621"
+  },
+  {
+   "slug": "compute-clusters",
+   "name": "Compute (Clusters)",
+   "aliases": [
+    "Clusters",
+    "All-purpose compute",
+    "Job compute"
+   ],
+   "category": "platform",
+   "categoryColor": "#FF3621"
+  },
+  {
+   "slug": "serverless-compute",
+   "name": "Serverless Compute",
+   "aliases": [],
+   "category": "platform",
+   "categoryColor": "#FF3621"
+  },
+  {
+   "slug": "databricks-runtime",
+   "name": "Databricks Runtime",
+   "aliases": [],
+   "category": "platform",
+   "categoryColor": "#FF3621"
+  },
+  {
+   "slug": "spark-real-time-mode",
+   "name": "Real-Time Mode for Apache Spark",
+   "aliases": [],
+   "category": "platform",
+   "categoryColor": "#FF3621"
+  },
+  {
+   "slug": "multicloud",
+   "name": "Multicloud Deployment",
+   "aliases": [],
+   "category": "platform",
+   "categoryColor": "#FF3621"
+  },
+  {
+   "slug": "lakeflow",
+   "name": "Lakeflow",
+   "aliases": [],
+   "category": "engineering",
+   "categoryColor": "#2272B4"
+  },
+  {
+   "slug": "lakeflow-connect",
+   "name": "Lakeflow Connect",
+   "aliases": [],
+   "category": "engineering",
+   "categoryColor": "#2272B4"
+  },
+  {
+   "slug": "zerobus-ingest",
+   "name": "Zerobus Ingest",
+   "aliases": [],
+   "category": "engineering",
+   "categoryColor": "#2272B4"
+  },
+  {
+   "slug": "spark-declarative-pipelines",
+   "name": "Apache Spark Declarative Pipelines",
+   "aliases": [
+    "Lakeflow Declarative Pipelines",
+    "Delta Live Tables (DLT)",
+    "DLT",
+    "Delta Live Tables"
+   ],
+   "category": "engineering",
+   "categoryColor": "#2272B4"
+  },
+  {
+   "slug": "lakeflow-jobs",
+   "name": "Lakeflow Jobs",
+   "aliases": [
+    "Databricks Workflows",
+    "Workflows",
+    "Jobs"
+   ],
+   "category": "engineering",
+   "categoryColor": "#2272B4"
+  },
+  {
+   "slug": "lakeflow-designer",
+   "name": "Lakeflow Designer",
+   "aliases": [],
+   "category": "engineering",
+   "categoryColor": "#2272B4"
+  },
+  {
+   "slug": "auto-loader",
+   "name": "Auto Loader",
+   "aliases": [],
+   "category": "engineering",
+   "categoryColor": "#2272B4"
+  },
+  {
+   "slug": "structured-streaming",
+   "name": "Structured Streaming",
+   "aliases": [],
+   "category": "engineering",
+   "categoryColor": "#2272B4"
+  },
+  {
+   "slug": "lakebridge",
+   "name": "Lakebridge",
+   "aliases": [],
+   "category": "engineering",
+   "categoryColor": "#2272B4"
+  },
+  {
+   "slug": "delta-lake",
+   "name": "Delta Lake",
+   "aliases": [],
+   "category": "storage",
+   "categoryColor": "#00875C"
+  },
+  {
+   "slug": "apache-iceberg",
+   "name": "Apache Iceberg",
+   "aliases": [],
+   "category": "storage",
+   "categoryColor": "#00875C"
+  },
+  {
+   "slug": "lakehouse-storage",
+   "name": "Lakehouse Storage (Managed Tables)",
+   "aliases": [
+    "Managed tables",
+    "Delta tables"
+   ],
+   "category": "storage",
+   "categoryColor": "#00875C"
+  },
+  {
+   "slug": "liquid-clustering",
+   "name": "Liquid Clustering",
+   "aliases": [],
+   "category": "storage",
+   "categoryColor": "#00875C"
+  },
+  {
+   "slug": "predictive-optimization",
+   "name": "Predictive Optimization",
+   "aliases": [],
+   "category": "storage",
+   "categoryColor": "#00875C"
+  },
+  {
+   "slug": "lakebase",
+   "name": "Lakebase",
+   "aliases": [
+    "OLTP",
+    "Postgres"
+   ],
+   "category": "storage",
+   "categoryColor": "#00875C"
+  },
+  {
+   "slug": "data-warehousing",
+   "name": "Databricks Lakehouse (Data Warehousing)",
+   "aliases": [],
+   "category": "analytics",
+   "categoryColor": "#1B5162"
+  },
+  {
+   "slug": "databricks-sql",
+   "name": "Databricks SQL",
+   "aliases": [
+    "DBSQL"
+   ],
+   "category": "analytics",
+   "categoryColor": "#1B5162"
+  },
+  {
+   "slug": "sql-warehouse",
+   "name": "SQL Warehouse",
+   "aliases": [],
+   "category": "analytics",
+   "categoryColor": "#1B5162"
+  },
+  {
+   "slug": "lakehouse-rt",
+   "name": "Lakehouse//RT",
+   "aliases": [],
+   "category": "analytics",
+   "categoryColor": "#1B5162"
+  },
+  {
+   "slug": "ai-bi",
+   "name": "Databricks AI/BI",
+   "aliases": [],
+   "category": "analytics",
+   "categoryColor": "#1B5162"
+  },
+  {
+   "slug": "ai-bi-dashboards",
+   "name": "AI/BI Dashboards",
+   "aliases": [],
+   "category": "analytics",
+   "categoryColor": "#1B5162"
+  },
+  {
+   "slug": "lakehouse-federation",
+   "name": "Lakehouse Federation",
+   "aliases": [],
+   "category": "analytics",
+   "categoryColor": "#1B5162"
+  },
+  {
+   "slug": "genie",
+   "name": "Databricks Genie",
+   "aliases": [],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "genie-one",
+   "name": "Genie One",
+   "aliases": [],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "genie-agents",
+   "name": "Genie Agents",
+   "aliases": [
+    "AI/BI Genie spaces",
+    "Genie spaces",
+    "AI/BI Genie"
+   ],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "genie-code",
+   "name": "Genie Code",
+   "aliases": [],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "genie-deep-research",
+   "name": "Genie Deep Research",
+   "aliases": [],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "agent-bricks",
+   "name": "Agent Bricks",
+   "aliases": [],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "ai-search",
+   "name": "Databricks AI Search",
+   "aliases": [
+    "Databricks Vector Search",
+    "Mosaic AI Vector Search",
+    "Vector Search"
+   ],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "unity-ai-gateway",
+   "name": "Unity AI Gateway",
+   "aliases": [],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "document-intelligence",
+   "name": "Document Intelligence",
+   "aliases": [],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "model-serving",
+   "name": "Databricks Model Serving",
+   "aliases": [
+    "Mosaic AI Model Serving"
+   ],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "model-training",
+   "name": "Databricks Model Training",
+   "aliases": [],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "mlflow",
+   "name": "Managed MLflow",
+   "aliases": [],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "feature-store",
+   "name": "Databricks Feature Store",
+   "aliases": [],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "ai-functions",
+   "name": "AI Functions",
+   "aliases": [],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "automl",
+   "name": "Databricks AutoML",
+   "aliases": [],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "customerlake",
+   "name": "CustomerLake",
+   "aliases": [],
+   "category": "ai",
+   "categoryColor": "#98102A"
+  },
+  {
+   "slug": "unity-catalog",
+   "name": "Unity Catalog",
+   "aliases": [
+    "UC"
+   ],
+   "category": "governance",
+   "categoryColor": "#1B3139"
+  },
+  {
+   "slug": "unity-catalog-semantics",
+   "name": "Unity Catalog Semantics",
+   "aliases": [],
+   "category": "governance",
+   "categoryColor": "#1B3139"
+  },
+  {
+   "slug": "data-lineage",
+   "name": "Data & AI Lineage",
+   "aliases": [],
+   "category": "governance",
+   "categoryColor": "#1B3139"
+  },
+  {
+   "slug": "abac",
+   "name": "Attribute-Based Access Control",
+   "aliases": [],
+   "category": "governance",
+   "categoryColor": "#1B3139"
+  },
+  {
+   "slug": "data-quality-monitoring",
+   "name": "Data Quality Monitoring",
+   "aliases": [
+    "Lakehouse Monitoring"
+   ],
+   "category": "governance",
+   "categoryColor": "#1B3139"
+  },
+  {
+   "slug": "lakewatch",
+   "name": "Lakewatch",
+   "aliases": [],
+   "category": "governance",
+   "categoryColor": "#1B3139"
+  },
+  {
+   "slug": "system-tables",
+   "name": "System Tables",
+   "aliases": [],
+   "category": "governance",
+   "categoryColor": "#1B3139"
+  },
+  {
+   "slug": "enterprise-security",
+   "name": "Enterprise Security",
+   "aliases": [],
+   "category": "governance",
+   "categoryColor": "#1B3139"
+  },
+  {
+   "slug": "delta-sharing",
+   "name": "Delta Sharing",
+   "aliases": [
+    "Data sharing"
+   ],
+   "category": "sharing",
+   "categoryColor": "#BA7B23"
+  },
+  {
+   "slug": "opensharing",
+   "name": "OpenSharing",
+   "aliases": [],
+   "category": "sharing",
+   "categoryColor": "#BA7B23"
+  },
+  {
+   "slug": "marketplace",
+   "name": "Databricks Marketplace",
+   "aliases": [],
+   "category": "sharing",
+   "categoryColor": "#BA7B23"
+  },
+  {
+   "slug": "clean-rooms",
+   "name": "Databricks Clean Rooms",
+   "aliases": [],
+   "category": "sharing",
+   "categoryColor": "#BA7B23"
+  },
+  {
+   "slug": "partner-connect",
+   "name": "Partner Connect",
+   "aliases": [],
+   "category": "sharing",
+   "categoryColor": "#BA7B23"
+  },
+  {
+   "slug": "databricks-apps",
+   "name": "Databricks Apps",
+   "aliases": [],
+   "category": "devtools",
+   "categoryColor": "#618794"
+  },
+  {
+   "slug": "notebooks",
+   "name": "Databricks Notebooks",
+   "aliases": [],
+   "category": "devtools",
+   "categoryColor": "#618794"
+  },
+  {
+   "slug": "workspace",
+   "name": "Databricks Workspace",
+   "aliases": [],
+   "category": "devtools",
+   "categoryColor": "#618794"
+  },
+  {
+   "slug": "git-folders",
+   "name": "Git Folders (Repos)",
+   "aliases": [
+    "Repos"
+   ],
+   "category": "devtools",
+   "categoryColor": "#618794"
+  },
+  {
+   "slug": "asset-bundles",
+   "name": "Databricks Asset Bundles",
+   "aliases": [
+    "DAB",
+    "DABs"
+   ],
+   "category": "devtools",
+   "categoryColor": "#618794"
+  },
+  {
+   "slug": "databricks-cli",
+   "name": "Databricks CLI",
+   "aliases": [],
+   "category": "devtools",
+   "categoryColor": "#618794"
+  },
+  {
+   "slug": "databricks-connect",
+   "name": "Databricks Connect",
+   "aliases": [],
+   "category": "devtools",
+   "categoryColor": "#618794"
+  },
+  {
+   "slug": "ide-integrations",
+   "name": "IDE Integrations",
+   "aliases": [],
+   "category": "devtools",
+   "categoryColor": "#618794"
+  },
+  {
+   "slug": "rest-api",
+   "name": "REST API & SDKs",
+   "aliases": [],
+   "category": "devtools",
+   "categoryColor": "#618794"
+  },
+  {
+   "slug": "terraform-provider",
+   "name": "Databricks Terraform Provider",
+   "aliases": [],
+   "category": "devtools",
+   "categoryColor": "#618794"
+  }
+ ]
+}
