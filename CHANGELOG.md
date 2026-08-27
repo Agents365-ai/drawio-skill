@@ -4,7 +4,7 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
-## [Unreleased]
+## [2.2.0] — 2026-08-27
 ### Added
 - **`scripts/dbxicons.py`** — Databricks product icon resolver, following the
   `aiicons.py` pattern. draw.io has no Databricks shape set, so lakehouse
