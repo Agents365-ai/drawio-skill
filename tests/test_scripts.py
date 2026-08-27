@@ -297,6 +297,30 @@ class TestValidateCli(unittest.TestCase):
         self.assertEqual(r.returncode, 1)
         self.assertIn("error", r.stdout)
 
+    def test_findings_carry_code_and_fix(self):
+        # Structured-diagnostic format: stable [CODE] + a (fix: ...) hint an
+        # agent can act on mechanically.
+        r = self._check(self.BAD)
+        self.assertIn("error: [E-DANGLING-END]", r.stdout)
+        self.assertIn("(fix:", r.stdout)
+
+    def test_json_output(self):
+        import json as _json
+        with tempfile.NamedTemporaryFile("w", suffix=".drawio", delete=False) as f:
+            f.write(self.BAD)
+            path = f.name
+        try:
+            r = run("validate.py", path, "--json")
+        finally:
+            os.unlink(path)
+        self.assertEqual(r.returncode, 1)
+        out = _json.loads(r.stdout)
+        self.assertEqual(out["errors"], 1)
+        finding = out["findings"][0]
+        self.assertEqual(finding["code"], "E-DANGLING-END")
+        self.assertEqual(finding["severity"], "error")
+        self.assertIn("fix", finding)
+
     # A vertex wrapped in UserObject (link) — the edge references the wrapper id.
     LINKED = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
               '<mxCell id="0"/><mxCell id="1" parent="0"/>'
@@ -669,13 +693,16 @@ class TestImportersCli(unittest.TestCase):
     @staticmethod
     def _status(style):
         for tag, hue in (("added", "82b366"), ("removed", "b85450"),
-                         ("changed", "d79b00"), ("same", "999999")):
+                         ("changed", "d79b00"), ("moved", "9673a6"),
+                         ("same", "999999")):
             if hue in style:
                 return tag
         return "?"
 
     def test_drawiodiff_by_id(self):
         # api label moves (changed), cache removed, worker added, db unchanged.
+        # The (api, worker) edge re-points (api, cache) — source kept, old target
+        # removed, new target added — so it is orange "rerouted", not green.
         old = self._drawio([("api", "api v1"), ("db", "db"), ("cache", "cache")],
                            [("api", "db"), ("api", "cache")])
         new = self._drawio([("api", "api v2"), ("db", "db"), ("worker", "worker")],
@@ -688,11 +715,66 @@ class TestImportersCli(unittest.TestCase):
             status = {n["id"]: self._status(n["style"]) for n in graph["nodes"]}
             self.assertEqual(status, {"api": "changed", "db": "same",
                                       "cache": "removed", "worker": "added"})
-            estatus = {(e["source"], e["target"]): self._status(e["style"])
+            estatus = {(e["source"], e["target"]): e["style"]
                        for e in graph["edges"]}
-            self.assertEqual(estatus, {("api", "db"): "same",
-                                       ("api", "cache"): "removed",
-                                       ("api", "worker"): "added"})
+            self.assertIn("999999", estatus[("api", "db")])    # same
+            self.assertIn("b85450", estatus[("api", "cache")])  # removed
+            self.assertIn("d79b00", estatus[("api", "worker")])  # rerouted
+
+    @staticmethod
+    def _drawio_pos(nodes, edges):
+        """.drawio XML from (id, label, x, y) nodes and (src, tgt) edges."""
+        cells = ['<mxCell id="0"/>', '<mxCell id="1" parent="0"/>']
+        for cid, label, x, y in nodes:
+            cells.append(f'<mxCell id="{cid}" value="{label}" vertex="1" parent="1" '
+                         f'style="rounded=1;"><mxGeometry x="{x}" y="{y}" '
+                         'width="120" height="60" as="geometry"/></mxCell>')
+        for i, (s, t) in enumerate(edges):
+            cells.append(f'<mxCell id="e{i}" edge="1" parent="1" source="{s}" '
+                         'target="{}"><mxGeometry relative="1" as="geometry"/></mxCell>'.format(t))
+        return ('<mxfile><diagram name="P"><mxGraphModel><root>'
+                + "".join(cells) + "</root></mxGraphModel></diagram></mxfile>")
+
+    def test_drawiodiff_moved(self):
+        # Same label, same id, new coordinates -> violet "moved" (selectively).
+        old = self._drawio_pos([("a", "a", 0, 0), ("b", "b", 200, 0)], [])
+        new = self._drawio_pos([("a", "a", 0, 0), ("b", "b", 200, 300)], [])
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "old.drawio"), old)
+            self._write(os.path.join(d, "new.drawio"), new)
+            graph = json.loads(run("drawiodiff.py", os.path.join(d, "old.drawio"),
+                                   os.path.join(d, "new.drawio")).stdout)
+            status = {n["id"]: self._status(n["style"]) for n in graph["nodes"]}
+            self.assertEqual(status, {"a": "same", "b": "moved"})
+
+    def test_drawiodiff_relayout_is_not_movement(self):
+        # Every matched node changed position -> the files come from different
+        # layout runs; movement is layout noise, so all nodes stay "same".
+        old = self._drawio_pos([("a", "a", 0, 0), ("b", "b", 200, 0), ("c", "c", 400, 0)], [])
+        new = self._drawio_pos([("a", "a", 100, 100), ("b", "b", 300, 100),
+                                ("c", "c", 500, 100)], [])
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "old.drawio"), old)
+            self._write(os.path.join(d, "new.drawio"), new)
+            graph = json.loads(run("drawiodiff.py", os.path.join(d, "old.drawio"),
+                                   os.path.join(d, "new.drawio")).stdout)
+            status = {n["id"]: self._status(n["style"]) for n in graph["nodes"]}
+            self.assertEqual(status, {"a": "same", "b": "same", "c": "same"})
+
+    def test_drawiodiff_flip_is_rerouted(self):
+        # (a,b) in old, (b,a) in new: the pair is shown once, orange, and the
+        # reversed old edge is not double-counted as removed.
+        old = self._drawio_pos([("a", "a", 0, 0), ("b", "b", 200, 0)], [("a", "b")])
+        new = self._drawio_pos([("a", "a", 0, 0), ("b", "b", 200, 0)], [("b", "a")])
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "old.drawio"), old)
+            self._write(os.path.join(d, "new.drawio"), new)
+            graph = json.loads(run("drawiodiff.py", os.path.join(d, "old.drawio"),
+                                   os.path.join(d, "new.drawio")).stdout)
+            self.assertEqual(len(graph["edges"]), 1)
+            self.assertEqual((graph["edges"][0]["source"], graph["edges"][0]["target"]),
+                             ("b", "a"))
+            self.assertIn("d79b00", graph["edges"][0]["style"])  # rerouted
 
     def test_drawiodiff_by_label(self):
         # ids differ across versions; --by-label matches on the visible text.

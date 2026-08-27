@@ -4,10 +4,17 @@
 Compares an OLD and a NEW .drawio and emits a single graph where every node and
 edge is tinted by what happened to it:
 
-  added   (in new only)          -> green
-  removed (in old only)          -> red, dashed
-  changed (matched, label moved) -> orange
-  same    (matched, unchanged)   -> grey
+  added    (in new only)                 -> green
+  removed  (in old only)                 -> red, dashed
+  changed  (matched, label moved)        -> orange
+  moved    (matched, same label, new x/y) -> violet
+  same     (matched, unchanged)          -> grey
+
+Edges can additionally be **rerouted** (orange): a new edge whose old
+counterpart kept one endpoint and swapped the other for a freshly added node
+("service repointed from cache to worker"), or whose direction flipped
+((a,b) in old, (b,a) in new). A flipped edge suppresses its reversed old
+counterpart so the pair is shown once.
 
 The output is a normal graph JSON — feed it to autolayout.py for one clean,
 freshly laid-out "what changed" diagram:
@@ -22,6 +29,12 @@ it the natural companion to the live-infra importers: snapshot `terraform show
 -json` / `docker inspect` / `kubectl get -o json` twice and diff the two to see
 drift. For hand-drawn diagrams whose ids are random, pass `--by-label` to match
 on the visible label text instead.
+
+Because the output is re-laid-out by autolayout, a "moved" tint is only
+reported for hand-placed coordinates — and only when it is selective. If every
+matched node changed position, the two files were laid out by different runs
+(the usual importer + autolayout case), so movement is layout noise, not a
+fact, and all matched nodes stay "same".
 
 Only leaf vertices and the edges between them are compared; container/group
 cells and edge labels are skipped. The diff is a flat colour-coded view, so the
@@ -39,19 +52,22 @@ STYLE = {
     "added":   "rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;",
     "removed": "rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;dashed=1;",
     "changed": "rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;",
+    "moved":   "rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;",
     "same":    "rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;",
 }
 EDGE_STYLE = {
-    "added":   "endArrow=classic;html=1;strokeColor=#82b366;strokeWidth=2;",
-    "removed": "endArrow=classic;html=1;strokeColor=#b85450;strokeWidth=2;dashed=1;",
-    "same":    "endArrow=classic;html=1;strokeColor=#999999;",
+    "added":    "endArrow=classic;html=1;strokeColor=#82b366;strokeWidth=2;",
+    "removed":  "endArrow=classic;html=1;strokeColor=#b85450;strokeWidth=2;dashed=1;",
+    "rerouted": "endArrow=classic;html=1;strokeColor=#d79b00;strokeWidth=2;",
+    "same":     "endArrow=classic;html=1;strokeColor=#999999;",
 }
 
 
 def parse(path):
-    """Return (nodes, edges) for a .drawio: nodes {id: (label, style)} for leaf
-    vertices, edges {(source_id, target_id)}. Cells are flattened across pages;
-    UserObject/object wrappers are unwrapped (id on the wrapper, cell inside)."""
+    """Return (nodes, edges) for a .drawio: nodes {id: (label, style, pos)} for
+    leaf vertices (pos = (x, y) or None when no geometry), edges
+    {(source_id, target_id)}. Cells are flattened across pages; UserObject/object
+    wrappers are unwrapped (id on the wrapper, cell inside)."""
     try:
         tree = ET.parse(path)
     except (ET.ParseError, OSError) as exc:
@@ -89,8 +105,39 @@ def parse(path):
             g = c.find("mxGeometry")
             if g is not None and g.get("relative") == "1":    # edge-label child
                 continue
-            nodes[cid] = (labels.get(cid, ""), c.get("style") or "")
+            pos = None
+            if g is not None:
+                try:
+                    pos = (float(g.get("x", "0")), float(g.get("y", "0")))
+                except ValueError:
+                    pos = None
+            nodes[cid] = (labels.get(cid, ""), c.get("style") or "", pos)
     return nodes, edges
+
+
+def classify_rerouted(old_ek, new_ek, removed, added):
+    """Edge keys that are reroutes of an old edge, not brand-new connections.
+
+    Two decidable cases (everything else stays a plain add):
+    - flip:      (a,b) in old and (b,a) in new — same pair, reversed direction.
+    - re-point:  old (a,b) with b removed and new (a,c) with c added (the kept
+                 endpoint a pins the pairing; ambiguous when a kept endpoint has
+                 several candidate re-points, in which case nothing is flagged).
+    """
+    old_only, new_only = old_ek - new_ek, new_ek - old_ek
+    rerouted = {(s, t) for (s, t) in new_only if (t, s) in old_only}
+    for a, b in old_only:
+        if (b, a) in new_only:
+            continue                                          # flip, handled above
+        if b in removed and a not in removed:
+            cands = [(a, c) for (s, c) in new_only if s == a and c in added]
+            if len(cands) == 1:
+                rerouted.add(cands[0])
+        elif a in removed and b not in removed:
+            cands = [(c, b) for (s, t) in new_only if t == b and s in added]
+            if len(cands) == 1:
+                rerouted.add(cands[0])
+    return rerouted
 
 
 def main():
@@ -111,13 +158,25 @@ def main():
         """Map match-key -> label. By id (default) the key is the cell id and the
         value is its label; by label the key *is* the label."""
         if args.by_label:
-            return {lbl: lbl for lbl, _ in nodes.values()}, {i: lbl for i, (lbl, _) in nodes.items()}
-        return {i: lbl for i, (lbl, _) in nodes.items()}, {i: i for i in nodes}
+            return {lbl: lbl for lbl, _, _ in nodes.values()}, {i: lbl for i, (lbl, _, _) in nodes.items()}
+        return {i: lbl for i, (lbl, _, _) in nodes.items()}, {i: i for i in nodes}
 
     old_keys, old_id2key = keyed(old_n)
     new_keys, new_id2key = keyed(new_n)
+    old_pos = {old_id2key[i]: p for i, (_, _, p) in old_n.items() if i in old_id2key}
+    new_pos = {new_id2key[i]: p for i, (_, _, p) in new_n.items() if i in new_id2key}
 
-    nodes, counts = [], {"added": 0, "removed": 0, "changed": 0, "same": 0}
+    # Selective movement only: when every matched node changed position the two
+    # files come from different layout runs, so movement carries no information.
+    moved = {key for key in set(old_keys) & set(new_keys)
+             if old_keys[key] == new_keys[key]
+             and old_pos.get(key) and new_pos.get(key)
+             and old_pos[key] != new_pos[key]}
+    if moved and len(moved) == len(set(old_keys) & set(new_keys)):
+        moved = set()
+
+    nodes, counts = [], {"added": 0, "removed": 0, "changed": 0,
+                         "moved": 0, "same": 0}
     for key in sorted(set(old_keys) | set(new_keys)):
         if key in old_keys and key not in new_keys:
             status, label = "removed", old_keys[key]
@@ -125,6 +184,8 @@ def main():
             status, label = "added", new_keys[key]
         elif old_keys[key] != new_keys[key]:                  # matched, label moved
             status, label = "changed", new_keys[key]
+        elif key in moved:
+            status, label = "moved", new_keys[key]
         else:
             status, label = "same", new_keys[key]
         counts[status] += 1
@@ -139,14 +200,23 @@ def main():
         return out
 
     old_ek, new_ek = edge_keys(old_e, old_id2key), edge_keys(new_e, new_id2key)
+    removed = set(old_keys) - set(new_keys)
+    added = set(new_keys) - set(old_keys)
+    rerouted = classify_rerouted(old_ek, new_ek, removed, added)
     node_keys = {n["id"] for n in nodes}
     edges = []
     for s, t in sorted(old_ek | new_ek):
         if s not in node_keys or t not in node_keys:
             continue
-        status = "same" if (s, t) in old_ek and (s, t) in new_ek else \
-                 ("added" if (s, t) in new_ek else "removed")
-        edges.append({"source": s, "target": t, "style": EDGE_STYLE[status]})
+        if (s, t) in old_ek and (s, t) in new_ek:
+            status = "same"
+        elif (s, t) in new_ek:
+            status = "rerouted" if (s, t) in rerouted else "added"
+        else:
+            status = "removed" if (t, s) not in new_ek else None   # flip: shown once
+        if status:
+            edges.append({"source": s, "target": t, "style": EDGE_STYLE[status]})
+    rerouted_n = sum(1 for e in edges if "d79b00" in e["style"])
 
     graph = {"direction": args.direction, "nodes": nodes, "edges": edges}
     text = json.dumps(graph, indent=2)
@@ -157,7 +227,8 @@ def main():
     else:
         sys.stdout.write(text)
     sys.stderr.write(f"+{counts['added']} added, -{counts['removed']} removed, "
-                     f"~{counts['changed']} changed, ={counts['same']} unchanged\n")
+                     f"~{counts['changed']} changed, >{counts['moved']} moved, "
+                     f"={counts['same']} unchanged, {rerouted_n} edge(s) rerouted\n")
 
 
 if __name__ == "__main__":
