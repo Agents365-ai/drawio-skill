@@ -8,6 +8,16 @@ routing defects. Runs without launching draw.io, so it is a fast pre-check
 before the visual review step.
 
   python3 validate.py diagram.drawio
+  python3 validate.py diagram.drawio --json
+
+Each finding is rendered as:
+
+  error: [E-DANGLING-END] edge '4' target 'nope' does not exist (fix: ...)
+
+The bracketed code is stable, and every finding carries a ``fix`` hint, so an
+agent (or a script) can act on the output mechanically; ``--json`` emits the
+same findings as structured objects (``code``, ``severity``, ``subject``,
+``message``, ``fix``) instead of prose lines.
 
 Edge routing checks (warnings): an edge segment crossing a non-incident leaf
 vertex ("routes through vertex"), and two edges crossing each other ("edges X
@@ -26,13 +36,20 @@ Exit status is non-zero when any error (or, with --strict, any warning) is
 found, so it can gate a workflow. Compressed (non-XML) diagram pages are
 skipped with a warning — this skill always writes uncompressed XML.
 
-Usage: python3 validate.py <file.drawio> [--strict]
+Usage: python3 validate.py <file.drawio> [--strict] [--json]
 """
 import argparse
+import json
 import sys
 import xml.etree.ElementTree as ET
 
 RESERVED = {"0", "1"}
+
+
+def diag(code, severity, subject, message, fix):
+    """One structured finding: stable code, the cell(s) it is about, prose, fix."""
+    return {"code": code, "severity": severity, "subject": subject,
+            "message": message, "fix": fix}
 
 
 def rect(cell):
@@ -228,24 +245,37 @@ def geometry_warnings(cells, ids, parents):
     for eid, pts, ends in routed:
         for vid, box in leaves:
             if vid not in ends and route_hits_rect(pts, box):
-                warns.append(f"edge {eid!r} routes through vertex {vid!r}")
+                warns.append(diag(
+                    "W-EDGE-THROUGH-VERTEX", "warning", eid,
+                    f"edge {eid!r} routes through vertex {vid!r}",
+                    "add waypoints (<Array as=\"points\">) so the route goes "
+                    "around the vertex"))
     # Edge-edge crossings (both routes known).
     for i in range(len(routed)):
         for j in range(i + 1, len(routed)):
             (ia, pa, _), (ib, pb, _) = routed[i], routed[j]
             if routes_cross(pa, pb):
-                warns.append(f"edges {ia!r} and {ib!r} cross")
+                warns.append(diag(
+                    "W-EDGE-CROSS", "warning", f"{ia},{ib}",
+                    f"edges {ia!r} and {ib!r} cross",
+                    "add waypoints to one edge or reroute it so the paths "
+                    "do not cross"))
     return warns
 
 
 def check_page(diagram):
-    """Return (errors, warnings) for one <diagram> page."""
+    """Return (errors, warnings) for one <diagram> page, as structured findings."""
     name = diagram.get("name", "?")
     model = diagram.find("mxGraphModel")
     if model is None:
         if (diagram.text or "").strip():
-            return [], [f"page {name!r}: compressed, skipped (cannot lint)"]
-        return [f"page {name!r}: no <mxGraphModel>"], []
+            return [], [diag("W-COMPRESSED", "warning", name,
+                             f"page {name!r}: compressed, skipped (cannot lint)",
+                             "save the page as uncompressed XML (this skill "
+                             "always writes uncompressed)")]
+        return [diag("E-PAGE-MODEL", "error", name,
+                     f"page {name!r}: no <mxGraphModel>",
+                     "regenerate the file with this skill's writers")], []
     root = model.find("root")
     # Normalize UserObject/object wrappers (used for links & metadata): the id
     # lives on the wrapper, geometry/style on the inner mxCell — fold the two
@@ -264,30 +294,51 @@ def check_page(diagram):
     for c in cells:
         cid = c.get("id")
         if cid in ids:
-            errors.append(f"duplicate id {cid!r}")
+            errors.append(diag("E-DUP-ID", "error", cid,
+                               f"duplicate id {cid!r}",
+                               "give each cell a unique id"))
         ids[cid] = c
     parents = {c.get("parent") for c in cells}            # ids that have children
     for c in cells:
         cid, parent = c.get("id"), c.get("parent")
         is_v, is_e = c.get("vertex") == "1", c.get("edge") == "1"
         if parent is not None and parent not in ids:
-            errors.append(f"cell {cid!r} parent {parent!r} does not exist")
+            errors.append(diag(
+                "E-BAD-PARENT", "error", cid,
+                f"cell {cid!r} parent {parent!r} does not exist",
+                "add the parent container or repoint parent= at an existing cell"))
         for end in ("source", "target"):
             ref = c.get(end)
             if ref and ref not in ids:
-                errors.append(f"edge {cid!r} {end} {ref!r} does not exist")
+                errors.append(diag(
+                    "E-DANGLING-END", "error", cid,
+                    f"edge {cid!r} {end} {ref!r} does not exist",
+                    "add the referenced cell or correct/remove the edge endpoint"))
         if (is_v or is_e) and cid in RESERVED:
-            errors.append(f"cell {cid!r} reuses reserved id 0/1")
+            errors.append(diag(
+                "E-RESERVED-ID", "error", cid,
+                f"cell {cid!r} reuses reserved id 0/1",
+                "use any other id (draw.io reserves 0/1 for the graph root)"))
         if is_v and not is_edge_label(c):
             r = rect(c)
             if r is None or any(v != v for v in r):       # None or NaN
-                errors.append(f"vertex {cid!r} has missing/invalid geometry")
+                errors.append(diag(
+                    "E-GEOMETRY", "error", cid,
+                    f"vertex {cid!r} has missing/invalid geometry",
+                    "add an <mxGeometry> with numeric x, y, width, height"))
             else:
                 x, y, w, h = r
                 if w <= 0 or h <= 0:
-                    warns.append(f"vertex {cid!r} non-positive size {w:g}x{h:g}")
+                    warns.append(diag(
+                        "W-SIZE", "warning", cid,
+                        f"vertex {cid!r} non-positive size {w:g}x{h:g}",
+                        "set width/height to positive values"))
                 if x < 0 or y < 0:
-                    warns.append(f"vertex {cid!r} negative position ({x:g},{y:g})")
+                    warns.append(diag(
+                        "W-POSITION", "warning", cid,
+                        f"vertex {cid!r} negative position ({x:g},{y:g})",
+                        "shift the vertex into the positive quadrant "
+                        "(the draw.io canvas starts at 0,0)"))
     # Sibling overlap: only leaf vertices (containers legitimately wrap children).
     boxes = [(c.get("id"), c.get("parent"), rect(c)) for c in cells
              if c.get("vertex") == "1" and c.get("id") not in parents and rect(c)
@@ -296,15 +347,25 @@ def check_page(diagram):
         for j in range(i + 1, len(boxes)):
             (ia, pa, ra), (ib, pb, rb) = boxes[i], boxes[j]
             if pa == pb and overlap(ra, rb):
-                warns.append(f"vertices {ia!r} and {ib!r} overlap")
+                warns.append(diag(
+                    "W-OVERLAP", "warning", f"{ia},{ib}",
+                    f"vertices {ia!r} and {ib!r} overlap",
+                    "move the siblings apart or nest one inside the other"))
     warns += geometry_warnings(cells, ids, parents)
     return errors, warns
+
+
+def render(d, severity):
+    """One finding -> the prose line format."""
+    return f"{severity}: [{d['code']}] {d['message']} (fix: {d['fix']})"
 
 
 def main():
     ap = argparse.ArgumentParser(description="Lint a .drawio file for structural errors.")
     ap.add_argument("file")
     ap.add_argument("--strict", action="store_true", help="treat warnings as failure too")
+    ap.add_argument("--json", action="store_true",
+                    help="emit findings as structured JSON instead of prose lines")
     ap.add_argument("--score", action="store_true",
                     help="also print a readability score (lower is better) — "
                          "useful for comparing layout variants of the same graph")
@@ -319,17 +380,22 @@ def main():
         e, w = check_page(page)
         errors += e
         warns += w
-    for w in warns:
-        print(f"warning: {w}")
-    for e in errors:
-        print(f"error: {e}")
-    print(f"{len(errors)} error(s), {len(warns)} warning(s)")
+    if args.json:
+        print(json.dumps({"errors": len(errors), "warnings": len(warns),
+                          "findings": errors + warns}, indent=2))
+    else:
+        for w in warns:
+            print(render(w, "warning"))
+        for e in errors:
+            print(render(e, "error"))
+        print(f"{len(errors)} error(s), {len(warns)} warning(s)")
     if args.score:
+        lines = [d["message"] for d in errors + warns]
         # Weighted by how badly each defect hurts readability. Comparable only
         # across variants of the SAME graph (same nodes/edges).
-        through = sum(1 for w in warns if "routes through" in w)
-        cross = sum(1 for w in warns if " cross" in w)
-        olap = sum(1 for w in warns if " overlap" in w)
+        through = sum(1 for m in lines if "routes through" in m)
+        cross = sum(1 for m in lines if " cross" in m)
+        olap = sum(1 for m in lines if " overlap" in m)
         print(f"score: {20 * through + 10 * cross + 5 * olap} "
               f"({through} through-vertex, {cross} crossings, {olap} overlaps)")
     if errors or (args.strict and warns):

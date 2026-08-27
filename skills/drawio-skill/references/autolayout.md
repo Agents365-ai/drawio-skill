@@ -125,14 +125,14 @@ Each code importer keeps only **intra-project** edges (third-party/stdlib import
 
 ## Diffing two diagrams (`drawiodiff.py`)
 
-`drawiodiff.py old.drawio new.drawio -o diff.json` compares two `.drawio` files and emits a colour-coded graph JSON for autolayout — one diagram showing **what changed**: nodes/edges added (green), removed (red, dashed), changed (orange, a matched node whose label moved) or unchanged (grey).
+`drawiodiff.py old.drawio new.drawio -o diff.json` compares two `.drawio` files and emits a colour-coded graph JSON for autolayout — one diagram showing **what changed**: nodes/edges added (green), removed (red, dashed), changed (orange, a matched node whose label moved), moved (violet, a matched node with the same label at new coordinates) or unchanged (grey). Edges can be **rerouted** (orange): a re-point of an old edge (one endpoint kept, the other swapped for a newly added node) or a direction flip, shown once instead of as a separate added/removed pair.
 
 ```bash
 python3 <this-skill-dir>/scripts/drawiodiff.py old.drawio new.drawio -o diff.json
 python3 <this-skill-dir>/scripts/autolayout.py diff.json -o diff.drawio
 ```
 
-Nodes match by cell **id** by default — ideal for anything the importers or live-infra snapshots produce (their ids are stable semantic keys), so *snapshot → change → snapshot → diff* shows drift directly (e.g. two `tfstate.py` or `k8simports.py` snapshots). Pass `--by-label` to match on the visible label instead, for hand-drawn diagrams whose ids are random. Only leaf vertices and their edges are compared (containers/group cells and edge labels are skipped); the diff is a flat colour-coded view, so original icons are replaced by status colours (labels are kept). Multi-page files are flattened; compressed pages are skipped with a warning (this skill always writes uncompressed XML).
+Nodes match by cell **id** by default — ideal for anything the importers or live-infra snapshots produce (their ids are stable semantic keys), so *snapshot → change → snapshot → diff* shows drift directly (e.g. two `tfstate.py` or `k8simports.py` snapshots). Pass `--by-label` to match on the visible label instead, for hand-drawn diagrams whose ids are random. Movement is reported only when it is selective: if every matched node changed position, the two files come from different layout runs (the usual importer + autolayout case) and all matched nodes stay "same". Only leaf vertices and their edges are compared (containers/group cells and edge labels are skipped); the diff is a flat colour-coded view, so original icons are replaced by status colours (labels are kept). Multi-page files are flattened; compressed pages are skipped with a warning (this skill always writes uncompressed XML).
 
 ## Architecture time-lapse over git history (`timelapse.py`)
 
