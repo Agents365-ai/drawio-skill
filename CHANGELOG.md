@@ -4,6 +4,23 @@ All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
 
+## [2.3.0] — 2026-08-27
+### Added
+- **Structured diagnostics in `scripts/validate.py`** — findings render as
+  `error: [E-DANGLING-END] ... (fix: ...)` with 12 stable codes and a fix hint
+  per finding, so an agent can act on lint output mechanically; `--json` emits
+  the same findings as structured objects (`code`/`severity`/`subject`/
+  `message`/`fix`). Message substrings are unchanged, so `--score` and existing
+  consumers keep working.
+- **`moved` (violet) and `rerouted` (orange) delta classes in
+  `scripts/drawiodiff.py`** — a matched node with the same label at new
+  coordinates is violet "moved", reported only when selective (if every matched
+  node changed position, the files come from different layout runs and all stay
+  "same"); an edge that re-points an old edge (one endpoint kept, the other
+  swapped for a newly added node) or flips direction is orange "rerouted",
+  shown once instead of a separate added/removed pair. (Both borrowed from the
+  archify investigation, PR #107.)
+
 ## [2.2.0] — 2026-08-27
 ### Added
 - **`scripts/dbxicons.py`** — Databricks product icon resolver, following the
