@@ -1,0 +1,38 @@
+{
+  "name": "drawio-skill",
+  "version": "2.3.0",
+  "description": "Generate professional editable draw.io diagrams from natural language, codebases, infrastructure definitions, and SQL schemas.",
+  "author": {
+    "name": "Agents365.ai",
+    "url": "https://github.com/Agents365-ai"
+  },
+  "homepage": "https://agents365-ai.github.io/drawio-skill/",
+  "repository": "https://github.com/Agents365-ai/drawio-skill",
+  "license": "MIT",
+  "keywords": [
+    "drawio",
+    "diagrams",
+    "architecture",
+    "uml",
+    "visualization"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "draw.io Skill",
+    "shortDescription": "Create editable professional diagrams",
+    "longDescription": "Turn natural language, source code, infrastructure definitions, and database schemas into editable draw.io diagrams with validation and iterative visual refinement.",
+    "developerName": "Agents365.ai",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Diagram generation",
+      "Codebase visualization",
+      "Architecture modeling"
+    ],
+    "websiteURL": "https://agents365-ai.github.io/drawio-skill/",
+    "defaultPrompt": [
+      "Create an editable draw.io architecture diagram from this description.",
+      "Visualize this codebase as a draw.io diagram.",
+      "Turn this SQL schema into an editable ER diagram."
+    ]
+  }
+}
