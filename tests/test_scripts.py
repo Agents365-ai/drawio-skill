@@ -111,6 +111,11 @@ class TestAiIcons(unittest.TestCase):
         self.assertEqual(self.m.pick_variant("googlecloud", self.fam["googlecloud"], "text"),
                          "googlecloud-brand")
 
+    def test_remote_host_allowlist(self):
+        self.assertEqual("https://unpkg.com/x", self.m.safe_url("https://unpkg.com/x"))
+        with self.assertRaises(ValueError):
+            self.m.safe_url("https://attacker.invalid/icon.svg")
+
     def test_unknown_brand(self):
         self.assertEqual(self.m.search(self.fam, "definitelynotabrand", 3), [])
 
@@ -885,6 +890,8 @@ class TestImportersCli(unittest.TestCase):
 
     def test_drawio2pptx_deck(self):
         import shutil
+        if os.environ.get("DRAWIO_E2E") != "1":
+            self.skipTest("set DRAWIO_E2E=1 to launch the desktop CLI")
         try:
             import pptx  # noqa: F401
         except ImportError:
@@ -1030,7 +1037,8 @@ class TestImportersCli(unittest.TestCase):
             out = os.path.join(d, "seq.drawio")
             r = run("seqlayout.py", path, "-o", out)
             self.assertEqual(r.returncode, 0, r.stderr)
-            xml = open(out, encoding="utf-8").read()
+            with open(out, encoding="utf-8") as fh:
+                xml = fh.read()
             self.assertIn("umlActor", xml)                       # actor header
             self.assertIn('parent="b"', xml)                     # activation bar on b
             self.assertIn("endArrow=block", xml)                 # sync arrow
@@ -1060,7 +1068,8 @@ class TestImportersCli(unittest.TestCase):
             out = os.path.join(d, "c4.drawio")
             r = run("c4.py", path, "-o", out)
             self.assertEqual(r.returncode, 0, r.stderr)
-            xml = open(out, encoding="utf-8").read()
+            with open(out, encoding="utf-8") as fh:
+                xml = fh.read()
             self.assertEqual(xml.count("<diagram"), 2)
             self.assertIn('link="data:page/id,containers"', xml)   # drill-down
             self.assertIn("mxgraph.c4.person2", xml)
@@ -1175,6 +1184,8 @@ class TestDrawioHtml(unittest.TestCase):
 
     def test_viewer_end_to_end(self):
         import shutil
+        if os.environ.get("DRAWIO_E2E") != "1":
+            self.skipTest("set DRAWIO_E2E=1 to launch the desktop CLI")
         if not shutil.which("drawio"):
             self.skipTest("draw.io CLI not installed")
         with tempfile.TemporaryDirectory() as d:
@@ -1276,15 +1287,18 @@ class TestRelabel(unittest.TestCase):
             self._write(dp, FIXTURE_RELABEL)
             r = run("relabel.py", dp, "--extract", "-o", lp)
             self.assertEqual(r.returncode, 0, r.stderr)
-            labels = json.load(open(lp, encoding="utf-8"))
+            with open(lp, encoding="utf-8") as fh:
+                labels = json.load(fh)
             # page name + vertex value + UserObject label + edge label
             self.assertEqual(set(labels), {"Flow", "Start", "Web Server", "go"})
             labels.update({"Start": "\u5f00\u59cb", "Web Server": "Web \u670d\u52a1\u5668"})
-            json.dump(labels, open(lp, "w", encoding="utf-8"), ensure_ascii=False)
+            with open(lp, "w", encoding="utf-8") as fh:
+                json.dump(labels, fh, ensure_ascii=False)
             r = run("relabel.py", dp, "--map", lp, "-o", out)
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertIn("4 labels replaced", r.stderr)
-            text = open(out, encoding="utf-8").read()
+            with open(out, encoding="utf-8") as fh:
+                text = fh.read()
             self.assertIn("\u5f00\u59cb", text)
             self.assertIn("Web \u670d\u52a1\u5668", text)
             self.assertNotIn('value="Start"', text)

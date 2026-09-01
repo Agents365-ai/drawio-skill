@@ -2,7 +2,53 @@
 
 All notable changes to **drawio-skill** are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
-semantic-ish versioning (the `version:` field in `skills/drawio-skill/SKILL.md`).
+semantic-ish versioning (the `metadata.version` field in
+`skills/drawio-skill/SKILL.md`).
+
+## [3.0.0] — 2026-09-01
+### Added
+- **Versioned Diagram IR** (`drawio-skill/diagram-ir/v1`) with a published JSON
+  Schema, stable semantic IDs, node/edge properties, provenance, multilingual
+  labels, and readers for JSON plus compressed/uncompressed `.drawio` pages.
+- **Unified `scripts/diagramctl.py`** with `doctor`, `build`, `inspect`, `query`,
+  `test`, `review`, `sync`/`reconcile`, `views`, `whatif`, `story`, `publish`, and
+  `transform` commands. It auto-detects common sources and orchestrates the 39
+  existing focused tools without replacing their stable interfaces.
+- **Incremental source reconciliation** — refresh labels, relations, semantic
+  properties, and provenance while preserving matching cells' manual geometry
+  and style. New elements are staged, retired elements remain reviewable by
+  default, and destructive pruning is explicit.
+- **Multi-view architecture projection** — executive, system, deployment,
+  data-flow, and security pages from one model, with shared model IDs and
+  click-through links between pages containing the same component.
+- **Diagram-as-Test architecture contracts** — eight deterministic rules for
+  direct Internet/database access, cycles, orphans, ownership, production
+  observability, external timeouts, trust-boundary protocols, and WCAG-style
+  text contrast. JSON/YAML policies and CI-friendly exit codes.
+- **Architecture query/review** — kind/owner/boundary filtering, shortest-path
+  queries, provenance/accessible summaries, dependency-cycle and articulation-
+  point detection, coupling signals, and Markdown/JSON review reports.
+- **What-if failure propagation** — deterministic downstream impact with
+  isolation-edge support plus red/amber annotated `.drawio` output.
+- **Accessible Story Mode** — a self-contained offline HTML walkthrough with
+  clickable and keyboard-focusable nodes, arrow-key navigation, SVG title/desc,
+  a full text alternative, provenance/ownership/boundary details, reduced-
+  motion behavior, failure overlays, and multilingual label switching.
+- **Codex UI metadata** in `agents/openai.yaml`, explicit `allowed-tools`
+  disclosure, offline/security guidance, and allowlisted hosts for optional AI
+  and Databricks icon fetching.
+
+### Changed
+- Reworked `SKILL.md` from a 355-line capability catalog into a 131-line
+  progressive-disclosure router. Detailed semantic, IR, and security workflows
+  now live in focused references.
+- Native draw.io integration tests are now explicitly enabled with
+  `DRAWIO_E2E=1`; an installed Electron binary is no longer mistaken for a
+  usable renderer inside headless/macOS sandbox sessions.
+- Scripts: 39 focused tools + 1 unified CLI + 1 internal IR module. Tests:
+  146 → 157, including IR round-trip, compressed import, semantic rules,
+  three-way reconcile invariants, multi-view, accessibility, host allowlists,
+  and CLI workflows.
 
 ## [2.3.0] — 2026-08-27
 ### Added

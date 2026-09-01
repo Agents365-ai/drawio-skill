@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Agents365-ai/drawio-skill/diagram-ir.schema.json",
+  "title": "drawio-skill Diagram IR v1",
+  "type": "object",
+  "required": ["schema", "metadata", "nodes", "edges"],
+  "properties": {
+    "schema": {"const": "drawio-skill/diagram-ir/v1"},
+    "metadata": {"type": "object"},
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "kind", "properties"],
+        "properties": {
+          "id": {"type": "string", "not": {"enum": ["0", "1"]}},
+          "label": {"type": "string"},
+          "kind": {"type": "string"},
+          "properties": {"type": "object"},
+          "provenance": {"type": "object"},
+          "labels": {"type": "object", "additionalProperties": {"type": "string"}}
+        },
+        "additionalProperties": true
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "source", "target", "label", "kind", "properties"],
+        "properties": {
+          "id": {"type": "string"},
+          "source": {"type": "string"},
+          "target": {"type": "string"},
+          "label": {"type": "string"},
+          "kind": {"type": "string"},
+          "properties": {"type": "object"},
+          "provenance": {"type": "object"}
+        },
+        "additionalProperties": true
+      }
+    },
+    "views": {"type": "array", "items": {"type": "object"}}
+  },
+  "additionalProperties": true
+}

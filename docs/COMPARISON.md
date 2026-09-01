@@ -55,9 +55,9 @@ _Last audited against competitor READMEs on 2026-07-10. Please open an issue or 
 
 ## Key advantages
 
-1. **Self-check + iterative loop** — the only pure-SKILL.md solution that reads its own output and auto-fixes before showing the user, then supports multi-round refinement
-2. **11 diagram type presets** — ERD, UML Class, Sequence, C4, Architecture, ML/Deep Learning, Flowchart, SysML, BPMN, Network Topology, Cross-Functional Swimlane — each with preset shapes, styles, and layout conventions
-3. **ML/DL model diagrams** — tensor shape annotations, layer-type color coding, encoder/decoder swimlanes — built for academic papers
-4. **Multi-agent, zero-config** — works across 6 platforms with just the `skills/drawio-skill/` directory + draw.io desktop. No MCP server, no Python, no Node.js, no browser
-5. **Production-grade layout** — grid-aligned coordinates, complexity-scaled spacing, routing corridors, hub-center strategy, animated connectors
-6. **Browser fallback** — generates diagrams.net URLs when the desktop CLI is unavailable, plus auto-launch for desktop editing
+1. **Sustainable Diagram IR synchronization** — meaning, provenance, and geometry are separate; source changes update incrementally without discarding manual coordinates or styles
+2. **Diagram-as-Test and architecture query** — policy rules, path queries, failure propagation, and coupling/SPOF review work in CI instead of stopping at image generation
+3. **One model, multiple views** — executive, system, deployment, data-flow, and security pages share stable identities and clickable drill-down
+4. **Self-check + iterative loop** — reads its own output, auto-fixes visible defects, and supports targeted refinement
+5. **11 diagram type presets** — ERD, UML, C4, SysML, BPMN, network, swimlane, ML, and more have structural and layout conventions
+6. **No daemon, graceful degradation** — core semantic workflows need only Python; draw.io and Graphviz are optional native-export/layout enhancements

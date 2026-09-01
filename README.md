@@ -13,7 +13,7 @@
 
 **English** · [中文](README_CN.md) · [📖 Online Docs](https://agents365-ai.github.io/drawio-skill/)
 
-A skill that turns natural-language descriptions into `.drawio` XML and exports them to PNG / SVG / PDF / JPG via the native draw.io desktop CLI. It can also turn an **existing codebase** (Python / JS-TS / Go / Rust), **Terraform / Kubernetes / docker-compose infrastructure**, or a **SQL schema** into an auto-laid-out diagram. Works with **Claude Code, Cursor, Copilot, OpenClaw, Codex, Autohand Code, Hermes**, and any agent compatible with the [Agent Skills](https://agentskills.io) format.
+A skill that turns natural language and real system sources into maintainable `.drawio` architecture models. Beyond generation and export, it incrementally synchronizes without discarding manual layout, projects multiple views from one model, enforces architecture contracts, queries dependencies, simulates failure propagation, and publishes dependency-free interactive walkthroughs. Works with **Claude Code, Cursor, Copilot, OpenClaw, Codex, Autohand Code, Hermes**, and any agent compatible with the [Agent Skills](https://agentskills.io) format.
 
 <p align="center">
   <img src="assets/microservices-example.png" width="900" alt="Microservices Architecture — generated from a single natural-language prompt">
@@ -21,6 +21,12 @@ A skill that turns natural-language descriptions into `.drawio` XML and exports 
 
 ## ✨ Highlights
 
+- **Architecture digital twin / Diagram IR** — separate meaning, provenance, and geometry; project executive, system, deployment, data-flow, and security views from one model
+- **Incremental sync without losing manual layout** — `diagramctl sync` updates changed nodes/relations while preserving tuned coordinates, styles, and annotations; removals stay reviewable by default
+- **Diagram-as-Test** — YAML/JSON rules for direct Internet-to-database access, cycles, orphans, ownership, production observability, external timeouts, trust-boundary protocols, and color contrast
+- **Architecture query and review** — query components/owners/boundaries/paths, identify articulation points and high coupling, and emit Markdown/JSON review reports
+- **What-if + Story Mode** — simulate failure propagation with an annotated diagram; publish an offline, keyboard-accessible HTML walkthrough with text alternative, provenance, and language switching
+- **One CLI** — `doctor/build/sync/views/query/test/review/whatif/story/publish/transform` connects the toolbox; core semantic workflows need only Python and are offline by default
 - **11 diagram type presets** — ERD, UML Class, Sequence, C4, Architecture, ML/Deep Learning, Flowchart, SysML (BDD / IBD / Requirement / Parametric), BPMN, Network Topology, Cross-Functional Swimlane
 - **Mermaid → native .drawio** (draw.io ≥ 30) — author 28 standard types as Mermaid text (**mindmap, gantt, timeline, journey, pie, sankey, kanban**…) and the CLI converts them into a laid-out, editable `.drawio` — structure in, layout free
 - **Visualize a codebase** — extract and auto-lay-out the structure of a Python / JS-TS / Go / Rust project (import graphs) or a Python class hierarchy — Graphviz placement, transitive reduction, nested module containers
@@ -34,7 +40,7 @@ A skill that turns natural-language descriptions into `.drawio` XML and exports 
 - **Iterative feedback loop** — up to 5 rounds of targeted refinement
 - **Style presets** — capture your visual style from a `.drawio` file or image, reuse on demand
 - **Clean layout** — grid-aligned, spacing scales with diagram size, connectors routed clear of nodes
-- **Multi-agent, zero-config** — runs from a single SKILL.md; no MCP server, no background daemon (the optional `npx` installer needs Node, the skill itself does not)
+- **Multi-agent, no daemon** — portable Agent Skills package; no MCP server or background process (core semantic workflows need only Python; native export remains optional)
 
 ## 🗺️ Feature Map
 
