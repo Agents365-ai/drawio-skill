@@ -116,3 +116,15 @@ python3 scripts/aiicons.py "openai" --embed     # self-contained data URI
 ## Rendering in CI
 
 Regenerate, lint (`validate.py --strict`), and export diagrams headlessly in GitHub Actions — via draw.io desktop under `xvfb` or the Docker REST renderer. Full workflow recipes in [CI.md](CI.md).
+
+## MCP, CI gates, and the prompt cookbook
+
+- **MCP hosts** (Claude Desktop, Cursor, VS Code, Codex): register
+  `scripts/diagramctl_mcp.py` — recipes in
+  [`../skills/drawio-skill/references/mcp.md`](../skills/drawio-skill/references/mcp.md).
+- **Architecture rules on every PR**: the
+  `drawio-architecture-test` action gates Diagram IR files with no
+  draw.io/Xvfb install —
+  [`../skills/drawio-skill/references/ci-gate.md`](../skills/drawio-skill/references/ci-gate.md).
+- **Prompt patterns** that get the best results per workflow:
+  [`../skills/drawio-skill/references/cookbook.md`](../skills/drawio-skill/references/cookbook.md).

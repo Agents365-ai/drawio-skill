@@ -14,6 +14,8 @@ Bonus: the pipeline itself can be the diagram — `ciimports.py <repo-root>` tur
 
 Importer node ids are stable (module paths, `type.name`, `kind/name`), so regenerated `.drawio` files produce reviewable diffs when the underlying code or infra changes.
 
+For turnkey gates, this repo also ships composite GitHub Actions: a pure-Python architecture-rule gate (`drawio-architecture-test`) and a visual PR diagram diff (`drawio-diff`) — see [`../skills/drawio-skill/references/ci-gate.md`](../skills/drawio-skill/references/ci-gate.md) and [`../skills/drawio-skill/references/pr-bot.md`](../skills/drawio-skill/references/pr-bot.md).
+
 ## Option A — draw.io desktop + xvfb (GitHub Actions)
 
 The desktop CLI works headless under `xvfb`. Complete workflow:

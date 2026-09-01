@@ -117,3 +117,14 @@ python3 scripts/aiicons.py "openai" --embed     # 内联为自包含 data URI
 ## 在 CI 中渲染
 
 在 GitHub Actions 里无头地重新生成、校验（`validate.py --strict`）并导出图表 —— 走 xvfb 下的 draw.io 桌面版或 Docker REST 渲染器。完整 workflow 配方见 [CI_CN.md](CI_CN.md)。
+
+## MCP、CI 门禁与提示词手册
+
+- **MCP 宿主**（Claude Desktop、Cursor、VS Code、Codex）：注册
+  `scripts/diagramctl_mcp.py` —— 配置配方见
+  [`../skills/drawio-skill/references/mcp.md`](../skills/drawio-skill/references/mcp.md)。
+- **每个 PR 强制执行架构规则**：`drawio-architecture-test` action 无需安装
+  draw.io/Xvfb 即可门禁 Diagram IR —— 见
+  [`../skills/drawio-skill/references/ci-gate.md`](../skills/drawio-skill/references/ci-gate.md)。
+- **各工作流的提示词模式**：
+  [`../skills/drawio-skill/references/cookbook.md`](../skills/drawio-skill/references/cookbook.md)。

@@ -26,6 +26,19 @@ review for a repo.
 
 ## Adopting it in your own repo
 
+Without copying anything, reference this repo's action directly:
+
+```yaml
+- uses: Agents365-ai/drawio-skill/.github/actions/drawio-diff@main
+```
+
+(Pin to a tag for reproducibility; the action checks out its own skill
+scripts via `github.action_repository`.) The pure-Python
+`drawio-architecture-test` gate needs no desktop tools at all —
+see `references/ci-gate.md`.
+
+Alternatively, vendor the pieces:
+
 1. Copy `.github/actions/drawio-diff/` and `skills/drawio-skill/` (or at
    least `scripts/prdiff.py`, `scripts/drawiodiff.py`, `scripts/autolayout.py`)
    into your repo.
