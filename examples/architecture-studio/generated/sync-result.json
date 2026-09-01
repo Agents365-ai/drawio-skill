@@ -1,0 +1,29 @@
+{
+  "added": [
+    "events"
+  ],
+  "changed": [
+    "orders"
+  ],
+  "removed": [],
+  "changed_edges": [
+    "orders-db"
+  ],
+  "conflicts": [
+    {
+      "id": "orders",
+      "field": "label",
+      "manual": "Orders (manual)",
+      "incoming": "Order Service v2"
+    },
+    {
+      "id": "orders",
+      "field": "properties",
+      "keys": [
+        "owner"
+      ]
+    }
+  ],
+  "output": "generated/reconciled.drawio",
+  "source_type": "ir"
+}

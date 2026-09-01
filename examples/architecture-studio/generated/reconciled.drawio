@@ -1,0 +1,41 @@
+<mxfile host="drawio-skill" agent="diagram-ir" version="3.0.0" modified="2026-09-01T06:57:30+00:00">
+  <diagram id="system" name="System">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="gateway" value="API Gateway" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1" data-model-id="gateway" data-kind="gateway" data-properties="{&quot;owner&quot;:&quot;platform&quot;}" data-source-properties="{&quot;owner&quot;:&quot;platform&quot;}" data-source-label="API Gateway" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/sync-source-v2.ir.json&quot;}" data-owner="platform">
+          <mxGeometry x="0" y="0" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="orders" value="Orders (manual)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;shadow=1;strokeWidth=3;" vertex="1" parent="1" data-model-id="orders" data-kind="service" data-properties="{&quot;owner&quot;:&quot;platform-ops&quot;}" data-source-properties="{&quot;owner&quot;:&quot;commerce-team&quot;}" data-source-label="Order Service v2" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/sync-source-v2.ir.json&quot;}" data-owner="checkout-team" data-conflict="label" data-conflict-properties="owner">
+          <mxGeometry x="720" y="210" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="Orders DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1" data-model-id="db" data-kind="database" data-properties="{&quot;owner&quot;:&quot;commerce-team&quot;}" data-source-properties="{&quot;owner&quot;:&quot;commerce-team&quot;}" data-source-label="Orders DB" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/sync-source-v2.ir.json&quot;}" data-owner="checkout-team">
+          <mxGeometry x="0" y="210" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="e0" value="HTTPS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="gateway" target="orders" data-model-id="gateway-orders" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;}" data-source-label="HTTPS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="80" y="70" />
+              <mxPoint x="80" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e1" value="mTLS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="orders" target="db" data-model-id="orders-db" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;mTLS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;mTLS&quot;}" data-source-label="mTLS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="80" y="180" />
+              <mxPoint x="80" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="events" value="Order Events" vertex="1" parent="1" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" data-model-id="events" data-kind="queue" data-status="added" data-properties="{&quot;owner&quot;:&quot;commerce-team&quot;}" data-source-properties="{&quot;owner&quot;:&quot;commerce-team&quot;}" data-source-label="Order Events" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/sync-source-v2.ir.json&quot;}">
+          <mxGeometry x="720" y="380.0" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-orders-events" value="publish" edge="1" parent="1" source="orders" target="events" style="endArrow=classic;html=1;rounded=0;" data-model-id="orders-events" data-kind="async" data-status="added" data-properties="{&quot;protocol&quot;:&quot;Kafka&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;Kafka&quot;}" data-source-label="publish">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

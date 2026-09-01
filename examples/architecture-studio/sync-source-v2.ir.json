@@ -1,0 +1,16 @@
+{
+  "schema": "drawio-skill/diagram-ir/v1",
+  "metadata": {"title": "Checkout sync v2", "created": "2026-09-01T00:00:00+00:00"},
+  "nodes": [
+    {"id": "gateway", "label": "API Gateway", "kind": "gateway", "properties": {"owner": "platform"}, "provenance": {"path": "examples/architecture-studio/sync-source-v2.ir.json"}},
+    {"id": "orders", "label": "Order Service v2", "kind": "service", "properties": {"owner": "commerce-team"}, "provenance": {"path": "examples/architecture-studio/sync-source-v2.ir.json"}},
+    {"id": "db", "label": "Orders DB", "kind": "database", "properties": {"owner": "commerce-team"}, "provenance": {"path": "examples/architecture-studio/sync-source-v2.ir.json"}},
+    {"id": "events", "label": "Order Events", "kind": "queue", "properties": {"owner": "commerce-team"}, "provenance": {"path": "examples/architecture-studio/sync-source-v2.ir.json"}}
+  ],
+  "edges": [
+    {"id": "gateway-orders", "source": "gateway", "target": "orders", "label": "HTTPS", "kind": "sync", "properties": {"protocol": "HTTPS"}},
+    {"id": "orders-db", "source": "orders", "target": "db", "label": "mTLS", "kind": "sync", "properties": {"protocol": "mTLS"}},
+    {"id": "orders-events", "source": "orders", "target": "events", "label": "publish", "kind": "async", "properties": {"protocol": "Kafka"}}
+  ],
+  "views": []
+}

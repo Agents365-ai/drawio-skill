@@ -52,6 +52,10 @@
 
 ## 🖼️ 示例
 
+可维护的 [Architecture Studio 演示](examples/architecture-studio/) 覆盖代码 →
+IR → `.drawio`、保留人工布局的冲突感知同步，以及架构模型 →
+规则/多视图/What-if/无障碍 Story。所有产物都由一条脚本重建并纳入测试。
+
 > [!TIP]
 > **页首那张图就是用下面这条提示词生成的：**
 
@@ -102,7 +106,7 @@ Skill 在多种图表拓扑中尽量保持线条清晰路由，避免穿越无�
 ### 1. 安装 draw.io 桌面版 CLI
 
 | 平台 | 命令 |
-|------|------|
+| ------ | ------ |
 | **macOS** | `brew install --cask drawio` |
 | **Windows** | [下载安装包](https://github.com/jgraph/drawio-desktop/releases) |
 | **Linux** | 从 [releases](https://github.com/jgraph/drawio-desktop/releases) 下载 `.deb`/`.rpm`；无头导出需 `sudo apt install xvfb` |
@@ -249,7 +253,7 @@ python3 scripts/tubemap.py metro.json -o metro.drawio
 ```
 
 | 组件 | 作用 |
-|---|---|
+| --- | --- |
 | **13 个提取器** | **Python · JS/TS · Go · Rust** 的导入关系图、**Python 类继承**、**Terraform / Kubernetes / docker-compose** 资源图（自动配官方云图标）、**SQL DDL → ER 图**、**OpenAPI / Swagger → API 图**（按 HTTP 方法着色的接口 + schema），**CI 流水线 → DAG**（GitHub Actions `needs:` 依赖图 + GitLab 阶段，含触发器、matrix 规模、可复用工作流调用）、以及从 `terraform show -json` / `docker inspect` / `kubectl get -o json` 提取的**实时**基础设施（画出真正已部署的样子） |
 | **图对比 (diff)** | `drawiodiff.py` 把两张 `.drawio`（或两个实时快照）对比成一张彩色图 —— 新增=绿、删除=红、变更=橙 —— 一眼看出架构 / 基础设施**漂移** |
 | **语言变体** | `relabel.py` 按 JSON 映射批量换标签，布局/样式/id 全不动 —— `--extract` 导出全部标签，翻译值后 `--map` 应用。一张图 → 中英双胞胎，双语文档必备 |
@@ -272,7 +276,7 @@ python3 scripts/tubemap.py metro.json -o metro.drawio
 ## 🧩 支持的图表类型
 
 | 类别 | 示例 | 特色 |
-|------|------|------|
+| ------ | ------ | ------ |
 | 架构图 | 微服务、云（AWS/GCP/Azure）、网络拓扑、部署 | 分层泳道、hub 居中策略 |
 | C4 模型 | 系统上下文、容器、组件 | 多页 `.drawio`、点击下钻链接 |
 | ML / 深度学习 | Transformer、CNN、LSTM、GRU | 张量形状标注、层类型配色 |
@@ -348,7 +352,7 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 ### 对比原生智能体（无 skill）
 
 | 功能 | 原生智能体 | drawio-skill |
-|------|-----------|--------------|
+| ------ | ----------- | -------------- |
 | 导出后自检 | ❌ | ✅ 读取 PNG 自动修复 6 类问题 |
 | 迭代审查循环 | ❌ 需手动重新提问 | ✅ 定向编辑，5 轮安全阀 |
 | 图表类型预设 | ❌ | ✅ 7 种（ERD、UML、序列、C4、架构、ML、流程） |
@@ -369,7 +373,7 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 ### 对比其他 draw.io Skills 与工具
 
 | 功能 | drawio-skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp)（官方）<br>![stars](https://img.shields.io/github/stars/jgraph/drawio-mcp?style=flat-square&logo=github&v=2) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills)<br>![stars](https://img.shields.io/github/stars/bahayonghang/drawio-skills?style=flat-square&logo=github) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio)<br>![stars](https://img.shields.io/github/stars/GBSOSS/ai-drawio?style=flat-square&logo=github) |
-|------|------|------|------|------|
+| ------ | ------ | ------ | ------ | ------ |
 | **方式** | 纯 SKILL.md | MCP 服务 / Claude Code 插件 / Project | YAML DSL + CLI（MCP 可选） | Claude Code 插件 |
 | **依赖** | 仅 draw.io 桌面版 | draw.io 桌面版 | draw.io 桌面版（MCP 可选） | draw.io 插件 + 浏览器 |
 | **多智能体支持** | ✅ 6 个平台 | ⚠️ MCP 宿主（Claude、Cursor、VS Code） | ✅ Claude / Gemini / Codex | ❌ 仅 Claude Code |
@@ -391,11 +395,13 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 ## 🎯 何时用(以及何时别用)
 
 **适合:**
+
 - 精致、精确的图 —— 汇报/决策用图、架构图、网络拓扑、严格 UML、ER 图
 - 不透明实色填充、10,000+ 官方图形、品牌图标(AWS / Azure / GCP / Cisco / Kubernetes + AI/LLM logo)、泳道、自定义几何
 - 需要导出 PNG / SVG / PDF 且保持可编辑的场景
 
 **这些情况请改用同系列的其它 skill:**
+
 - **随性的手绘 / 白板观感** → [excalidraw-skill](https://github.com/Agents365-ai/excalidraw-skill) 或 [tldraw-skill](https://github.com/Agents365-ai/tldraw-skill)
 - **以代码形式存进 git、在 Markdown 里渲染的图** → [mermaid-skill](https://github.com/Agents365-ai/mermaid-skill)(通用)或 [plantuml-skill](https://github.com/Agents365-ai/plantuml-skill)(UML)
 - **无限画布自由涂鸦 / 自由笔迹** → [tldraw-skill](https://github.com/Agents365-ai/tldraw-skill)
@@ -405,7 +411,7 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 [Agents365-ai 图表 skill 家族](https://github.com/Agents365-ai) 一员 —— 按场景挑工具：
 
 | Skill | 风格 | 适用场景 |
-|---|---|---|
+| --- | --- | --- |
 | [excalidraw-skill](https://github.com/Agents365-ai/excalidraw-skill) | 手绘 / 草图 | 白板原型、非正式图 |
 | [mermaid-skill](https://github.com/Agents365-ai/mermaid-skill) | 文本驱动、自动布局 | 可嵌入 README、易于版本管理 |
 | [plantuml-skill](https://github.com/Agents365-ai/plantuml-skill) | UML 专精 | CI 流水线里的类图 / 序列图 |
@@ -444,8 +450,8 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 
 **Agents365-ai**
 
-- GitHub: https://github.com/Agents365-ai
-- Bilibili: https://space.bilibili.com/441831884
+- GitHub: <https://github.com/Agents365-ai>
+- Bilibili: <https://space.bilibili.com/441831884>
 
 ## 📄 许可证
 

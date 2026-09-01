@@ -27,6 +27,8 @@ python3 skills/drawio-skill/scripts/diagramctl.py story architecture.ir.json \
 
 See `references/diagram-ir.md` and `references/semantic-workflows.md` for the
 model, rule catalog, provenance, and accessibility behavior.
+The complete reproducible workflow is in
+[`examples/architecture-studio/`](../examples/architecture-studio/).
 
 [中文](USAGE_CN.md)
 
