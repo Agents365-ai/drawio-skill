@@ -26,6 +26,7 @@ A skill that turns natural language and real system sources into maintainable `.
 - **Diagram-as-Test** — YAML/JSON rules for direct Internet-to-database access, cycles, orphans, ownership, production observability, external timeouts, trust-boundary protocols, and color contrast
 - **Architecture query and review** — query components/owners/boundaries/paths, identify articulation points and high coupling, and emit Markdown/JSON review reports
 - **What-if + Story Mode** — simulate failure propagation with an annotated diagram; publish an offline, keyboard-accessible HTML walkthrough with text alternative, provenance, and language switching
+- **MCP server built in** — `scripts/diagramctl_mcp.py` exposes nine tools (`build/sync/views/architecture_test/review/query/whatif/story/doctor`) to Claude Desktop, Cursor, VS Code, Codex, and any MCP host; stdlib-only and offline, no `mcp` package
 - **One CLI** — `doctor/build/sync/views/query/test/review/whatif/story/publish/transform` connects the toolbox; core semantic workflows need only Python and are offline by default
 - **11 diagram type presets** — ERD, UML Class, Sequence, C4, Architecture, ML/Deep Learning, Flowchart, SysML (BDD / IBD / Requirement / Parametric), BPMN, Network Topology, Cross-Functional Swimlane
 - **Mermaid → native .drawio** (draw.io ≥ 30) — author 28 standard types as Mermaid text (**mindmap, gantt, timeline, journey, pie, sankey, kanban**…) and the CLI converts them into a laid-out, editable `.drawio` — structure in, layout free
@@ -40,7 +41,8 @@ A skill that turns natural language and real system sources into maintainable `.
 - **Iterative feedback loop** — up to 5 rounds of targeted refinement
 - **Style presets** — capture your visual style from a `.drawio` file or image, reuse on demand
 - **Clean layout** — grid-aligned, spacing scales with diagram size, connectors routed clear of nodes
-- **Multi-agent, no daemon** — portable Agent Skills package; no MCP server or background process (core semantic workflows need only Python; native export remains optional)
+- **CI-ready** — official `drawio-architecture-test` GitHub Action enforces architecture contracts on every PR with no draw.io/Xvfb/Graphviz install; visual PR diff action for rendered `.drawio`
+- **Multi-agent, no daemon** — portable Agent Skills package plus an optional MCP server for host integrations (core semantic workflows need only Python; native export remains optional)
 
 ## 🗺️ Feature Map
 
@@ -377,7 +379,7 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 
 | Feature | drawio-skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp) (official)<br>![stars](https://img.shields.io/github/stars/jgraph/drawio-mcp?style=flat-square&logo=github&v=2) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills)<br>![stars](https://img.shields.io/github/stars/bahayonghang/drawio-skills?style=flat-square&logo=github) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio)<br>![stars](https://img.shields.io/github/stars/GBSOSS/ai-drawio?style=flat-square&logo=github) |
 | --- | --- | --- | --- | --- |
-| **Approach** | Pure SKILL.md | MCP servers / Claude Code plugin / Project | YAML DSL + CLI (MCP optional) | Claude Code plugin |
+| **Approach** | Pure SKILL.md + optional MCP server | MCP servers / Claude Code plugin / Project | YAML DSL + CLI (MCP optional) | Claude Code plugin |
 | **Dependencies** | draw.io desktop only | draw.io desktop | draw.io desktop (MCP optional) | draw.io plugin + browser |
 | **Multi-agent** | ✅ 6 platforms | ⚠️ MCP hosts (Claude, Cursor, VS Code) | ✅ Claude / Gemini / Codex | ❌ Claude Code only |
 | **Self-check + auto-fix** | ✅ 2-round (reads PNG) | ❌ | ✅ validation + strict mode | ❌ screenshot only |

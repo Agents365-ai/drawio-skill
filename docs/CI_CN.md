@@ -14,6 +14,8 @@
 
 Importer 的节点 id 是稳定的(模块路径、`type.name`、`kind/name`),代码或基础设施变更后重新生成的 `.drawio` diff 可读、可 review。
 
+本仓库还内置了两个开箱即用的 composite GitHub Action:纯 Python 的架构规则门禁(`drawio-architecture-test`)和可视 PR 图表 diff(`drawio-diff`)—— 见 [`../skills/drawio-skill/references/ci-gate.md`](../skills/drawio-skill/references/ci-gate.md) 与 [`../skills/drawio-skill/references/pr-bot.md`](../skills/drawio-skill/references/pr-bot.md)。
+
 ## 方案 A —— draw.io 桌面版 + xvfb(GitHub Actions)
 
 桌面版 CLI 在 `xvfb` 下可无头运行。完整 workflow:

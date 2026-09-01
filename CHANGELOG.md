@@ -5,6 +5,38 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `metadata.version` field in
 `skills/drawio-skill/SKILL.md`).
 
+## [3.1.0] — 2026-09-01
+
+### Added
+
+- **MCP server mode** (`scripts/diagramctl_mcp.py`) — a stdlib-only, offline
+  Model Context Protocol stdio server exposing the semantic workflows as nine
+  tools (`doctor`, `build`, `sync`, `views`, `architecture_test`, `review`,
+  `query`, `whatif`, `story`) to any MCP host (Claude Desktop, Cursor,
+  VS Code, Codex, Claude Code). No `mcp` package or network access; each call
+  shells out to `diagramctl.py`, and `architecture_test` mirrors the CI exit
+  code through `isError`. Host registration recipes in
+  `references/mcp.md`; covered by 11 regression tests (suite 160 → 171).
+- **Official GitHub Action: `drawio-architecture-test`**
+  (`.github/actions/drawio-architecture-test/`) — runs the Diagram-as-Test
+  architecture contract rules against Diagram IR files on every PR and
+  reports via job summary + sticky comment + artifact, with a hard gate exit.
+  Pure Python: no draw.io desktop, Xvfb, or Graphviz, so it runs on a stock
+  runner in seconds. Usable cross-repo via
+  `uses: Agents365-ai/drawio-skill/.github/actions/drawio-architecture-test@main`;
+  ready-to-copy workflow template
+  `.github/workflows/drawio-architecture-test.example.yml`; guide in
+  `references/ci-gate.md`.
+- **Prompt Cookbook** (`references/cookbook.md`) — tested prompt patterns for
+  each workflow (architecture, sync, contracts, views, what-if, Story, C4,
+  UML, ML, Mermaid-first) with the structural clauses that separate strong
+  prompts from weak ones, plus anti-patterns. Routed from `SKILL.md`.
+
+### Changed
+
+- Scripts: 39 focused tools + 1 unified CLI + 1 IR module + 1 MCP server.
+  Tests: 160 → 171.
+
 ## [3.0.0] — 2026-09-01
 
 ### Added

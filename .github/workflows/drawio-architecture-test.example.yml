@@ -1,0 +1,47 @@
+# TEMPLATE — not a live workflow in this repo.
+#
+# Architecture-as-test CI gate for users of drawio-skill. Pure Python: no
+# draw.io desktop, Xvfb, or Graphviz needed, so it runs on a stock
+# ubuntu-latest runner in seconds.
+#
+# To adopt in your own repo (recommended: reference this repo's action
+# directly so you get updates without copying code):
+#   1. Export your architecture model once (locally or in a prior step):
+#        python3 diagramctl.py build ./src --ir-output architecture.ir.json \
+#          -o architecture.drawio
+#      and commit architecture.ir.json.
+#   2. Copy this file to .github/workflows/drawio-architecture-test.yml
+#      (drop `.example`).
+#   3. Uncomment the pull_request trigger below (workflow_dispatch alone is
+#      harmless; the pull_request trigger is intentionally commented out so
+#      this template never runs anywhere until adopted).
+#   4. Point `ir-files` at your IR file(s); optionally set `rules` to a
+#      policy YAML selecting rule ids.
+
+name: drawio-architecture-test (example)
+
+on:
+  workflow_dispatch: {}
+  # pull_request:
+  #   paths:
+  #     - "**/*.ir.json"
+  #     - "policy.yml"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  architecture-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: "Agents365-ai/drawio-skill/.github/actions/\
+          drawio-architecture-test@main"
+        with:
+          ir-files: |
+            architecture.ir.json
+          # rules: policy.yml
+          # strict: true
+          github-token: ${{ github.token }}

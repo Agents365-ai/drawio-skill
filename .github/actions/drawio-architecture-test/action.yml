@@ -1,0 +1,174 @@
+name: 'draw.io Architecture Test'
+description: >-
+  Runs drawio-skill's deterministic architecture contract rules
+  (Diagram-as-Test) against Diagram IR files and reports findings as a job
+  summary + sticky PR comment. Pure Python: no draw.io desktop, Xvfb, or
+  Graphviz required.
+author: 'drawio-skill'
+
+inputs:
+  ir-files:
+    description: >-
+      Newline-separated list of Diagram IR JSON files to test (glob patterns
+      allowed)
+    required: true
+  rules:
+    description: >-
+      Optional policy file (JSON/YAML) selecting rule ids; defaults to all
+      rules
+    required: false
+    default: ''
+  strict:
+    description: 'Also fail on warnings (not just errors)'
+    required: false
+    default: 'false'
+  summary:
+    description: 'Write the findings report to the job summary'
+    required: false
+    default: 'true'
+  post-comment:
+    description: 'Post/update a sticky PR comment with the findings'
+    required: false
+    default: 'true'
+  github-token:
+    description: >-
+      Token used to post the sticky PR comment (needs pull-requests: write)
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: 'composite'
+  steps:
+    # The action may be referenced cross-repo:
+    #   uses: Agents365-ai/drawio-skill/.github/actions/
+    #         drawio-architecture-test@main
+    # Composite steps run in the caller's workspace, so check the skill itself
+    # out next to it. github.action_repository/action_ref point at this repo
+    # and the ref the caller pinned.
+    - name: Check out drawio-skill (for the diagramctl scripts)
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ github.action_repository }}
+        ref: ${{ github.action_ref }}
+        path: _drawio-skill
+        fetch-depth: 1
+
+    - name: Run architecture contract rules
+      id: run
+      shell: bash
+      env:
+        DIAGRAMCTL: ${{ github.workspace }}/_drawio-skill/skills/
+          drawio-skill/scripts/diagramctl.py
+        IR_FILES: ${{ inputs.ir-files }}
+        RULES: ${{ inputs.rules }}
+        STRICT: ${{ inputs.strict }}
+      run: |
+        set -euo pipefail
+        out_dir="_drawio-architecture-test"
+        mkdir -p "$out_dir"
+        shopt -s nullglob
+        # Expand glob patterns one per line (IR_FILES is newline-separated).
+        files=()
+        while IFS= read -r pattern; do
+          [ -z "$pattern" ] && continue
+          for f in $pattern; do
+            [ -f "$f" ] && files+=("$f") || {
+              echo "warning: no match for $pattern" >&2
+            }
+          done
+        done <<< "$IR_FILES"
+        shopt -u nullglob
+        if [ ${#files[@]} -eq 0 ]; then
+          echo "No IR files matched:" >&2
+          printf '%s\n' "$IR_FILES" >&2
+          exit 1
+        fi
+        failed=0
+        : > "$out_dir/combined.md"
+        for f in "${files[@]}"; do
+          echo "Testing $f"
+          args=(test "$f" -o "$out_dir/$(basename "$f" .json).findings.json")
+          [ -n "$RULES" ] && args+=(--rules "$RULES")
+          [ "$STRICT" = "true" ] && args+=(--strict)
+          if ! python3 "$DIAGRAMCTL" "${args[@]}"; then
+            failed=1
+          fi
+        done
+        python3 - "$out_dir" "$RULES" > "$out_dir/report.md" <<'PY'
+        import json, sys
+        from pathlib import Path
+
+        out_dir, rules = Path(sys.argv[1]), sys.argv[2]
+        rows, errors, warnings = [], 0, 0
+        for findings_file in sorted(out_dir.glob("*.findings.json")):
+            data = json.loads(findings_file.read_text(encoding="utf-8"))
+            errors += data.get("errors", 0)
+            warnings += data.get("warnings", 0)
+            for f in data.get("findings", []):
+                subject = f["subject"]
+                row = (
+                    f"| {findings_file.name.removesuffix('.findings.json')}"
+                    f" | {f['severity']} | {f['rule']}"
+                    f" | {subject} | {f['message']} |"
+                )
+                rows.append(row)
+        lines = ["## draw.io architecture test", ""]
+        if rules:
+            lines += [f"Policy: `{rules}`", ""]
+        models = len(list(out_dir.glob("*.findings.json")))
+        lines += [
+            f"**{errors} error(s), {warnings} warning(s)**"
+            f" across {models} model(s).",
+            "",
+        ]
+        if rows:
+            header = ["| Model | Severity | Rule | Subject | Message |",
+                      "| --- | --- | --- | --- | --- |"]
+            lines += header + rows
+        else:
+            lines.append("No findings — all architecture contracts hold.")
+        print("\n".join(lines))
+        PY
+        echo "failed=$failed" >> "$GITHUB_OUTPUT"
+
+    - name: Write job summary
+      if: inputs.summary == 'true'
+      shell: bash
+      run: cat _drawio-architecture-test/report.md >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Upload findings artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: drawio-architecture-test
+        path: _drawio-architecture-test
+
+    - name: Post/update sticky PR comment
+      if: inputs.post-comment == 'true' && github.event_name == 'pull_request'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        set -euo pipefail
+        marker="<!-- drawio-architecture-test-bot -->"
+        body_file="$(mktemp)"
+        printf '%s\n' "$marker" > "$body_file"
+        cat _drawio-architecture-test/report.md >> "$body_file"
+        pr_number="${{ github.event.pull_request.number }}"
+        existing_id=$(gh api \
+          "repos/${{ github.repository }}/issues/${pr_number}/comments" \
+          --paginate \
+          --jq ".[] | select(.body | startswith(\"$marker\")) | .id" | head -n1)
+        if [ -n "$existing_id" ]; then
+          gh api --method PATCH \
+            "repos/${{ github.repository }}/issues/comments/${existing_id}" \
+            -f body=@"$body_file"
+        else
+          gh pr comment "$pr_number" --body-file "$body_file"
+        fi
+
+    - name: Enforce gate
+      if: steps.run.outputs.failed == '1'
+      shell: bash
+      run: |
+        echo "Architecture contract violations found — see the report above."
+        exit 1

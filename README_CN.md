@@ -26,6 +26,7 @@
 - **Diagram-as-Test** —— 用 YAML/JSON 规则检查直连数据库、循环依赖、孤立节点、owner、生产可观测性、外部超时、信任边界协议与颜色对比度
 - **架构查询与体检** —— 查询任意组件/owner/边界/调用路径，发现单点连接、高耦合、缺失元数据，并生成 Markdown/JSON 审查报告
 - **What-if + Story Mode** —— 模拟节点故障传播并生成高亮图；发布键盘可用、带文本替代/来源信息/多语言切换的离线 HTML 讲解页
+- **内置 MCP 服务** —— `scripts/diagramctl_mcp.py` 把 9 个工具（`build/sync/views/architecture_test/review/query/whatif/story/doctor`）暴露给 Claude Desktop、Cursor、VS Code、Codex 等任何 MCP host；纯标准库、默认离线，无需 `mcp` 包
 - **统一 CLI** —— `doctor/build/sync/views/query/test/review/whatif/story/publish/transform` 串起全部能力，核心语义工作流仅需 Python 且默认离线
 - **11 种图表类型预设** —— ER 图、UML 类图、序列图、C4、架构图、ML/深度学习、流程图、SysML（BDD / IBD / 需求图 / 参数图）、BPMN、网络拓扑、跨职能泳道图
 - **Mermaid → 原生 .drawio**（draw.io ≥ 30）—— 28 种标准类型直接用 Mermaid 文本作图（**mindmap、gantt、timeline、journey、pie、sankey、kanban**……），CLI 原生转成已布局、可编辑的 `.drawio` —— 只管结构，布局白送
@@ -40,7 +41,8 @@
 - **迭代反馈循环** —— 最多 5 轮定向优化
 - **样式预设** —— 用 `.drawio` 文件或图片"教会"Skill 你的风格，命名保存后随时复用
 - **整洁布局** —— 网格对齐，间距随图表规模缩放，连线避开节点
-- **多智能体、无后台服务** —— 可移植的 Agent Skills 包，无需 MCP 或 daemon；核心语义工作流只需 Python，原生导出按需安装
+- **CI 就绪** —— 官方 `drawio-architecture-test` GitHub Action 在每个 PR 上强制执行架构契约，无需安装 draw.io/Xvfb/Graphviz；另有渲染 `.drawio` 的可视 PR diff action
+- **多智能体、无后台服务** —— 可移植的 Agent Skills 包，外加可选的 MCP server 供宿主集成（核心语义工作流只需 Python，原生导出按需安装）
 
 ## 🗺️ 功能全景
 
@@ -374,7 +376,7 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 
 | 功能 | drawio-skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp)（官方）<br>![stars](https://img.shields.io/github/stars/jgraph/drawio-mcp?style=flat-square&logo=github&v=2) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills)<br>![stars](https://img.shields.io/github/stars/bahayonghang/drawio-skills?style=flat-square&logo=github) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio)<br>![stars](https://img.shields.io/github/stars/GBSOSS/ai-drawio?style=flat-square&logo=github) |
 | ------ | ------ | ------ | ------ | ------ |
-| **方式** | 纯 SKILL.md | MCP 服务 / Claude Code 插件 / Project | YAML DSL + CLI（MCP 可选） | Claude Code 插件 |
+| **方式** | 纯 SKILL.md + 可选 MCP 服务 | MCP 服务 / Claude Code 插件 / Project | YAML DSL + CLI（MCP 可选） | Claude Code 插件 |
 | **依赖** | 仅 draw.io 桌面版 | draw.io 桌面版 | draw.io 桌面版（MCP 可选） | draw.io 插件 + 浏览器 |
 | **多智能体支持** | ✅ 6 个平台 | ⚠️ MCP 宿主（Claude、Cursor、VS Code） | ✅ Claude / Gemini / Codex | ❌ 仅 Claude Code |
 | **自检 + 自动修复** | ✅ 2 轮（读取 PNG） | ❌ | ✅ 校验 + 严格模式 | ❌ 仅截图 |
