@@ -5,6 +5,33 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `metadata.version` field in
 `skills/drawio-skill/SKILL.md`).
 
+## [3.2.0] — 2026-09-01
+
+### Added
+
+- **Semantic fidelity (v3.1 roadmap P0)** for code-backed diagrams:
+  - **Source-kind profiles**: `diagramctl.py build --from python|js|go|rust|pyclasses`
+    now labels source modules `module` / `library` / `command` from the file
+    name (package roots `__init__.py`/`lib.rs` = library, entrypoints
+    `__main__.py`/`main.rs`/`cli.py` = command) instead of a blanket
+    `service`. Source importers also record per-file `provenance` (resolved to
+    the real path), and Python edges carry the import statement line number.
+  - **Architecture contracts stop misfiring on source modules**: ownership
+    (`every-service-has-owner`) and observability
+    (`production-has-observability`) rules no longer fire on ordinary
+    `module`/`library`/`command` kinds.
+  - **Profile reporting**: `diagramctl test` now reports a `profile` field
+    (`code` vs `architecture`), so a CI gate can see what it is enforcing.
+  - **View fallback reporting**: `views`/`build --views` emit per-view
+    `fallback` / `fallback_reason` / `hint` when a projection had no metadata
+    and fell back to the whole model, instead of failing silently.
+
+### Changed
+
+- Tests: 171 → 174 (source-profile build, view-fallback metadata gap, profile
+  inference). Dogfood re-run against the repository's own toolbox now produces
+  `module` kinds and zero ownership/observability noise.
+
 ## [3.1.0] — 2026-09-01
 
 ### Added

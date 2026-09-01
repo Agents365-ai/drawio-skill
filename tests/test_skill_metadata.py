@@ -20,7 +20,7 @@ class TestSkillMetadata(unittest.TestCase):
         assert metadata_match is not None
         metadata = json.loads(metadata_match.group(1))
 
-        self.assertEqual("3.1.0", metadata.get("version"))
+        self.assertEqual("3.2.0", metadata.get("version"))
         self.assertEqual(
             "https://github.com/Agents365-ai/drawio-skill", metadata.get("homepage")
         )

@@ -9,6 +9,7 @@ importing the scripts directly; CLI/exit-code behaviour (validate, importers) is
 tested via subprocess against tiny temp fixtures. No Graphviz/draw.io needed —
 auto-layout is exercised through to_drawio() with synthetic node positions.
 """
+
 import base64
 import gzip
 import importlib.util
@@ -31,6 +32,7 @@ def load(name):
     """Import a bundled script module by file path."""
     path = os.path.join(SCRIPTS, name + ".py")
     spec = importlib.util.spec_from_file_location(name, path)
+    assert spec is not None and spec.loader is not None
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
@@ -38,15 +40,21 @@ def load(name):
 
 def run(script, *args, **kw):
     """Run a script as a subprocess; return CompletedProcess."""
-    return subprocess.run([sys.executable, os.path.join(SCRIPTS, script), *args],
-                          capture_output=True, text=True, **kw)
+    return subprocess.run(
+        [sys.executable, os.path.join(SCRIPTS, script), *args],
+        capture_output=True,
+        text=True,
+        **kw,
+    )
 
 
 class TestShapeSearch(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.m = load("shapesearch")
-        with gzip.open(os.path.join(DATA, "shape-index.json.gz"), "rt", encoding="utf-8") as f:
+        with gzip.open(
+            os.path.join(DATA, "shape-index.json.gz"), "rt", encoding="utf-8"
+        ) as f:
             cls.shapes = json.load(f)
         cls.tm = cls.m.build_tag_map(cls.shapes)
 
@@ -106,10 +114,16 @@ class TestAiIcons(unittest.TestCase):
 
     def test_variant_preference(self):
         # claude has a colour variant; openai is mono-only -> falls back.
-        self.assertEqual(self.m.pick_variant("claude", self.fam["claude"], "color"), "claude-color")
-        self.assertEqual(self.m.pick_variant("openai", self.fam["openai"], "color"), "openai")
-        self.assertEqual(self.m.pick_variant("googlecloud", self.fam["googlecloud"], "text"),
-                         "googlecloud-brand")
+        self.assertEqual(
+            self.m.pick_variant("claude", self.fam["claude"], "color"), "claude-color"
+        )
+        self.assertEqual(
+            self.m.pick_variant("openai", self.fam["openai"], "color"), "openai"
+        )
+        self.assertEqual(
+            self.m.pick_variant("googlecloud", self.fam["googlecloud"], "text"),
+            "googlecloud-brand",
+        )
 
     def test_remote_host_allowlist(self):
         self.assertEqual("https://unpkg.com/x", self.m.safe_url("https://unpkg.com/x"))
@@ -128,7 +142,9 @@ class TestEncodeUrl(unittest.TestCase):
     @staticmethod
     def decode(b64):
         # Reverse the encoder: inflate, then decodeURIComponent.
-        inflated = zlib.decompress(base64.b64decode(b64), -zlib.MAX_WBITS).decode("utf-8")
+        inflated = zlib.decompress(base64.b64decode(b64), -zlib.MAX_WBITS).decode(
+            "utf-8"
+        )
         return urllib.parse.unquote(inflated)
 
     def test_roundtrip_cjk_and_percent(self):
@@ -154,75 +170,109 @@ class TestAutolayoutColor(unittest.TestCase):
     def test_palette_from_design_file(self):
         # Sourced from styles/built-in/default.json, not the inline fallback.
         self.assertNotEqual(self.pal, self.m._FALLBACK_PALETTE)
-        self.assertEqual(self.pal[0], ("#dae8fc", "#6c8ebf"))   # primary
+        self.assertEqual(self.pal[0], ("#dae8fc", "#6c8ebf"))  # primary
 
     def _render(self, color):
-        graph = {"direction": "TB", "nodes": [
-            {"id": "a", "label": "A", "group": "mod1"},
-            {"id": "b", "label": "B", "group": "mod2"},
-            {"id": "c", "label": "C", "style": "fillColor=#ff0000;"},
-            {"id": "d", "label": "D"},
-        ], "edges": []}
+        graph = {
+            "direction": "TB",
+            "nodes": [
+                {"id": "a", "label": "A", "group": "mod1"},
+                {"id": "b", "label": "B", "group": "mod2"},
+                {"id": "c", "label": "C", "style": "fillColor=#ff0000;"},
+                {"id": "d", "label": "D"},
+            ],
+            "edges": [],
+        }
         pos = {"a": (1, 4), "b": (3, 4), "c": (5, 4), "d": (7, 4)}
         return self.m.to_drawio(graph, 5, pos, {}, color=color)
 
     def test_grouped_nodes_coloured(self):
         out = self._render(color=True)
-        self.assertIn("fillColor=#d5e8d4", out)   # b tinted by mod2 (success/green)
+        self.assertIn("fillColor=#d5e8d4", out)  # b tinted by mod2 (success/green)
         self.assertIn("strokeColor=#82b366", out)  # mod2 container border colour
-        self.assertIn("fillColor=#ff0000", out)    # explicit style preserved
+        self.assertIn("fillColor=#ff0000", out)  # explicit style preserved
 
     def test_mono_disables_colour(self):
         out = self._render(color=False)
         self.assertIn("strokeColor=#999999", out)  # grey container
         self.assertNotIn("fillColor=#d5e8d4", out)  # no group tint
-        self.assertIn("fillColor=#ff0000", out)     # explicit style still wins
+        self.assertIn("fillColor=#ff0000", out)  # explicit style still wins
 
     def test_graph_level_spacing(self):
         # Importers emitting icon nodes ask for extra separation (labels render
         # below the shape); the keys pass straight through to dot.
-        dot = self.m.build_dot({"nodes": [{"id": "a"}], "edges": [],
-                                "ranksep": 0.7, "nodesep": 0.6})
+        dot = self.m.build_dot(
+            {"nodes": [{"id": "a"}], "edges": [], "ranksep": 0.7, "nodesep": 0.6}
+        )
         self.assertIn("ranksep=0.70;", dot)
         self.assertIn("nodesep=0.60;", dot)
 
     def test_node_link_wraps_userobject(self):
         out = self.m.to_drawio(
-            {"direction": "TB",
-             "nodes": [{"id": "n", "label": "L", "link": "data:page/id,p2"}],
-             "edges": []}, 5, {"n": (1, 1)}, {}, color=True)
+            {
+                "direction": "TB",
+                "nodes": [{"id": "n", "label": "L", "link": "data:page/id,p2"}],
+                "edges": [],
+            },
+            5,
+            {"n": (1, 1)},
+            {},
+            color=True,
+        )
         self.assertIn('<UserObject label="L" link="data:page/id,p2" id="n">', out)
-        self.assertNotIn('value="L"', out)          # label moved to the wrapper
+        self.assertNotIn('value="L"', out)  # label moved to the wrapper
 
     def test_edge_style_passthrough(self):
         out = self.m.to_drawio(
-            {"direction": "TB",
-             "nodes": [{"id": "a"}, {"id": "b"}],
-             "edges": [{"source": "a", "target": "b", "style": "endArrow=ERone;"}]},
-            5, {"a": (1, 1), "b": (3, 1)}, {}, color=True)
+            {
+                "direction": "TB",
+                "nodes": [{"id": "a"}, {"id": "b"}],
+                "edges": [{"source": "a", "target": "b", "style": "endArrow=ERone;"}],
+            },
+            5,
+            {"a": (1, 1), "b": (3, 1)},
+            {},
+            color=True,
+        )
         self.assertIn("endArrow=ERone;", out)
 
     def test_label_newline_becomes_entity(self):
         out = self.m.to_drawio(
-            {"direction": "TB", "nodes": [{"id": "n", "label": "one\ntwo"}],
-             "edges": []}, 5, {"n": (1, 1)}, {}, color=True)
+            {
+                "direction": "TB",
+                "nodes": [{"id": "n", "label": "one\ntwo"}],
+                "edges": [],
+            },
+            5,
+            {"n": (1, 1)},
+            {},
+            color=True,
+        )
         self.assertIn("one&#xa;two", out)
 
     def test_escapes_special_chars(self):
         # Ids/edges with a quote or backslash must be escaped in the DOT input
         # (else they corrupt the Graphviz source); a style with a quote must be
         # XML-escaped in the emitted mxCell.
-        dot = self.m.build_dot({
-            "nodes": [{"id": 'a"x'}, {"id": "b\\y"}],
-            "edges": [{"source": 'a"x', "target": "b\\y"}],
-        })
+        dot = self.m.build_dot(
+            {
+                "nodes": [{"id": 'a"x'}, {"id": "b\\y"}],
+                "edges": [{"source": 'a"x', "target": "b\\y"}],
+            }
+        )
         self.assertIn(r'"a\"x"', dot)
         self.assertIn(r'"b\\y"', dot)
         out = self.m.to_drawio(
-            {"direction": "TB",
-             "nodes": [{"id": "n", "label": "L", "style": 'fillColor="#fff";'}],
-             "edges": []},
-            5, {"n": (1, 1)}, {}, color=True)
+            {
+                "direction": "TB",
+                "nodes": [{"id": "n", "label": "L", "style": 'fillColor="#fff";'}],
+                "edges": [],
+            },
+            5,
+            {"n": (1, 1)},
+            {},
+            color=True,
+        )
         self.assertIn("&quot;", out)
 
 
@@ -232,18 +282,27 @@ class TestBuiltinPresets(unittest.TestCase):
     def test_presets_conform(self):
         import glob
         import re
+
         hexpat = re.compile(r"^#[0-9A-Fa-f]{6}$")
         files = sorted(glob.glob(os.path.join(self.STYLES, "*.json")))
         names = {os.path.basename(f)[:-5] for f in files}
-        self.assertLessEqual({"default", "corporate", "handdrawn",
-                              "colorblind-safe", "dark"}, names)
+        self.assertLessEqual(
+            {"default", "corporate", "handdrawn", "colorblind-safe", "dark"}, names
+        )
         for f in files:
             with open(f, encoding="utf-8") as fh:
                 d = json.load(fh)
             self.assertEqual(d["name"], os.path.basename(f)[:-5])
-            self.assertFalse(d.get("default"), f)   # built-ins never default
-            for slot in ("primary", "success", "warning", "accent",
-                         "danger", "neutral", "secondary"):
+            self.assertFalse(d.get("default"), f)  # built-ins never default
+            for slot in (
+                "primary",
+                "success",
+                "warning",
+                "accent",
+                "danger",
+                "neutral",
+                "secondary",
+            ):
                 pair = d["palette"][slot]
                 if pair is not None:
                     self.assertRegex(pair["fillColor"], hexpat)
@@ -254,36 +313,42 @@ class TestBuiltinPresets(unittest.TestCase):
 
 
 class TestValidateCli(unittest.TestCase):
-    GOOD = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
-            '<mxCell id="0"/><mxCell id="1" parent="0"/>'
-            '<mxCell id="2" value="A" vertex="1" parent="1">'
-            '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
-            '<mxCell id="3" value="B" vertex="1" parent="1">'
-            '<mxGeometry x="200" y="0" width="80" height="40" as="geometry"/></mxCell>'
-            '<mxCell id="4" edge="1" parent="1" source="2" target="3">'
-            '<mxGeometry relative="1" as="geometry"/></mxCell>'
-            '</root></mxGraphModel></diagram></mxfile>')
-    BAD = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
-           '<mxCell id="0"/><mxCell id="1" parent="0"/>'
-           '<mxCell id="2" value="A" vertex="1" parent="1">'
-           '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
-           '<mxCell id="4" edge="1" parent="1" source="2" target="nope">'
-           '<mxGeometry relative="1" as="geometry"/></mxCell>'
-           '</root></mxGraphModel></diagram></mxfile>')
+    GOOD = (
+        '<mxfile><diagram name="P1"><mxGraphModel><root>'
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        '<mxCell id="2" value="A" vertex="1" parent="1">'
+        '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="3" value="B" vertex="1" parent="1">'
+        '<mxGeometry x="200" y="0" width="80" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="4" edge="1" parent="1" source="2" target="3">'
+        '<mxGeometry relative="1" as="geometry"/></mxCell>'
+        "</root></mxGraphModel></diagram></mxfile>"
+    )
+    BAD = (
+        '<mxfile><diagram name="P1"><mxGraphModel><root>'
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        '<mxCell id="2" value="A" vertex="1" parent="1">'
+        '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="4" edge="1" parent="1" source="2" target="nope">'
+        '<mxGeometry relative="1" as="geometry"/></mxCell>'
+        "</root></mxGraphModel></diagram></mxfile>"
+    )
     # Edge label: a relative-positioned vertex that legitimately omits width/height.
-    EDGE_LABEL = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
-                  '<mxCell id="0"/><mxCell id="1" parent="0"/>'
-                  '<mxCell id="2" value="A" vertex="1" parent="1">'
-                  '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
-                  '<mxCell id="3" value="B" vertex="1" parent="1">'
-                  '<mxGeometry x="200" y="0" width="80" height="40" as="geometry"/></mxCell>'
-                  '<mxCell id="4" edge="1" parent="1" source="2" target="3">'
-                  '<mxGeometry relative="1" as="geometry"/></mxCell>'
-                  '<mxCell id="5" value="lbl" style="edgeLabel;html=1;" vertex="1" '
-                  'connectable="0" parent="1">'
-                  '<mxGeometry x="0.5" y="0" relative="1" as="geometry">'
-                  '<mxPoint as="offset"/></mxGeometry></mxCell>'
-                  '</root></mxGraphModel></diagram></mxfile>')
+    EDGE_LABEL = (
+        '<mxfile><diagram name="P1"><mxGraphModel><root>'
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        '<mxCell id="2" value="A" vertex="1" parent="1">'
+        '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="3" value="B" vertex="1" parent="1">'
+        '<mxGeometry x="200" y="0" width="80" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="4" edge="1" parent="1" source="2" target="3">'
+        '<mxGeometry relative="1" as="geometry"/></mxCell>'
+        '<mxCell id="5" value="lbl" style="edgeLabel;html=1;" vertex="1" '
+        'connectable="0" parent="1">'
+        '<mxGeometry x="0.5" y="0" relative="1" as="geometry">'
+        '<mxPoint as="offset"/></mxGeometry></mxCell>'
+        "</root></mxGraphModel></diagram></mxfile>"
+    )
 
     def _check(self, xml):
         with tempfile.NamedTemporaryFile("w", suffix=".drawio", delete=False) as f:
@@ -311,6 +376,7 @@ class TestValidateCli(unittest.TestCase):
 
     def test_json_output(self):
         import json as _json
+
         with tempfile.NamedTemporaryFile("w", suffix=".drawio", delete=False) as f:
             f.write(self.BAD)
             path = f.name
@@ -327,17 +393,19 @@ class TestValidateCli(unittest.TestCase):
         self.assertIn("fix", finding)
 
     # A vertex wrapped in UserObject (link) — the edge references the wrapper id.
-    LINKED = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
-              '<mxCell id="0"/><mxCell id="1" parent="0"/>'
-              '<UserObject label="A" link="data:page/id,p2" id="2">'
-              '<mxCell vertex="1" parent="1">'
-              '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
-              '</UserObject>'
-              '<mxCell id="3" value="B" vertex="1" parent="1">'
-              '<mxGeometry x="200" y="0" width="80" height="40" as="geometry"/></mxCell>'
-              '<mxCell id="4" edge="1" parent="1" source="2" target="3">'
-              '<mxGeometry relative="1" as="geometry"/></mxCell>'
-              '</root></mxGraphModel></diagram></mxfile>')
+    LINKED = (
+        '<mxfile><diagram name="P1"><mxGraphModel><root>'
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        '<UserObject label="A" link="data:page/id,p2" id="2">'
+        '<mxCell vertex="1" parent="1">'
+        '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+        "</UserObject>"
+        '<mxCell id="3" value="B" vertex="1" parent="1">'
+        '<mxGeometry x="200" y="0" width="80" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="4" edge="1" parent="1" source="2" target="3">'
+        '<mxGeometry relative="1" as="geometry"/></mxCell>'
+        "</root></mxGraphModel></diagram></mxfile>"
+    )
 
     def test_userobject_wrapper_resolves(self):
         # The wrapper id must satisfy edge source refs (no dangling-edge error).
@@ -363,39 +431,42 @@ class TestValidateGeometry(unittest.TestCase):
     @staticmethod
     def _ids(xml):
         import xml.etree.ElementTree as ET
+
         root = ET.fromstring(xml)
         return {c.get("id"): c for c in root.iter("mxCell")}
 
     # --- pure-function unit tests ---
     def test_segments_cross(self):
         c = self.m.segments_cross
-        self.assertTrue(c((0, 0), (10, 10), (0, 10), (10, 0)))     # an X
-        self.assertFalse(c((0, 0), (10, 0), (0, 5), (10, 5)))      # parallel
-        self.assertFalse(c((0, 0), (10, 0), (10, 0), (10, 10)))    # touch at endpoint
+        self.assertTrue(c((0, 0), (10, 10), (0, 10), (10, 0)))  # an X
+        self.assertFalse(c((0, 0), (10, 0), (0, 5), (10, 5)))  # parallel
+        self.assertFalse(c((0, 0), (10, 0), (10, 0), (10, 10)))  # touch at endpoint
 
     def test_route_hits_rect(self):
         h = self.m.route_hits_rect
-        self.assertTrue(h([(0, 50), (100, 50)], (40, 40, 20, 20)))   # cuts through
-        self.assertFalse(h([(0, 0), (100, 0)], (40, 40, 20, 20)))    # clear of box
+        self.assertTrue(h([(0, 50), (100, 50)], (40, 40, 20, 20)))  # cuts through
+        self.assertFalse(h([(0, 0), (100, 0)], (40, 40, 20, 20)))  # clear of box
 
     def test_abs_rect_resolves_container_offset(self):
         ids = self._ids(
-            '<root>'
+            "<root>"
             '<mxCell id="c" vertex="1" parent="1">'
             '<mxGeometry x="100" y="100" width="200" height="200" as="geometry"/></mxCell>'
             '<mxCell id="ch" vertex="1" parent="c">'
             '<mxGeometry x="10" y="10" width="40" height="40" as="geometry"/></mxCell>'
-            '</root>')
+            "</root>"
+        )
         self.assertEqual(self.m.abs_rect(ids["ch"], ids), (110, 110, 40, 40))
 
     def test_endpoint_honours_exit_point(self):
         ids = self._ids(
-            '<root>'
+            "<root>"
             '<mxCell id="s" vertex="1" parent="1">'
             '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
             '<mxCell id="e" edge="1" parent="1" source="s" target="s" '
             'style="exitX=1;exitY=0.5;"><mxGeometry relative="1" as="geometry"/></mxCell>'
-            '</root>')
+            "</root>"
+        )
         self.assertEqual(self.m.endpoint(ids["e"], "source", ids), (80, 20))
 
     # --- CLI integration tests ---
@@ -409,43 +480,49 @@ class TestValidateGeometry(unittest.TestCase):
             os.unlink(path)
 
     # Two waypointed edges forming an X that crosses at (300,300).
-    CROSS = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
-             '<mxCell id="0"/><mxCell id="1" parent="0"/>'
-             '<mxCell id="n1" vertex="1" parent="1"><mxGeometry x="80" y="80" width="40" height="40" as="geometry"/></mxCell>'
-             '<mxCell id="n2" vertex="1" parent="1"><mxGeometry x="80" y="480" width="40" height="40" as="geometry"/></mxCell>'
-             '<mxCell id="n3" vertex="1" parent="1"><mxGeometry x="480" y="80" width="40" height="40" as="geometry"/></mxCell>'
-             '<mxCell id="n4" vertex="1" parent="1"><mxGeometry x="480" y="480" width="40" height="40" as="geometry"/></mxCell>'
-             '<mxCell id="e1" edge="1" parent="1" source="n1" target="n4"><mxGeometry relative="1" as="geometry">'
-             '<Array as="points"><mxPoint x="200" y="200"/></Array></mxGeometry></mxCell>'
-             '<mxCell id="e2" edge="1" parent="1" source="n2" target="n3"><mxGeometry relative="1" as="geometry">'
-             '<Array as="points"><mxPoint x="200" y="400"/></Array></mxGeometry></mxCell>'
-             '</root></mxGraphModel></diagram></mxfile>')
+    CROSS = (
+        '<mxfile><diagram name="P1"><mxGraphModel><root>'
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        '<mxCell id="n1" vertex="1" parent="1"><mxGeometry x="80" y="80" width="40" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="n2" vertex="1" parent="1"><mxGeometry x="80" y="480" width="40" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="n3" vertex="1" parent="1"><mxGeometry x="480" y="80" width="40" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="n4" vertex="1" parent="1"><mxGeometry x="480" y="480" width="40" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="e1" edge="1" parent="1" source="n1" target="n4"><mxGeometry relative="1" as="geometry">'
+        '<Array as="points"><mxPoint x="200" y="200"/></Array></mxGeometry></mxCell>'
+        '<mxCell id="e2" edge="1" parent="1" source="n2" target="n3"><mxGeometry relative="1" as="geometry">'
+        '<Array as="points"><mxPoint x="200" y="400"/></Array></mxGeometry></mxCell>'
+        "</root></mxGraphModel></diagram></mxfile>"
+    )
 
     # A waypointed edge whose route passes straight through obstacle vertex 'v'.
-    THROUGH = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
-               '<mxCell id="0"/><mxCell id="1" parent="0"/>'
-               '<mxCell id="n1" vertex="1" parent="1"><mxGeometry x="80" y="80" width="40" height="40" as="geometry"/></mxCell>'
-               '<mxCell id="n2" vertex="1" parent="1"><mxGeometry x="480" y="80" width="40" height="40" as="geometry"/></mxCell>'
-               '<mxCell id="v" vertex="1" parent="1"><mxGeometry x="280" y="80" width="40" height="40" as="geometry"/></mxCell>'
-               '<mxCell id="e" edge="1" parent="1" source="n1" target="n2"><mxGeometry relative="1" as="geometry">'
-               '<Array as="points"><mxPoint x="300" y="100"/></Array></mxGeometry></mxCell>'
-               '</root></mxGraphModel></diagram></mxfile>')
+    THROUGH = (
+        '<mxfile><diagram name="P1"><mxGraphModel><root>'
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        '<mxCell id="n1" vertex="1" parent="1"><mxGeometry x="80" y="80" width="40" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="n2" vertex="1" parent="1"><mxGeometry x="480" y="80" width="40" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="v" vertex="1" parent="1"><mxGeometry x="280" y="80" width="40" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="e" edge="1" parent="1" source="n1" target="n2"><mxGeometry relative="1" as="geometry">'
+        '<Array as="points"><mxPoint x="300" y="100"/></Array></mxGeometry></mxCell>'
+        "</root></mxGraphModel></diagram></mxfile>"
+    )
 
     # Same geometry as THROUGH but the edge has NO waypoints — auto-routed, so
     # its path is unknown and must NOT be geometry-checked (no false positive).
-    AUTOROUTE = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
-                 '<mxCell id="0"/><mxCell id="1" parent="0"/>'
-                 '<mxCell id="n1" vertex="1" parent="1"><mxGeometry x="80" y="80" width="40" height="40" as="geometry"/></mxCell>'
-                 '<mxCell id="n2" vertex="1" parent="1"><mxGeometry x="480" y="80" width="40" height="40" as="geometry"/></mxCell>'
-                 '<mxCell id="v" vertex="1" parent="1"><mxGeometry x="280" y="80" width="40" height="40" as="geometry"/></mxCell>'
-                 '<mxCell id="e" edge="1" parent="1" source="n1" target="n2">'
-                 '<mxGeometry relative="1" as="geometry"/></mxCell>'
-                 '</root></mxGraphModel></diagram></mxfile>')
+    AUTOROUTE = (
+        '<mxfile><diagram name="P1"><mxGraphModel><root>'
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        '<mxCell id="n1" vertex="1" parent="1"><mxGeometry x="80" y="80" width="40" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="n2" vertex="1" parent="1"><mxGeometry x="480" y="80" width="40" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="v" vertex="1" parent="1"><mxGeometry x="280" y="80" width="40" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="e" edge="1" parent="1" source="n1" target="n2">'
+        '<mxGeometry relative="1" as="geometry"/></mxCell>'
+        "</root></mxGraphModel></diagram></mxfile>"
+    )
 
     def test_edge_crossing_warns(self):
         r = self._check(self.CROSS)
         self.assertIn("edges 'e1' and 'e2' cross", r.stdout)
-        self.assertEqual(r.returncode, 0)            # warning, not error
+        self.assertEqual(r.returncode, 0)  # warning, not error
 
     def test_edge_crossing_strict_fails(self):
         with tempfile.NamedTemporaryFile("w", suffix=".drawio", delete=False) as f:
@@ -481,7 +558,21 @@ class TestImportersCli(unittest.TestCase):
             graph = json.loads(r.stdout)
             ids = {n["id"] for n in graph["nodes"]}
             self.assertEqual(ids, {"a", "b"})
-            self.assertIn({"source": "a", "target": "b"}, graph["edges"])
+            self.assertEqual(
+                graph["edges"],
+                [
+                    {
+                        "source": "a",
+                        "target": "b",
+                        "provenance": {"path": "a.py", "line": 1},
+                    }
+                ],
+            )
+            # Per-node file provenance (relative to the scanned project dir).
+            self.assertEqual(
+                {n["id"]: n["provenance"]["path"] for n in graph["nodes"]},
+                {"a": "a.py", "b": "b.py"},
+            )
 
     def test_pyclasses_inheritance(self):
         with tempfile.TemporaryDirectory() as d:
@@ -512,8 +603,10 @@ class TestImportersCli(unittest.TestCase):
             self._write(os.path.join(d, "go.mod"), "module example.com/m\n\ngo 1.21\n")
             os.mkdir(os.path.join(d, "a"))
             os.mkdir(os.path.join(d, "b"))
-            self._write(os.path.join(d, "a", "a.go"),
-                        'package a\n\nimport _ "example.com/m/b"\n')
+            self._write(
+                os.path.join(d, "a", "a.go"),
+                'package a\n\nimport _ "example.com/m/b"\n',
+            )
             self._write(os.path.join(d, "b", "b.go"), "package b\n")
             r = run("goimports.py", d)
             graph = json.loads(r.stdout)
@@ -521,52 +614,81 @@ class TestImportersCli(unittest.TestCase):
             self.assertEqual(len(graph["nodes"]), 2)
             self.assertEqual(ids, {"example.com/m/a", "example.com/m/b"})
             self.assertEqual(len(graph["edges"]), 1)
-            self.assertEqual(graph["edges"][0],
-                             {"source": "example.com/m/a", "target": "example.com/m/b"})
+            self.assertEqual(
+                graph["edges"][0],
+                {"source": "example.com/m/a", "target": "example.com/m/b"},
+            )
 
     def test_tfimports_edge_and_icons(self):
         # Node ids are type.name; the lambda resolves to an official aws4 icon
         # and the referenced role becomes an edge.
         with tempfile.TemporaryDirectory() as d:
-            self._write(os.path.join(d, "main.tf"),
-                        'resource "aws_lambda_function" "fn" {\n'
-                        '  role = aws_iam_role.exec.arn  # comment\n'
-                        '}\n'
-                        'resource "aws_iam_role" "exec" {\n'
-                        '  name = "exec"\n'
-                        '}\n')
+            self._write(
+                os.path.join(d, "main.tf"),
+                'resource "aws_lambda_function" "fn" {\n'
+                "  role = aws_iam_role.exec.arn  # comment\n"
+                "}\n"
+                'resource "aws_iam_role" "exec" {\n'
+                '  name = "exec"\n'
+                "}\n",
+            )
             r = run("tfimports.py", d, "--no-reduce")
             graph = json.loads(r.stdout)
             ids = {n["id"] for n in graph["nodes"]}
             self.assertEqual(ids, {"aws_lambda_function.fn", "aws_iam_role.exec"})
-            self.assertEqual(graph["edges"], [{"source": "aws_lambda_function.fn",
-                                               "target": "aws_iam_role.exec"}])
+            self.assertEqual(
+                graph["edges"],
+                [{"source": "aws_lambda_function.fn", "target": "aws_iam_role.exec"}],
+            )
             fn = next(n for n in graph["nodes"] if n["id"] == "aws_lambda_function.fn")
             self.assertIn("mxgraph.aws4", fn["style"])
-            self.assertEqual(graph["ranksep"], 0.7)   # icon labels need spacing
+            self.assertEqual(graph["ranksep"], 0.7)  # icon labels need spacing
 
     def test_tfimports_no_icons(self):
         # Without icons the type stays visible on the box (two-line label).
         with tempfile.TemporaryDirectory() as d:
-            self._write(os.path.join(d, "main.tf"),
-                        'resource "aws_s3_bucket" "logs" {}\n')
+            self._write(
+                os.path.join(d, "main.tf"), 'resource "aws_s3_bucket" "logs" {}\n'
+            )
             graph = json.loads(run("tfimports.py", d, "--no-icons").stdout)
             self.assertEqual(graph["nodes"][0]["label"], "logs\naws_s3_bucket")
             self.assertNotIn("style", graph["nodes"][0])
 
-    K8S_LIST = {"kind": "List", "items": [
-        {"apiVersion": "v1", "kind": "Service",
-         "metadata": {"name": "web", "namespace": "shop"},
-         "spec": {"selector": {"app": "web"}}},
-        {"apiVersion": "apps/v1", "kind": "Deployment",
-         "metadata": {"name": "web", "namespace": "shop"},
-         "spec": {"template": {"metadata": {"labels": {"app": "web", "tier": "fe"}},
-                  "spec": {"containers": [
-                      {"name": "web", "image": "nginx",
-                       "envFrom": [{"configMapRef": {"name": "cfg"}}]}]}}}},
-        {"apiVersion": "v1", "kind": "ConfigMap",
-         "metadata": {"name": "cfg", "namespace": "shop"}},
-    ]}
+    K8S_LIST = {
+        "kind": "List",
+        "items": [
+            {
+                "apiVersion": "v1",
+                "kind": "Service",
+                "metadata": {"name": "web", "namespace": "shop"},
+                "spec": {"selector": {"app": "web"}},
+            },
+            {
+                "apiVersion": "apps/v1",
+                "kind": "Deployment",
+                "metadata": {"name": "web", "namespace": "shop"},
+                "spec": {
+                    "template": {
+                        "metadata": {"labels": {"app": "web", "tier": "fe"}},
+                        "spec": {
+                            "containers": [
+                                {
+                                    "name": "web",
+                                    "image": "nginx",
+                                    "envFrom": [{"configMapRef": {"name": "cfg"}}],
+                                }
+                            ]
+                        },
+                    }
+                },
+            },
+            {
+                "apiVersion": "v1",
+                "kind": "ConfigMap",
+                "metadata": {"name": "cfg", "namespace": "shop"},
+            },
+        ],
+    }
 
     def test_k8simports_json(self):
         # JSON input needs no PyYAML; selector match and configMap ref -> edges.
@@ -574,11 +696,17 @@ class TestImportersCli(unittest.TestCase):
             self._write(os.path.join(d, "all.json"), json.dumps(self.K8S_LIST))
             graph = json.loads(run("k8simports.py", d).stdout)
             ids = {n["id"] for n in graph["nodes"]}
-            self.assertEqual(ids, {"shop/Service/web", "shop/Deployment/web",
-                                   "shop/ConfigMap/cfg"})
+            self.assertEqual(
+                ids, {"shop/Service/web", "shop/Deployment/web", "shop/ConfigMap/cfg"}
+            )
             edges = {(e["source"], e["target"]) for e in graph["edges"]}
-            self.assertEqual(edges, {("shop/Service/web", "shop/Deployment/web"),
-                                     ("shop/Deployment/web", "shop/ConfigMap/cfg")})
+            self.assertEqual(
+                edges,
+                {
+                    ("shop/Service/web", "shop/Deployment/web"),
+                    ("shop/Deployment/web", "shop/ConfigMap/cfg"),
+                },
+            )
             svc = next(n for n in graph["nodes"] if n["id"] == "shop/Service/web")
             self.assertIn("mxgraph.kubernetes", svc["style"])
 
@@ -593,11 +721,13 @@ class TestImportersCli(unittest.TestCase):
             import yaml  # noqa: F401
         except ImportError:
             self.skipTest("PyYAML not installed")
-        compose = ("services:\n"
-                   "  api:\n    image: api:1\n    depends_on: [db]\n"
-                   "    volumes: ['uploads:/data', './src:/app']\n"
-                   "  db:\n    image: postgres:16\n"
-                   "volumes:\n  uploads:\n")
+        compose = (
+            "services:\n"
+            "  api:\n    image: api:1\n    depends_on: [db]\n"
+            "    volumes: ['uploads:/data', './src:/app']\n"
+            "  db:\n    image: postgres:16\n"
+            "volumes:\n  uploads:\n"
+        )
         with tempfile.TemporaryDirectory() as d:
             self._write(os.path.join(d, "docker-compose.yml"), compose)
             graph = json.loads(run("composeimports.py", d).stdout)
@@ -610,96 +740,199 @@ class TestImportersCli(unittest.TestCase):
             self.assertEqual(api["label"], "api\napi:1")
 
     DOCKER = [
-        {"Id": "a1", "Name": "/shop-web-1",
-         "Config": {"Image": "nginx:1.27", "Labels": {
-             "com.docker.compose.project": "shop", "com.docker.compose.service": "web",
-             "com.docker.compose.depends_on": "db:service_healthy:false"}},
-         "NetworkSettings": {"Networks": {"shop_net": {}, "bridge": {}}}, "Mounts": []},
-        {"Id": "a2", "Name": "/shop-db-1",
-         "Config": {"Image": "postgres:16", "Labels": {
-             "com.docker.compose.project": "shop", "com.docker.compose.service": "db"}},
-         "NetworkSettings": {"Networks": {"shop_net": {}}},
-         "Mounts": [{"Type": "volume", "Name": "pgdata", "Destination": "/data"},
-                    {"Type": "bind", "Source": "/etc/hosts", "Destination": "/etc/hosts"}]},
+        {
+            "Id": "a1",
+            "Name": "/shop-web-1",
+            "Config": {
+                "Image": "nginx:1.27",
+                "Labels": {
+                    "com.docker.compose.project": "shop",
+                    "com.docker.compose.service": "web",
+                    "com.docker.compose.depends_on": "db:service_healthy:false",
+                },
+            },
+            "NetworkSettings": {"Networks": {"shop_net": {}, "bridge": {}}},
+            "Mounts": [],
+        },
+        {
+            "Id": "a2",
+            "Name": "/shop-db-1",
+            "Config": {
+                "Image": "postgres:16",
+                "Labels": {
+                    "com.docker.compose.project": "shop",
+                    "com.docker.compose.service": "db",
+                },
+            },
+            "NetworkSettings": {"Networks": {"shop_net": {}}},
+            "Mounts": [
+                {"Type": "volume", "Name": "pgdata", "Destination": "/data"},
+                {"Type": "bind", "Source": "/etc/hosts", "Destination": "/etc/hosts"},
+            ],
+        },
     ]
 
     def test_dockerimports_live(self):
         # `docker inspect` array on stdin (-): depends_on resolves service->container;
         # built-in `bridge` network and the bind mount are dropped as noise.
-        graph = json.loads(run("dockerimports.py", "-",
-                               input=json.dumps(self.DOCKER)).stdout)
+        graph = json.loads(
+            run("dockerimports.py", "-", input=json.dumps(self.DOCKER)).stdout
+        )
         ids = {n["id"] for n in graph["nodes"]}
         self.assertEqual(ids, {"shop-web-1", "shop-db-1", "net:shop_net", "vol:pgdata"})
         edges = {(e["source"], e["target"]) for e in graph["edges"]}
-        self.assertEqual(edges, {("shop-web-1", "shop-db-1"),
-                                 ("shop-web-1", "net:shop_net"),
-                                 ("shop-db-1", "net:shop_net"),
-                                 ("shop-db-1", "vol:pgdata")})
+        self.assertEqual(
+            edges,
+            {
+                ("shop-web-1", "shop-db-1"),
+                ("shop-web-1", "net:shop_net"),
+                ("shop-db-1", "net:shop_net"),
+                ("shop-db-1", "vol:pgdata"),
+            },
+        )
         web = next(n for n in graph["nodes"] if n["id"] == "shop-web-1")
         self.assertEqual(web["label"], "shop-web-1\nnginx:1.27")
 
     def test_dockerimports_group_by_project(self):
-        graph = json.loads(run("dockerimports.py", "-", "--group",
-                               input=json.dumps(self.DOCKER)).stdout)
-        containers = [n for n in graph["nodes"] if not n["id"].startswith(("net:", "vol:"))]
+        graph = json.loads(
+            run(
+                "dockerimports.py", "-", "--group", input=json.dumps(self.DOCKER)
+            ).stdout
+        )
+        containers = [
+            n for n in graph["nodes"] if not n["id"].startswith(("net:", "vol:"))
+        ]
         self.assertTrue(all(n["group"] == "shop" for n in containers))
 
-    TFSTATE = {"format_version": "1.0", "values": {"root_module": {
-        "resources": [
-            {"address": "aws_instance.web", "mode": "managed", "type": "aws_instance",
-             "name": "web", "depends_on": ["aws_security_group.web"], "values": {}},
-            {"address": "aws_security_group.web", "mode": "managed",
-             "type": "aws_security_group", "name": "web", "values": {}},
-            {"address": "data.aws_ami.x", "mode": "data", "type": "aws_ami",
-             "name": "x", "values": {}}],
-        "child_modules": [{"address": "module.vpc", "resources": [
-            {"address": "module.vpc.aws_subnet.p[0]", "mode": "managed",
-             "type": "aws_subnet", "name": "p", "index": 0, "values": {}},
-            {"address": "module.vpc.aws_subnet.p[1]", "mode": "managed",
-             "type": "aws_subnet", "name": "p", "index": 1, "values": {}}]}]}}}
+    TFSTATE = {
+        "format_version": "1.0",
+        "values": {
+            "root_module": {
+                "resources": [
+                    {
+                        "address": "aws_instance.web",
+                        "mode": "managed",
+                        "type": "aws_instance",
+                        "name": "web",
+                        "depends_on": ["aws_security_group.web"],
+                        "values": {},
+                    },
+                    {
+                        "address": "aws_security_group.web",
+                        "mode": "managed",
+                        "type": "aws_security_group",
+                        "name": "web",
+                        "values": {},
+                    },
+                    {
+                        "address": "data.aws_ami.x",
+                        "mode": "data",
+                        "type": "aws_ami",
+                        "name": "x",
+                        "values": {},
+                    },
+                ],
+                "child_modules": [
+                    {
+                        "address": "module.vpc",
+                        "resources": [
+                            {
+                                "address": "module.vpc.aws_subnet.p[0]",
+                                "mode": "managed",
+                                "type": "aws_subnet",
+                                "name": "p",
+                                "index": 0,
+                                "values": {},
+                            },
+                            {
+                                "address": "module.vpc.aws_subnet.p[1]",
+                                "mode": "managed",
+                                "type": "aws_subnet",
+                                "name": "p",
+                                "index": 1,
+                                "values": {},
+                            },
+                        ],
+                    }
+                ],
+            }
+        },
+    }
 
     def test_tfstate_live(self):
         # `terraform show -json` on stdin: data sources excluded, depends_on edge,
         # count instances expanded, aws_instance -> official icon, module grouping.
-        graph = json.loads(run("tfstate.py", "-", "--group", "--no-reduce",
-                               input=json.dumps(self.TFSTATE)).stdout)
+        graph = json.loads(
+            run(
+                "tfstate.py",
+                "-",
+                "--group",
+                "--no-reduce",
+                input=json.dumps(self.TFSTATE),
+            ).stdout
+        )
         ids = {n["id"] for n in graph["nodes"]}
-        self.assertEqual(ids, {"aws_instance.web", "aws_security_group.web",
-                               "module.vpc.aws_subnet.p[0]", "module.vpc.aws_subnet.p[1]"})
-        self.assertEqual(graph["edges"],
-                         [{"source": "aws_instance.web", "target": "aws_security_group.web"}])
+        self.assertEqual(
+            ids,
+            {
+                "aws_instance.web",
+                "aws_security_group.web",
+                "module.vpc.aws_subnet.p[0]",
+                "module.vpc.aws_subnet.p[1]",
+            },
+        )
+        self.assertEqual(
+            graph["edges"],
+            [{"source": "aws_instance.web", "target": "aws_security_group.web"}],
+        )
         ec2 = next(n for n in graph["nodes"] if n["id"] == "aws_instance.web")
         self.assertIn("mxgraph.aws4", ec2["style"])
         sub = next(n for n in graph["nodes"] if n["id"].endswith("p[0]"))
-        self.assertEqual(sub["label"], "p[0]\naws_subnet")   # no icon -> type on box
+        self.assertEqual(sub["label"], "p[0]\naws_subnet")  # no icon -> type on box
         self.assertEqual(sub["group"], "module.vpc")
 
     def test_k8simports_stdin(self):
         # `kubectl get ... -o json | k8simports.py -` reads the live snapshot.
-        graph = json.loads(run("k8simports.py", "-",
-                               input=json.dumps(self.K8S_LIST)).stdout)
-        self.assertEqual({n["id"] for n in graph["nodes"]},
-                         {"shop/Service/web", "shop/Deployment/web", "shop/ConfigMap/cfg"})
+        graph = json.loads(
+            run("k8simports.py", "-", input=json.dumps(self.K8S_LIST)).stdout
+        )
+        self.assertEqual(
+            {n["id"] for n in graph["nodes"]},
+            {"shop/Service/web", "shop/Deployment/web", "shop/ConfigMap/cfg"},
+        )
 
     @staticmethod
     def _drawio(nodes, edges):
         """Minimal .drawio XML from (id, label) nodes and (src, tgt) edges."""
         cells = ['<mxCell id="0"/>', '<mxCell id="1" parent="0"/>']
         for i, (cid, label) in enumerate(nodes):
-            cells.append(f'<mxCell id="{cid}" value="{label}" vertex="1" parent="1" '
-                         f'style="rounded=1;"><mxGeometry x="{i*200}" y="0" '
-                         'width="120" height="60" as="geometry"/></mxCell>')
+            cells.append(
+                f'<mxCell id="{cid}" value="{label}" vertex="1" parent="1" '
+                f'style="rounded=1;"><mxGeometry x="{i * 200}" y="0" '
+                'width="120" height="60" as="geometry"/></mxCell>'
+            )
         for i, (s, t) in enumerate(edges):
-            cells.append(f'<mxCell id="e{i}" edge="1" parent="1" source="{s}" '
-                         'target="{}"><mxGeometry relative="1" as="geometry"/></mxCell>'.format(t))
-        return ('<mxfile><diagram name="P"><mxGraphModel><root>'
-                + "".join(cells) + "</root></mxGraphModel></diagram></mxfile>")
+            cells.append(
+                f'<mxCell id="e{i}" edge="1" parent="1" source="{s}" '
+                'target="{}"><mxGeometry relative="1" as="geometry"/></mxCell>'.format(
+                    t
+                )
+            )
+        return (
+            '<mxfile><diagram name="P"><mxGraphModel><root>'
+            + "".join(cells)
+            + "</root></mxGraphModel></diagram></mxfile>"
+        )
 
     @staticmethod
     def _status(style):
-        for tag, hue in (("added", "82b366"), ("removed", "b85450"),
-                         ("changed", "d79b00"), ("moved", "9673a6"),
-                         ("same", "999999")):
+        for tag, hue in (
+            ("added", "82b366"),
+            ("removed", "b85450"),
+            ("changed", "d79b00"),
+            ("moved", "9673a6"),
+            ("same", "999999"),
+        ):
             if hue in style:
                 return tag
         return "?"
@@ -708,21 +941,31 @@ class TestImportersCli(unittest.TestCase):
         # api label moves (changed), cache removed, worker added, db unchanged.
         # The (api, worker) edge re-points (api, cache) — source kept, old target
         # removed, new target added — so it is orange "rerouted", not green.
-        old = self._drawio([("api", "api v1"), ("db", "db"), ("cache", "cache")],
-                           [("api", "db"), ("api", "cache")])
-        new = self._drawio([("api", "api v2"), ("db", "db"), ("worker", "worker")],
-                           [("api", "db"), ("api", "worker")])
+        old = self._drawio(
+            [("api", "api v1"), ("db", "db"), ("cache", "cache")],
+            [("api", "db"), ("api", "cache")],
+        )
+        new = self._drawio(
+            [("api", "api v2"), ("db", "db"), ("worker", "worker")],
+            [("api", "db"), ("api", "worker")],
+        )
         with tempfile.TemporaryDirectory() as d:
             self._write(os.path.join(d, "old.drawio"), old)
             self._write(os.path.join(d, "new.drawio"), new)
-            graph = json.loads(run("drawiodiff.py", os.path.join(d, "old.drawio"),
-                                   os.path.join(d, "new.drawio")).stdout)
+            graph = json.loads(
+                run(
+                    "drawiodiff.py",
+                    os.path.join(d, "old.drawio"),
+                    os.path.join(d, "new.drawio"),
+                ).stdout
+            )
             status = {n["id"]: self._status(n["style"]) for n in graph["nodes"]}
-            self.assertEqual(status, {"api": "changed", "db": "same",
-                                      "cache": "removed", "worker": "added"})
-            estatus = {(e["source"], e["target"]): e["style"]
-                       for e in graph["edges"]}
-            self.assertIn("999999", estatus[("api", "db")])    # same
+            self.assertEqual(
+                status,
+                {"api": "changed", "db": "same", "cache": "removed", "worker": "added"},
+            )
+            estatus = {(e["source"], e["target"]): e["style"] for e in graph["edges"]}
+            self.assertIn("999999", estatus[("api", "db")])  # same
             self.assertIn("b85450", estatus[("api", "cache")])  # removed
             self.assertIn("d79b00", estatus[("api", "worker")])  # rerouted
 
@@ -731,14 +974,23 @@ class TestImportersCli(unittest.TestCase):
         """.drawio XML from (id, label, x, y) nodes and (src, tgt) edges."""
         cells = ['<mxCell id="0"/>', '<mxCell id="1" parent="0"/>']
         for cid, label, x, y in nodes:
-            cells.append(f'<mxCell id="{cid}" value="{label}" vertex="1" parent="1" '
-                         f'style="rounded=1;"><mxGeometry x="{x}" y="{y}" '
-                         'width="120" height="60" as="geometry"/></mxCell>')
+            cells.append(
+                f'<mxCell id="{cid}" value="{label}" vertex="1" parent="1" '
+                f'style="rounded=1;"><mxGeometry x="{x}" y="{y}" '
+                'width="120" height="60" as="geometry"/></mxCell>'
+            )
         for i, (s, t) in enumerate(edges):
-            cells.append(f'<mxCell id="e{i}" edge="1" parent="1" source="{s}" '
-                         'target="{}"><mxGeometry relative="1" as="geometry"/></mxCell>'.format(t))
-        return ('<mxfile><diagram name="P"><mxGraphModel><root>'
-                + "".join(cells) + "</root></mxGraphModel></diagram></mxfile>")
+            cells.append(
+                f'<mxCell id="e{i}" edge="1" parent="1" source="{s}" '
+                'target="{}"><mxGeometry relative="1" as="geometry"/></mxCell>'.format(
+                    t
+                )
+            )
+        return (
+            '<mxfile><diagram name="P"><mxGraphModel><root>'
+            + "".join(cells)
+            + "</root></mxGraphModel></diagram></mxfile>"
+        )
 
     def test_drawiodiff_moved(self):
         # Same label, same id, new coordinates -> violet "moved" (selectively).
@@ -747,22 +999,35 @@ class TestImportersCli(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             self._write(os.path.join(d, "old.drawio"), old)
             self._write(os.path.join(d, "new.drawio"), new)
-            graph = json.loads(run("drawiodiff.py", os.path.join(d, "old.drawio"),
-                                   os.path.join(d, "new.drawio")).stdout)
+            graph = json.loads(
+                run(
+                    "drawiodiff.py",
+                    os.path.join(d, "old.drawio"),
+                    os.path.join(d, "new.drawio"),
+                ).stdout
+            )
             status = {n["id"]: self._status(n["style"]) for n in graph["nodes"]}
             self.assertEqual(status, {"a": "same", "b": "moved"})
 
     def test_drawiodiff_relayout_is_not_movement(self):
         # Every matched node changed position -> the files come from different
         # layout runs; movement is layout noise, so all nodes stay "same".
-        old = self._drawio_pos([("a", "a", 0, 0), ("b", "b", 200, 0), ("c", "c", 400, 0)], [])
-        new = self._drawio_pos([("a", "a", 100, 100), ("b", "b", 300, 100),
-                                ("c", "c", 500, 100)], [])
+        old = self._drawio_pos(
+            [("a", "a", 0, 0), ("b", "b", 200, 0), ("c", "c", 400, 0)], []
+        )
+        new = self._drawio_pos(
+            [("a", "a", 100, 100), ("b", "b", 300, 100), ("c", "c", 500, 100)], []
+        )
         with tempfile.TemporaryDirectory() as d:
             self._write(os.path.join(d, "old.drawio"), old)
             self._write(os.path.join(d, "new.drawio"), new)
-            graph = json.loads(run("drawiodiff.py", os.path.join(d, "old.drawio"),
-                                   os.path.join(d, "new.drawio")).stdout)
+            graph = json.loads(
+                run(
+                    "drawiodiff.py",
+                    os.path.join(d, "old.drawio"),
+                    os.path.join(d, "new.drawio"),
+                ).stdout
+            )
             status = {n["id"]: self._status(n["style"]) for n in graph["nodes"]}
             self.assertEqual(status, {"a": "same", "b": "same", "c": "same"})
 
@@ -774,11 +1039,17 @@ class TestImportersCli(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             self._write(os.path.join(d, "old.drawio"), old)
             self._write(os.path.join(d, "new.drawio"), new)
-            graph = json.loads(run("drawiodiff.py", os.path.join(d, "old.drawio"),
-                                   os.path.join(d, "new.drawio")).stdout)
+            graph = json.loads(
+                run(
+                    "drawiodiff.py",
+                    os.path.join(d, "old.drawio"),
+                    os.path.join(d, "new.drawio"),
+                ).stdout
+            )
             self.assertEqual(len(graph["edges"]), 1)
-            self.assertEqual((graph["edges"][0]["source"], graph["edges"][0]["target"]),
-                             ("b", "a"))
+            self.assertEqual(
+                (graph["edges"][0]["source"], graph["edges"][0]["target"]), ("b", "a")
+            )
             self.assertIn("d79b00", graph["edges"][0]["style"])  # rerouted
 
     def test_drawiodiff_by_label(self):
@@ -788,34 +1059,47 @@ class TestImportersCli(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             self._write(os.path.join(d, "old.drawio"), old)
             self._write(os.path.join(d, "new.drawio"), new)
-            base = run("drawiodiff.py", os.path.join(d, "old.drawio"),
-                       os.path.join(d, "new.drawio"))
+            base = run(
+                "drawiodiff.py",
+                os.path.join(d, "old.drawio"),
+                os.path.join(d, "new.drawio"),
+            )
             # Without --by-label the random ids make everything add/remove.
-            self.assertNotIn("same", {self._status(n["style"])
-                                      for n in json.loads(base.stdout)["nodes"]})
-            graph = json.loads(run("drawiodiff.py", os.path.join(d, "old.drawio"),
-                                   os.path.join(d, "new.drawio"), "--by-label").stdout)
+            self.assertNotIn(
+                "same",
+                {self._status(n["style"]) for n in json.loads(base.stdout)["nodes"]},
+            )
+            graph = json.loads(
+                run(
+                    "drawiodiff.py",
+                    os.path.join(d, "old.drawio"),
+                    os.path.join(d, "new.drawio"),
+                    "--by-label",
+                ).stdout
+            )
             status = {n["id"]: self._status(n["style"]) for n in graph["nodes"]}
             self.assertEqual(status, {"API": "same", "DB": "removed", "Cache": "added"})
 
     def test_timelapse_sample_indices(self):
         tl = load("timelapse")
-        self.assertEqual(tl.sample_indices(3, 10), [0, 1, 2])        # fewer than n -> all
+        self.assertEqual(tl.sample_indices(3, 10), [0, 1, 2])  # fewer than n -> all
         self.assertEqual(tl.sample_indices(0, 5), [])
         picked = tl.sample_indices(20, 5)
-        self.assertEqual(picked[0], 0)                                # always first
-        self.assertEqual(picked[-1], 19)                             # always last
+        self.assertEqual(picked[0], 0)  # always first
+        self.assertEqual(picked[-1], 19)  # always last
         self.assertEqual(len(picked), 5)
-        self.assertEqual(picked, sorted(set(picked)))                # unique + ordered
+        self.assertEqual(picked, sorted(set(picked)))  # unique + ordered
 
     def test_timelapse_build_html_self_contained(self):
         tl = load("timelapse")
-        frames = [(b"\x89PNG-old", "abc1234567", "2026-01-01", "init", 2, 1),
-                  (b"\x89PNG-new", "def7654321", "2026-02-02", "grow", 9, 12)]
+        frames = [
+            (b"\x89PNG-old", "abc1234567", "2026-01-01", "init", 2, 1),
+            (b"\x89PNG-new", "def7654321", "2026-02-02", "grow", 9, 12),
+        ]
         html = tl.build_html(frames, "Evo")
         self.assertEqual(html.count("data:image/png;base64,"), 2)
         self.assertNotIn("http://", html)
-        self.assertNotIn("https://", html)                           # no CDN/external refs
+        self.assertNotIn("https://", html)  # no CDN/external refs
         for ctl in ('id="play"', 'id="scrub"', 'id="bar"'):
             self.assertIn(ctl, html)
         # the embedded frame payload carries per-commit counts
@@ -834,31 +1118,38 @@ class TestImportersCli(unittest.TestCase):
         '<mxCell id="c" value="DB" vertex="1" parent="1" style="shape=cylinder3;">'
         '<mxGeometry x="400" y="0" width="80" height="80" as="geometry"/></mxCell>'
         '<mxCell id="e1" value="reads" edge="1" parent="1" source="a" target="c">'
-        '<mxGeometry relative="1" as="geometry"/></mxCell>')
+        '<mxGeometry relative="1" as="geometry"/></mxCell>'
+    )
 
     def test_explain_groups_shapes_relations(self):
-        doc = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
-               + self.EXPLAIN_PAGE + "</root></mxGraphModel></diagram></mxfile>")
+        doc = (
+            '<mxfile><diagram name="P1"><mxGraphModel><root>'
+            + self.EXPLAIN_PAGE
+            + "</root></mxGraphModel></diagram></mxfile>"
+        )
         with tempfile.TemporaryDirectory() as d:
             path = os.path.join(d, "arch.drawio")
             self._write(path, doc)
             md = run("explain.py", path).stdout
-            self.assertIn("### Components (3)", md)       # A, B, DB (grp is a container)
-            self.assertIn("- **Tier**", md)              # container -> grouping heading
+            self.assertIn("### Components (3)", md)  # A, B, DB (grp is a container)
+            self.assertIn("- **Tier**", md)  # container -> grouping heading
             self.assertIn("- A", md)
-            self.assertIn("DB _data store_", md)         # cylinder -> data store
-            self.assertIn("A —reads→ DB", md)            # labeled relation
-            self.assertNotIn("- Tier _", md)             # container itself isn't a component
+            self.assertIn("DB _data store_", md)  # cylinder -> data store
+            self.assertIn("A —reads→ DB", md)  # labeled relation
+            self.assertNotIn("- Tier _", md)  # container itself isn't a component
 
     def test_explain_multipage(self):
-        doc = ('<mxfile>'
-               '<diagram name="P1"><mxGraphModel><root>' + self.EXPLAIN_PAGE
-               + '</root></mxGraphModel></diagram>'
-               '<diagram name="P2"><mxGraphModel><root>'
-               '<mxCell id="0"/><mxCell id="1" parent="0"/>'
-               '<mxCell id="x" value="Solo" vertex="1" parent="1" style="rounded=1;">'
-               '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
-               '</root></mxGraphModel></diagram></mxfile>')
+        doc = (
+            "<mxfile>"
+            '<diagram name="P1"><mxGraphModel><root>'
+            + self.EXPLAIN_PAGE
+            + "</root></mxGraphModel></diagram>"
+            '<diagram name="P2"><mxGraphModel><root>'
+            '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+            '<mxCell id="x" value="Solo" vertex="1" parent="1" style="rounded=1;">'
+            '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+            "</root></mxGraphModel></diagram></mxfile>"
+        )
         with tempfile.TemporaryDirectory() as d:
             path = os.path.join(d, "multi.drawio")
             self._write(path, doc)
@@ -869,10 +1160,12 @@ class TestImportersCli(unittest.TestCase):
 
     def test_drawio2pptx_page_names(self):
         tp = load("drawio2pptx")
-        doc = ('<mxfile>'
-               '<diagram name="Context"><mxGraphModel><root></root></mxGraphModel></diagram>'
-               '<diagram name="Containers"><mxGraphModel><root></root></mxGraphModel></diagram>'
-               '</mxfile>')
+        doc = (
+            "<mxfile>"
+            '<diagram name="Context"><mxGraphModel><root></root></mxGraphModel></diagram>'
+            '<diagram name="Containers"><mxGraphModel><root></root></mxGraphModel></diagram>'
+            "</mxfile>"
+        )
         with tempfile.TemporaryDirectory() as d:
             path = os.path.join(d, "c4.drawio")
             self._write(path, doc)
@@ -881,7 +1174,8 @@ class TestImportersCli(unittest.TestCase):
     def test_drawio2pptx_png_size(self):
         tp = load("drawio2pptx")
         import struct
-        blob = b"\x00" * 16 + struct.pack(">II", 1280, 720)      # IHDR w/h at [16:24]
+
+        blob = b"\x00" * 16 + struct.pack(">II", 1280, 720)  # IHDR w/h at [16:24]
         with tempfile.TemporaryDirectory() as d:
             path = os.path.join(d, "x.png")
             with open(path, "wb") as f:
@@ -890,6 +1184,7 @@ class TestImportersCli(unittest.TestCase):
 
     def test_drawio2pptx_deck(self):
         import shutil
+
         if os.environ.get("DRAWIO_E2E") != "1":
             self.skipTest("set DRAWIO_E2E=1 to launch the desktop CLI")
         try:
@@ -898,9 +1193,11 @@ class TestImportersCli(unittest.TestCase):
             self.skipTest("python-pptx not installed")
         if not (shutil.which("drawio") and shutil.which("dot")):
             self.skipTest("draw.io CLI / Graphviz not installed")
-        graph = {"direction": "TB",
-                 "nodes": [{"id": "a", "label": "A"}, {"id": "b", "label": "B"}],
-                 "edges": [{"source": "a", "target": "b"}]}
+        graph = {
+            "direction": "TB",
+            "nodes": [{"id": "a", "label": "A"}, {"id": "b", "label": "B"}],
+            "edges": [{"source": "a", "target": "b"}],
+        }
         with tempfile.TemporaryDirectory() as d:
             gj = os.path.join(d, "g.json")
             self._write(gj, json.dumps(graph))
@@ -910,6 +1207,7 @@ class TestImportersCli(unittest.TestCase):
             r = run("drawio2pptx.py", dr, "-o", out)
             self.assertEqual(r.returncode, 0, r.stderr)
             from pptx import Presentation
+
             prs = Presentation(out)
             self.assertEqual(len(prs.slides), 1)
 
@@ -919,24 +1217,27 @@ class TestImportersCli(unittest.TestCase):
         '<rect x="0" y="0" width="20" height="20" fill="#fff" pointer-events="all"/>'
         '<path d="M 20 10 L 60 10" fill="none" stroke="#000" pointer-events="stroke"/>'
         '<path d="M 60 10 L 55 7 L 55 13 Z" fill="#000000" pointer-events="all"/>'
-        "</svg>")
+        "</svg>"
+    )
 
     def test_svgflow_animates_only_edges(self):
         sf = load("svgflow")
         out, n = sf.animate(self.FLOW_SVG, 1.2, "6 4", reverse=False)
-        self.assertEqual(n, 1)                                    # one edge line
-        self.assertIn("@keyframes dio-flow", out)                # keyframes injected
-        self.assertIn("stroke-dashoffset:-10", out)              # -(6+4) forward travel
+        self.assertEqual(n, 1)  # one edge line
+        self.assertIn("@keyframes dio-flow", out)  # keyframes injected
+        self.assertIn("stroke-dashoffset:-10", out)  # -(6+4) forward travel
         self.assertEqual(out.count('class="dio-flow"'), 1)
         # class is injected right after "<path " — only on the stroke edge
         self.assertIn('<path class="dio-flow" d="M 20 10', out)
-        self.assertNotIn('<path class="dio-flow" d="M 60 10', out)  # arrowhead untouched
+        self.assertNotIn(
+            '<path class="dio-flow" d="M 60 10', out
+        )  # arrowhead untouched
         self.assertNotIn('class="dio-flow"', out.split("<rect", 1)[1].split("/>", 1)[0])
 
     def test_svgflow_reverse_flips_offset(self):
         sf = load("svgflow")
         out, _ = sf.animate(self.FLOW_SVG, 2, "8 2", reverse=True)
-        self.assertIn("stroke-dashoffset:10", out)               # +(8+2), toward source
+        self.assertIn("stroke-dashoffset:10", out)  # +(8+2), toward source
 
     def test_svg_export_embeds_images(self):
         # Without --embed-svg-images the CLI writes file:/// references to the
@@ -959,7 +1260,7 @@ class TestImportersCli(unittest.TestCase):
                     try:
                         call(mod)
                     except SystemExit:
-                        pass            # export "fails"; argv is what matters
+                        pass  # export "fails"; argv is what matters
                 finally:
                     mod.subprocess.run = real_run
 
@@ -970,46 +1271,53 @@ class TestImportersCli(unittest.TestCase):
 
     def test_drawio2mermaid_flowchart(self):
         # Reuses EXPLAIN_PAGE: container "Tier" with A/B, cylinder DB, edge a->c "reads".
-        doc = ('<mxfile><diagram name="P1"><mxGraphModel><root>'
-               + self.EXPLAIN_PAGE + "</root></mxGraphModel></diagram></mxfile>")
+        doc = (
+            '<mxfile><diagram name="P1"><mxGraphModel><root>'
+            + self.EXPLAIN_PAGE
+            + "</root></mxGraphModel></diagram></mxfile>"
+        )
         with tempfile.TemporaryDirectory() as d:
             path = os.path.join(d, "arch.drawio")
             self._write(path, doc)
             mmd = run("drawio2mermaid.py", path, "--direction", "TD").stdout
             self.assertTrue(mmd.startswith("flowchart TD"))
             self.assertIn("subgraph", mmd)
-            self.assertIn('["Tier"]', mmd)                       # container -> subgraph title
+            self.assertIn('["Tier"]', mmd)  # container -> subgraph title
             self.assertIn('["A"]', mmd)
-            self.assertIn('[("DB")]', mmd)                       # cylinder -> database shape
-            self.assertIn('-->|"reads"|', mmd)                   # labeled edge
+            self.assertIn('[("DB")]', mmd)  # cylinder -> database shape
+            self.assertIn('-->|"reads"|', mmd)  # labeled edge
 
     def test_drawio2mermaid_multipage_fenced(self):
-        doc = ('<mxfile>'
-               '<diagram name="P1"><mxGraphModel><root>'
-               '<mxCell id="0"/><mxCell id="1" parent="0"/>'
-               '<mxCell id="x" value="Solo" vertex="1" parent="1" style="rounded=1;">'
-               '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
-               '</root></mxGraphModel></diagram>'
-               '<diagram name="P2"><mxGraphModel><root>'
-               '<mxCell id="0"/><mxCell id="1" parent="0"/>'
-               '<mxCell id="y" value="Two" vertex="1" parent="1" style="rounded=1;">'
-               '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
-               '</root></mxGraphModel></diagram></mxfile>')
+        doc = (
+            "<mxfile>"
+            '<diagram name="P1"><mxGraphModel><root>'
+            '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+            '<mxCell id="x" value="Solo" vertex="1" parent="1" style="rounded=1;">'
+            '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+            "</root></mxGraphModel></diagram>"
+            '<diagram name="P2"><mxGraphModel><root>'
+            '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+            '<mxCell id="y" value="Two" vertex="1" parent="1" style="rounded=1;">'
+            '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>'
+            "</root></mxGraphModel></diagram></mxfile>"
+        )
         with tempfile.TemporaryDirectory() as d:
             path = os.path.join(d, "multi.drawio")
             self._write(path, doc)
             mmd = run("drawio2mermaid.py", path, "--fenced").stdout
-            self.assertEqual(mmd.count("```mermaid"), 2)          # one fence per page
+            self.assertEqual(mmd.count("```mermaid"), 2)  # one fence per page
             self.assertIn("%% Page 2: P2", mmd)
             self.assertIn('["Solo"]', mmd)
 
-    SQL = ("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(255));\n"
-           "CREATE TABLE orders (\n"
-           "  id INT,\n"
-           "  user_id INT NOT NULL REFERENCES users(id),\n"
-           "  PRIMARY KEY (id),\n"
-           "  CONSTRAINT fk FOREIGN KEY (user_id) REFERENCES users (id)\n"
-           ");\n")
+    SQL = (
+        "CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(255));\n"
+        "CREATE TABLE orders (\n"
+        "  id INT,\n"
+        "  user_id INT NOT NULL REFERENCES users(id),\n"
+        "  PRIMARY KEY (id),\n"
+        "  CONSTRAINT fk FOREIGN KEY (user_id) REFERENCES users (id)\n"
+        ");\n"
+    )
 
     def test_sqlerd_tables_and_fks(self):
         with tempfile.TemporaryDirectory() as d:
@@ -1023,14 +1331,20 @@ class TestImportersCli(unittest.TestCase):
             # inline REFERENCES + the equivalent named constraint -> 2 edges
             for e in graph["edges"]:
                 self.assertEqual((e["source"], e["target"]), ("orders", "users"))
-                self.assertIn("ERmany", e["style"])   # crow's foot at the FK side
+                self.assertIn("ERmany", e["style"])  # crow's foot at the FK side
 
     def test_seqlayout_geometry(self):
-        spec = {"participants": [{"id": "a", "label": "A", "actor": True},
-                                 {"id": "b", "label": "B"}],
-                "messages": [{"from": "a", "to": "b", "label": "call"},
-                             {"from": "b", "to": "b", "label": "work"},
-                             {"from": "b", "to": "a", "label": "done", "return": True}]}
+        spec = {
+            "participants": [
+                {"id": "a", "label": "A", "actor": True},
+                {"id": "b", "label": "B"},
+            ],
+            "messages": [
+                {"from": "a", "to": "b", "label": "call"},
+                {"from": "b", "to": "b", "label": "work"},
+                {"from": "b", "to": "a", "label": "done", "return": True},
+            ],
+        }
         with tempfile.TemporaryDirectory() as d:
             path = os.path.join(d, "seq.json")
             self._write(path, json.dumps(spec))
@@ -1039,29 +1353,49 @@ class TestImportersCli(unittest.TestCase):
             self.assertEqual(r.returncode, 0, r.stderr)
             with open(out, encoding="utf-8") as fh:
                 xml = fh.read()
-            self.assertIn("umlActor", xml)                       # actor header
-            self.assertIn('parent="b"', xml)                     # activation bar on b
-            self.assertIn("endArrow=block", xml)                 # sync arrow
-            self.assertIn("strokeColor=#999999", xml)            # return arrow
+            self.assertIn("umlActor", xml)  # actor header
+            self.assertIn('parent="b"', xml)  # activation bar on b
+            self.assertIn("endArrow=block", xml)  # sync arrow
+            self.assertIn("strokeColor=#999999", xml)  # return arrow
             # the generated file passes the structural linter
             v = run("validate.py", out)
             self.assertEqual(v.returncode, 0, v.stdout)
 
     def test_c4_multipage_drilldown(self):
         import shutil
+
         if not shutil.which("dot"):
             self.skipTest("Graphviz dot not installed")
-        spec = {"levels": [
-            {"name": "Context",
-             "elements": [{"id": "u", "type": "person", "label": "User"},
-                          {"id": "sys", "type": "system", "label": "System",
-                           "children": "Containers"}],
-             "relations": [{"from": "u", "to": "sys", "label": "Uses"}]},
-            {"name": "Containers",
-             "elements": [{"id": "api", "type": "container", "label": "API",
-                           "tech": "Go"},
-                          {"id": "db", "type": "database", "label": "DB"}],
-             "relations": [{"from": "api", "to": "db"}]}]}
+        spec = {
+            "levels": [
+                {
+                    "name": "Context",
+                    "elements": [
+                        {"id": "u", "type": "person", "label": "User"},
+                        {
+                            "id": "sys",
+                            "type": "system",
+                            "label": "System",
+                            "children": "Containers",
+                        },
+                    ],
+                    "relations": [{"from": "u", "to": "sys", "label": "Uses"}],
+                },
+                {
+                    "name": "Containers",
+                    "elements": [
+                        {
+                            "id": "api",
+                            "type": "container",
+                            "label": "API",
+                            "tech": "Go",
+                        },
+                        {"id": "db", "type": "database", "label": "DB"},
+                    ],
+                    "relations": [{"from": "api", "to": "db"}],
+                },
+            ]
+        }
         with tempfile.TemporaryDirectory() as d:
             path = os.path.join(d, "c4.json")
             self._write(path, json.dumps(spec))
@@ -1071,7 +1405,7 @@ class TestImportersCli(unittest.TestCase):
             with open(out, encoding="utf-8") as fh:
                 xml = fh.read()
             self.assertEqual(xml.count("<diagram"), 2)
-            self.assertIn('link="data:page/id,containers"', xml)   # drill-down
+            self.assertIn('link="data:page/id,containers"', xml)  # drill-down
             self.assertIn("mxgraph.c4.person2", xml)
             self.assertIn("[Container: Go]", xml)
             v = run("validate.py", out)
@@ -1095,19 +1429,42 @@ class TestImportersCli(unittest.TestCase):
     def test_openapiimports_operations_and_schemas(self):
         spec = {
             "openapi": "3.0.0",
-            "paths": {"/pets": {
-                "get": {"tags": ["pets"], "summary": "List",
-                        "responses": {"200": {"content": {"application/json":
-                            {"schema": {"$ref": "#/components/schemas/Pet"}}}}}},
-                "post": {"tags": ["pets"],
-                         "requestBody": {"content": {"application/json":
-                            {"schema": {"$ref": "#/components/schemas/Pet"}}}},
-                         "responses": {"201": {"description": "ok"}}},
-            }},
-            "components": {"schemas": {
-                "Pet": {"properties": {"owner": {"$ref": "#/components/schemas/Owner"}}},
-                "Owner": {"properties": {"id": {"type": "integer"}}},
-            }},
+            "paths": {
+                "/pets": {
+                    "get": {
+                        "tags": ["pets"],
+                        "summary": "List",
+                        "responses": {
+                            "200": {
+                                "content": {
+                                    "application/json": {
+                                        "schema": {"$ref": "#/components/schemas/Pet"}
+                                    }
+                                }
+                            }
+                        },
+                    },
+                    "post": {
+                        "tags": ["pets"],
+                        "requestBody": {
+                            "content": {
+                                "application/json": {
+                                    "schema": {"$ref": "#/components/schemas/Pet"}
+                                }
+                            }
+                        },
+                        "responses": {"201": {"description": "ok"}},
+                    },
+                }
+            },
+            "components": {
+                "schemas": {
+                    "Pet": {
+                        "properties": {"owner": {"$ref": "#/components/schemas/Owner"}}
+                    },
+                    "Owner": {"properties": {"id": {"type": "integer"}}},
+                }
+            },
         }
         with tempfile.TemporaryDirectory() as d:
             p = os.path.join(d, "api.json")
@@ -1119,18 +1476,20 @@ class TestImportersCli(unittest.TestCase):
             self.assertEqual({n["id"] for n in schemas}, {"S:Pet", "S:Owner"})
             get = next(n for n in ops if n["label"].startswith("GET"))
             post = next(n for n in ops if n["label"].startswith("POST"))
-            self.assertIn("fillColor=#dae8fc", get["style"])       # GET blue
-            self.assertIn("fillColor=#d5e8d4", post["style"])      # POST green
+            self.assertIn("fillColor=#dae8fc", get["style"])  # GET blue
+            self.assertIn("fillColor=#d5e8d4", post["style"])  # POST green
             pairs = {(e["source"], e["target"]) for e in graph["edges"]}
-            self.assertIn((get["id"], "S:Pet"), pairs)             # operation -> schema
-            self.assertIn(("S:Pet", "S:Owner"), pairs)            # schema nesting
+            self.assertIn((get["id"], "S:Pet"), pairs)  # operation -> schema
+            self.assertIn(("S:Pet", "S:Owner"), pairs)  # schema nesting
             self.assertEqual({n.get("group") for n in ops}, {"pets"})
             self.assertEqual(next(iter(schemas)).get("group"), "schemas")
 
     def test_openapiimports_no_schemas(self):
-        spec = {"openapi": "3.0.0",
-                "paths": {"/x": {"get": {"responses": {"200": {"description": "ok"}}}}},
-                "components": {"schemas": {"Y": {"properties": {"z": {"type": "string"}}}}}}
+        spec = {
+            "openapi": "3.0.0",
+            "paths": {"/x": {"get": {"responses": {"200": {"description": "ok"}}}}},
+            "components": {"schemas": {"Y": {"properties": {"z": {"type": "string"}}}}},
+        }
         with tempfile.TemporaryDirectory() as d:
             p = os.path.join(d, "api.json")
             self._write(p, json.dumps(spec))
@@ -1146,22 +1505,24 @@ class TestDrawioHtml(unittest.TestCase):
         cls.m = load("drawiohtml")
 
     TWO_PAGE = (
-        '<mxfile>'
+        "<mxfile>"
         '<diagram id="pg1" name="Context"><mxGraphModel><root>'
         '<mxCell id="0"/><mxCell id="1" parent="0"/>'
         '<UserObject label="System" link="data:page/id,pg2" id="sys">'
         '<mxCell style="rounded=1;" vertex="1" parent="1">'
         '<mxGeometry x="40" y="40" width="120" height="60" as="geometry"/></mxCell>'
-        '</UserObject></root></mxGraphModel></diagram>'
+        "</UserObject></root></mxGraphModel></diagram>"
         '<diagram id="pg2" name="Container"><mxGraphModel><root>'
         '<mxCell id="0"/><mxCell id="1" parent="0"/>'
         '<mxCell id="app" value="App" style="rounded=1;" vertex="1" parent="1">'
         '<mxGeometry x="40" y="40" width="120" height="60" as="geometry"/></mxCell>'
-        '</root></mxGraphModel></diagram></mxfile>')
+        "</root></mxGraphModel></diagram></mxfile>"
+    )
 
     def test_rewrite_page_links(self):
-        import xml.etree.ElementTree as ET
         import io
+        import xml.etree.ElementTree as ET
+
         tree = ET.parse(io.StringIO(self.TWO_PAGE))
         self.assertEqual(self.m.rewrite_page_links(tree), 1)
         links = [el.get("link") for el in tree.getroot().iter() if el.get("link")]
@@ -1172,18 +1533,21 @@ class TestDrawioHtml(unittest.TestCase):
         self.assertEqual(self.m.strip_prolog(svg), "<svg><g/></svg>")
 
     def test_build_html_self_contained(self):
-        html = self.m.build_html("t", [("pg1", "Context"), ("pg2", "Container")],
-                                 ['<svg width="10" height="10"/>',
-                                  '<svg width="10" height="10"/>'])
+        html = self.m.build_html(
+            "t",
+            [("pg1", "Context"), ("pg2", "Container")],
+            ['<svg width="10" height="10"/>', '<svg width="10" height="10"/>'],
+        )
         self.assertEqual(html.count('class="page"'), 2)
         self.assertIn('data-pgid="pg1"', html)
         self.assertIn('"name": "Container"', html)
-        self.assertIn("#page-", html)                          # link interception
+        self.assertIn("#page-", html)  # link interception
         for banned in ("<script src=", "<link ", "@import", "https://cdn"):
-            self.assertNotIn(banned, html)                     # no external requests
+            self.assertNotIn(banned, html)  # no external requests
 
     def test_viewer_end_to_end(self):
         import shutil
+
         if os.environ.get("DRAWIO_E2E") != "1":
             self.skipTest("set DRAWIO_E2E=1 to launch the desktop CLI")
         if not shutil.which("drawio"):
@@ -1199,9 +1563,9 @@ class TestDrawioHtml(unittest.TestCase):
             self.assertIn("1 drill-down link", r.stderr)
             with open(out, encoding="utf-8") as f:
                 html = f.read()
-            self.assertEqual(html.count("<svg"), 2)            # both pages inlined
-            self.assertIn("#page-pg2", html)                   # drill-down survived
-            self.assertIn("data-cell-id", html)                # searchable cells
+            self.assertEqual(html.count("<svg"), 2)  # both pages inlined
+            self.assertIn("#page-pg2", html)  # drill-down survived
+            self.assertIn("data-cell-id", html)  # searchable cells
 
 
 class TestHeatmap(unittest.TestCase):
@@ -1216,13 +1580,14 @@ class TestHeatmap(unittest.TestCase):
 
     def test_ramp_hits_anchors(self):
         a = self.m.PALETTES["heat"]
-        self.assertEqual(self.m.ramp(a, 0.0), "#57bb8a")          # low
-        self.assertEqual(self.m.ramp(a, 0.5), "#ffd666")          # mid
-        self.assertEqual(self.m.ramp(a, 1.0), "#e67c73")          # high
+        self.assertEqual(self.m.ramp(a, 0.0), "#57bb8a")  # low
+        self.assertEqual(self.m.ramp(a, 0.5), "#ffd666")  # mid
+        self.assertEqual(self.m.ramp(a, 1.0), "#e67c73")  # high
 
     def test_set_style_replaces_colours_once(self):
-        s = self.m.set_style("rounded=1;fillColor=#111111;strokeColor=#222222;",
-                             "#abcdef", "#123456")
+        s = self.m.set_style(
+            "rounded=1;fillColor=#111111;strokeColor=#222222;", "#abcdef", "#123456"
+        )
         self.assertIn("fillColor=#abcdef", s)
         self.assertIn("strokeColor=#123456", s)
         self.assertNotIn("#111111", s)
@@ -1231,7 +1596,7 @@ class TestHeatmap(unittest.TestCase):
     def test_load_metrics_csv_and_json(self):
         with tempfile.TemporaryDirectory() as d:
             csvp = os.path.join(d, "m.csv")
-            self._write(csvp, "service,ms\nweb,10\ndb,90\n")     # header auto-skipped
+            self._write(csvp, "service,ms\nweb,10\ndb,90\n")  # header auto-skipped
             self.assertEqual(self.m.load_metrics(csvp), {"web": 10.0, "db": 90.0})
             jp = os.path.join(d, "m.json")
             self._write(jp, '{"web":10,"db":90}')
@@ -1247,19 +1612,26 @@ class TestHeatmap(unittest.TestCase):
             '<mxCell id="db" value="Database" style="rounded=1;fillColor=#dddddd;'
             'strokeColor=#999999;" vertex="1" parent="1">'
             '<mxGeometry x="360" y="40" width="80" height="40" as="geometry"/></mxCell>'
-            '</root></mxGraphModel></diagram></mxfile>')
+            "</root></mxGraphModel></diagram></mxfile>"
+        )
         with tempfile.TemporaryDirectory() as d:
-            dp, mp, out = (os.path.join(d, n) for n in ("a.drawio", "m.csv", "out.drawio"))
+            dp, mp, out = (
+                os.path.join(d, n) for n in ("a.drawio", "m.csv", "out.drawio")
+            )
             self._write(dp, drawio)
             self._write(mp, "web,10\ndb,90\n")
             r = run("heatmap.py", dp, "-m", mp, "-o", out)
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertIn("2/2 metrics matched", r.stderr)
             import xml.etree.ElementTree as ET
-            cells = {c.get("id"): c.get("style") for c in ET.parse(out).getroot().iter("mxCell")}
-            self.assertIn("fillColor=#57bb8a", cells["web"])       # min -> green
-            self.assertIn("fillColor=#e67c73", cells["db"])        # max -> red
-            self.assertIn("hm-title", cells)                       # legend injected
+
+            cells = {
+                c.get("id"): c.get("style") or ""
+                for c in ET.parse(out).getroot().iter("mxCell")
+            }
+            self.assertIn("fillColor=#57bb8a", cells["web"])  # min -> green
+            self.assertIn("fillColor=#e67c73", cells["db"])  # max -> red
+            self.assertIn("hm-title", cells)  # legend injected
 
 
 FIXTURE_RELABEL = (
@@ -1272,7 +1644,8 @@ FIXTURE_RELABEL = (
     '<mxGeometry x="200" y="0" width="80" height="40" as="geometry"/></mxCell></UserObject>'
     '<mxCell id="e" value="go" style="endArrow=classic;" edge="1" parent="1" '
     'source="a" target="b"><mxGeometry relative="1" as="geometry"/></mxCell>'
-    '</root></mxGraphModel></diagram></mxfile>')
+    "</root></mxGraphModel></diagram></mxfile>"
+)
 
 
 class TestRelabel(unittest.TestCase):
@@ -1283,7 +1656,9 @@ class TestRelabel(unittest.TestCase):
 
     def test_extract_and_apply_roundtrip(self):
         with tempfile.TemporaryDirectory() as d:
-            dp, lp, out = (os.path.join(d, n) for n in ("a.drawio", "l.json", "out.drawio"))
+            dp, lp, out = (
+                os.path.join(d, n) for n in ("a.drawio", "l.json", "out.drawio")
+            )
             self._write(dp, FIXTURE_RELABEL)
             r = run("relabel.py", dp, "--extract", "-o", lp)
             self.assertEqual(r.returncode, 0, r.stderr)
@@ -1291,7 +1666,9 @@ class TestRelabel(unittest.TestCase):
                 labels = json.load(fh)
             # page name + vertex value + UserObject label + edge label
             self.assertEqual(set(labels), {"Flow", "Start", "Web Server", "go"})
-            labels.update({"Start": "\u5f00\u59cb", "Web Server": "Web \u670d\u52a1\u5668"})
+            labels.update(
+                {"Start": "\u5f00\u59cb", "Web Server": "Web \u670d\u52a1\u5668"}
+            )
             with open(lp, "w", encoding="utf-8") as fh:
                 json.dump(labels, fh, ensure_ascii=False)
             r = run("relabel.py", dp, "--map", lp, "-o", out)
@@ -1307,7 +1684,9 @@ class TestRelabel(unittest.TestCase):
 
     def test_unmatched_map_key_warns(self):
         with tempfile.TemporaryDirectory() as d:
-            dp, lp, out = (os.path.join(d, n) for n in ("a.drawio", "l.json", "out.drawio"))
+            dp, lp, out = (
+                os.path.join(d, n) for n in ("a.drawio", "l.json", "out.drawio")
+            )
             self._write(dp, FIXTURE_RELABEL)
             self._write(lp, '{"Nope": "X"}')
             r = run("relabel.py", dp, "--map", lp, "-o", out)
@@ -1321,17 +1700,27 @@ class TestRestyle(unittest.TestCase):
         cls.m = load("restyle")
 
     def test_hue_slot_mapping(self):
-        palette = {k: {"fillColor": "#000000", "strokeColor": "#000000"}
-                   for k in ("primary", "success", "warning", "accent",
-                             "danger", "neutral", "secondary")}
-        self.assertEqual(self.m.hue_slot("#dae8fc", palette), "primary")    # blue
-        self.assertEqual(self.m.hue_slot("#d5e8d4", palette), "success")    # green
-        self.assertEqual(self.m.hue_slot("#f8cecc", palette), "danger")     # red
-        self.assertEqual(self.m.hue_slot("#f5f5f5", palette), "neutral")    # grey
+        palette = {
+            k: {"fillColor": "#000000", "strokeColor": "#000000"}
+            for k in (
+                "primary",
+                "success",
+                "warning",
+                "accent",
+                "danger",
+                "neutral",
+                "secondary",
+            )
+        }
+        self.assertEqual(self.m.hue_slot("#dae8fc", palette), "primary")  # blue
+        self.assertEqual(self.m.hue_slot("#d5e8d4", palette), "success")  # green
+        self.assertEqual(self.m.hue_slot("#f8cecc", palette), "danger")  # red
+        self.assertEqual(self.m.hue_slot("#f5f5f5", palette), "neutral")  # grey
 
     def test_set_keys_replaces_and_appends(self):
-        s = self.m.set_keys("rounded=1;fillColor=#111111;", fillColor="#222222",
-                            fontFamily="Helvetica")
+        s = self.m.set_keys(
+            "rounded=1;fillColor=#111111;", fillColor="#222222", fontFamily="Helvetica"
+        )
         self.assertEqual(s.count("fillColor="), 1)
         self.assertIn("fillColor=#222222", s)
         self.assertIn("fontFamily=Helvetica", s)
@@ -1348,7 +1737,8 @@ class TestRestyle(unittest.TestCase):
             '<mxGeometry x="200" y="0" width="80" height="40" as="geometry"/></mxCell>'
             '<mxCell id="e" value="go" style="endArrow=classic;" edge="1" parent="1" '
             'source="svc" target="plain"><mxGeometry relative="1" as="geometry"/></mxCell>'
-            '</root></mxGraphModel></diagram></mxfile>')
+            "</root></mxGraphModel></diagram></mxfile>"
+        )
         with tempfile.TemporaryDirectory() as d:
             dp, out = os.path.join(d, "a.drawio"), os.path.join(d, "out.drawio")
             with open(dp, "w", encoding="utf-8") as f:
@@ -1356,14 +1746,20 @@ class TestRestyle(unittest.TestCase):
             r = run("restyle.py", dp, "--preset", "dark", "-o", out)
             self.assertEqual(r.returncode, 0, r.stderr)
             import xml.etree.ElementTree as ET
+
             tree = ET.parse(out)
-            cells = {c.get("id"): c.get("style") for c in tree.getroot().iter("mxCell")}
-            self.assertIn("fillColor=#004870", cells["svc"])         # blue -> dark primary
+            cells = {
+                c.get("id"): c.get("style") or "" for c in tree.getroot().iter("mxCell")
+            }
+            self.assertIn("fillColor=#004870", cells["svc"])  # blue -> dark primary
             self.assertIn("fontColor=#f0f0f0", cells["svc"])
-            self.assertNotIn("fontColor=", cells["plain"])           # default white fill kept dark text
-            self.assertIn("strokeColor=#bbbbbb", cells["e"])         # edgeColor
+            self.assertNotIn(
+                "fontColor=", cells["plain"]
+            )  # default white fill kept dark text
+            self.assertIn("strokeColor=#bbbbbb", cells["e"])  # edgeColor
             self.assertIn("labelBackgroundColor=none", cells["e"])
             model = tree.getroot().find(".//mxGraphModel")
+            assert model is not None
             self.assertEqual(model.get("background"), "#1e1e1e")
 
     def test_unknown_preset_lists_builtins(self):
@@ -1398,12 +1794,14 @@ class TestCiImports(unittest.TestCase):
         "    strategy:\n      matrix:\n        py: ['3.10', '3.11']\n"
         "    steps: [{run: pytest}]\n"
         "  deploy:\n    needs: [lint, test]\n"
-        "    uses: org/shared/.github/workflows/deploy.yml@main\n")
+        "    uses: org/shared/.github/workflows/deploy.yml@main\n"
+    )
 
     GITLAB = (
         "stages: [build, test]\n"
         "compile:\n  stage: build\n  script: [make]\n"
-        "unit:\n  stage: test\n  script: [make test]\n")
+        "unit:\n  stage: test\n  script: [make test]\n"
+    )
 
     def test_actions_workflow(self):
         self._need_yaml()
@@ -1416,7 +1814,7 @@ class TestCiImports(unittest.TestCase):
             self.assertIn("matrix \u00d72", by_id["ci//test"]["label"])
             self.assertIn("uses: deploy.yml@main", by_id["ci//deploy"]["label"])
             edges = {(e["source"], e["target"]) for e in graph["edges"]}
-            self.assertIn(("ci//trigger", "ci//lint"), edges)       # no needs -> trigger
+            self.assertIn(("ci//trigger", "ci//lint"), edges)  # no needs -> trigger
             self.assertIn(("ci//lint", "ci//deploy"), edges)
             self.assertIn(("ci//test", "ci//deploy"), edges)
             self.assertNotIn(("ci//trigger", "ci//deploy"), edges)  # has needs

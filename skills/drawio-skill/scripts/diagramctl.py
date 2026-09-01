@@ -22,10 +22,10 @@ from diagram_ir import (
     DEFAULT_RULES,
     accessible_description,
     impact_analysis,
+    infer_profile,
     load_ir,
     normalize_ir,
     project_views,
-    query as query_ir,
     reconcile,
     review,
     save_ir,
@@ -33,7 +33,9 @@ from diagram_ir import (
     story_html,
     write_drawio,
 )
-
+from diagram_ir import (
+    query as query_ir,
+)
 
 HERE = Path(__file__).resolve().parent
 IMPORTERS = {
@@ -51,6 +53,7 @@ IMPORTERS = {
     "openapi": "openapiimports.py",
     "ci": "ciimports.py",
 }
+CODE_IMPORTERS = {"python", "javascript", "js", "go", "rust", "pyclasses"}
 TRANSFORMS = {
     "restyle": "restyle.py",
     "heatmap": "heatmap.py",
@@ -115,6 +118,36 @@ def detect_source(path):
     return "graph"
 
 
+def code_kind(prov_path, importer):
+    """Semantic kind for a code-source node (v3.2 P0 source profiles).
+
+    Package roots become `library`, entrypoints become `command`, everything
+    else is an ordinary `module`. Go packages are library units by definition.
+    """
+    base = os.path.basename(prov_path or "")
+    stem = base.rsplit(".", 1)[0].lower()
+    if importer == "go" or stem in {"__init__", "lib"}:
+        return "library"
+    if stem in {"__main__", "main", "cli"}:
+        return "command"
+    return "module"
+
+
+def _resolve_provenance(ir, root_abs):
+    """Resolve importer-relative provenance paths against the scanned root."""
+    for node in ir["nodes"]:
+        prov = node.setdefault("provenance", {})
+        rel = prov.get("path")
+        if rel and not os.path.isabs(rel):
+            prov["path"] = os.path.normpath(os.path.join(root_abs, rel))
+        elif not rel:
+            prov["path"] = root_abs
+    for edge in ir["edges"]:
+        prov = edge.get("provenance")
+        if prov and prov.get("path") and not os.path.isabs(prov["path"]):
+            prov["path"] = os.path.normpath(os.path.join(root_abs, prov["path"]))
+
+
 def importer_ir(source, source_type, group=False):
     script = HERE / IMPORTERS[source_type]
     with tempfile.TemporaryDirectory(prefix="drawio-skill-") as td:
@@ -135,13 +168,19 @@ def importer_ir(source, source_type, group=False):
             raise RuntimeError(
                 proc.stderr.strip() or proc.stdout.strip() or f"{script.name} failed"
             )
+        # pi-lens-ignore: ast-grep:unchecked-throwing-call-python
         raw = json.loads(graph_path.read_text(encoding="utf-8"))
     ir = normalize_ir(raw, source_path=source)
     ir["metadata"]["importer"] = source_type
+    root_abs = os.path.abspath(source)
+    _resolve_provenance(ir, root_abs)
+    is_code = source_type in CODE_IMPORTERS
     for node in ir["nodes"]:
-        node.setdefault("provenance", {}).update(
-            {"importer": source_type, "path": os.path.abspath(source)}
-        )
+        prov = node.setdefault("provenance", {})
+        prov["importer"] = source_type
+        if is_code:
+            # Source profile: real file kinds instead of a blanket "service".
+            node["kind"] = code_kind(prov.get("path", ""), source_type)
     return ir
 
 
@@ -224,7 +263,17 @@ def cmd_build(args):
             "source_type": source_type,
             "nodes": len(ir["nodes"]),
             "edges": len(ir["edges"]),
-            "views": [v["name"] for v in views] if views else ["System"],
+            "views": [
+                {
+                    "name": v["name"],
+                    "nodes": len(v["nodes"]),
+                    "fallback": v.get("fallback", False),
+                    "fallback_reason": v.get("fallback_reason"),
+                }
+                for v in views
+            ]
+            if views
+            else ["System"],
         }
     )
 
@@ -276,11 +325,15 @@ def load_rules(path):
     text = Path(path).read_text(encoding="utf-8")
     try:
         data = json.loads(text)
+    # pi-lens-ignore: ast-grep:unchecked-throwing-call-python
+    # pi-lens-ignore: ast-grep:no-boolean-in-except
     except ValueError:
         try:
             import yaml
 
             data = yaml.safe_load(text)
+        # pi-lens-ignore: ast-grep:unchecked-throwing-call-python
+        # pi-lens-ignore: ast-grep:no-boolean-in-except
         except ImportError:
             rules, in_rules = [], False
             for line in text.splitlines():
@@ -298,8 +351,10 @@ def load_rules(path):
 
 
 def cmd_test(args):
-    findings = semantic_findings(load_ir(args.input), load_rules(args.rules))
+    ir = load_ir(args.input)
+    findings = semantic_findings(ir, load_rules(args.rules))
     result = {
+        "profile": infer_profile(ir),
         "errors": sum(f["severity"] == "error" for f in findings),
         "warnings": sum(f["severity"] == "warning" for f in findings),
         "findings": findings,
@@ -358,7 +413,16 @@ def cmd_views(args):
     emit(
         {
             "output": args.output,
-            "views": [{"name": v["name"], "nodes": len(v["nodes"])} for v in views],
+            "views": [
+                {
+                    "name": v["name"],
+                    "nodes": len(v["nodes"]),
+                    "fallback": v.get("fallback", False),
+                    "fallback_reason": v.get("fallback_reason"),
+                    "hint": v.get("hint"),
+                }
+                for v in views
+            ],
         }
     )
 
