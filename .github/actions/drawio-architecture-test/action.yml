@@ -1,10 +1,10 @@
-name: 'draw.io Architecture Test'
+name: "draw.io Architecture Test"
 description: >-
   Runs drawio-skill's deterministic architecture contract rules
   (Diagram-as-Test) against Diagram IR files and reports findings as a job
   summary + sticky PR comment. Pure Python: no draw.io desktop, Xvfb, or
   Graphviz required.
-author: 'drawio-skill'
+author: "drawio-skill"
 
 inputs:
   ir-files:
@@ -17,19 +17,19 @@ inputs:
       Optional policy file (JSON/YAML) selecting rule ids; defaults to all
       rules
     required: false
-    default: ''
+    default: ""
   strict:
-    description: 'Also fail on warnings (not just errors)'
+    description: "Also fail on warnings (not just errors)"
     required: false
-    default: 'false'
+    default: "false"
   summary:
-    description: 'Write the findings report to the job summary'
+    description: "Write the findings report to the job summary"
     required: false
-    default: 'true'
+    default: "true"
   post-comment:
-    description: 'Post/update a sticky PR comment with the findings'
+    description: "Post/update a sticky PR comment with the findings"
     required: false
-    default: 'true'
+    default: "true"
   github-token:
     description: >-
       Token used to post the sticky PR comment (needs pull-requests: write)
@@ -37,7 +37,7 @@ inputs:
     default: ${{ github.token }}
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     # The action may be referenced cross-repo:
     #   uses: Agents365-ai/drawio-skill/.github/actions/
