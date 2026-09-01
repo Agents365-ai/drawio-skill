@@ -3,16 +3,16 @@
 This backlog is based on the 3.0 release gate, checked showcase, and dogfood run
 against this repository. It is intentionally ordered by observed usefulness.
 
-## P0 — semantic fidelity
+## P0 — semantic fidelity  ✅ shipped in 3.2.0
 
-- Add source profiles so code modules use kinds such as `module`, `library`,
-  `adapter`, and `command` instead of defaulting to `service`.
-- Scope architecture contracts by kind/profile; ownership and production
-  observability rules should not fire on ordinary source modules.
-- Emit exact file-and-line provenance from language importers rather than only
-  the scanned root path.
-- Report when a projected view falls back to the entire model, including which
-  metadata would make that view distinctive.
+- ~~Add source profiles so code modules use kinds such as `module`, `library`,
+  `adapter`, and `command` instead of defaulting to `service`.~~ ✅ (`module`/`library`/`command`)
+- ~~Scope architecture contracts by kind/profile; ownership and production
+  observability rules should not fire on ordinary source modules.~~ ✅ (kinds + `profile` field)
+- ~~Emit exact file-and-line provenance from language importers rather than only
+  the scanned root path.~~ ✅ (per-file path + Python edge line numbers)
+- ~~Report when a projected view falls back to the entire model, including which
+  metadata would make that view distinctive.~~ ✅ (`fallback`/`fallback_reason`/`hint`)
 
 ## P1 — richer analysis
 

@@ -19,6 +19,7 @@ specifier inside a comment or string literal is counted in rare cases.
 Usage: python3 jsimports.py <src_dir> [-o graph.json] [--direction TB|LR]
                                        [--group] [--no-reduce]
 """
+
 import argparse
 import json
 import os
@@ -29,9 +30,9 @@ import sys
 EXTS = (".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs")
 SPEC = re.compile(
     r"(?:import|export)\b[^'\";]*?\bfrom\s*['\"]([^'\"]+)['\"]"  # import/export ... from "x"
-    r"|import\s*['\"]([^'\"]+)['\"]"                              # import "x" (side effect)
-    r"|require\s*\(\s*['\"]([^'\"]+)['\"]\s*\)"                   # require("x")
-    r"|import\s*\(\s*['\"]([^'\"]+)['\"]\s*\)"                    # import("x") dynamic
+    r"|import\s*['\"]([^'\"]+)['\"]"  # import "x" (side effect)
+    r"|require\s*\(\s*['\"]([^'\"]+)['\"]\s*\)"  # require("x")
+    r"|import\s*\(\s*['\"]([^'\"]+)['\"]\s*\)"  # import("x") dynamic
 )
 
 
@@ -63,9 +64,11 @@ def resolve(spec, importer, root, modules):
     if not spec.startswith("."):
         return None
     base = os.path.normpath(os.path.join(os.path.dirname(importer), spec))
-    candidates = ([base + e for e in EXTS]
-                  + [os.path.join(base, "index" + e) for e in EXTS]
-                  + [base])
+    candidates = (
+        [base + e for e in EXTS]
+        + [os.path.join(base, "index" + e) for e in EXTS]
+        + [base]
+    )
     for cand in candidates:
         mid = modid(cand, root)
         if mid in modules and modules[mid] != importer:
@@ -94,13 +97,17 @@ def transitive_reduce(nodes, edges):
     idx = {n: i for i, n in enumerate(nodes)}
     dot = "digraph{" + "".join(f"{idx[s]}->{idx[t]};" for s, t in edges) + "}"
     try:
-        out = subprocess.run(["tred"], input=dot, capture_output=True,
-                             text=True, check=True).stdout
+        out = subprocess.run(
+            ["tred"], input=dot, capture_output=True, text=True, check=True
+        ).stdout
     except (FileNotFoundError, subprocess.CalledProcessError) as exc:
         sys.stderr.write(f"warning: tred unavailable, keeping all edges ({exc})\n")
         return edges
     rev = {i: n for n, i in idx.items()}
-    return [(rev[int(a)], rev[int(b)]) for a, b in re.findall(r"(\d+)\s*->\s*(\d+)", out)]
+    # pi-lens-ignore: ast-grep:unchecked-throwing-call-python
+    return [
+        (rev[int(a)], rev[int(b)]) for a, b in re.findall(r"(\d+)\s*->\s*(\d+)", out)
+    ]
 
 
 def common_dir(ids):
@@ -115,33 +122,46 @@ def common_dir(ids):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="JS/TS import graph -> autolayout graph JSON.")
+    ap = argparse.ArgumentParser(
+        description="JS/TS import graph -> autolayout graph JSON."
+    )
     ap.add_argument("src", help="source directory")
     ap.add_argument("-o", "--output", help="output JSON path (default: stdout)")
     ap.add_argument("--direction", default="TB", choices=["TB", "LR"])
-    ap.add_argument("--group", action="store_true",
-                    help="group nodes into containers by top-level directory")
-    ap.add_argument("--no-reduce", action="store_true",
-                    help="keep every edge (skip transitive reduction)")
+    ap.add_argument(
+        "--group",
+        action="store_true",
+        help="group nodes into containers by top-level directory",
+    )
+    ap.add_argument(
+        "--no-reduce",
+        action="store_true",
+        help="keep every edge (skip transitive reduction)",
+    )
     args = ap.parse_args()
 
     modules, root = discover(args.src)
     if not modules:
         sys.exit(f"error: no JS/TS modules found under {args.src}")
-    edges = sorted({(m, t) for m, p in modules.items()
-                    for t in edges_of(m, p, root, modules)})
+    edges = sorted(
+        {(m, t) for m, p in modules.items() for t in edges_of(m, p, root, modules)}
+    )
     raw = len(edges)
     if not args.no_reduce:
         edges = transitive_reduce(list(modules), edges)
     strip = common_dir(list(modules))
-    label = lambda m: (m[len(strip):] if strip and m.startswith(strip) else m) or m
+    label = lambda m: (m[len(strip) :] if strip and m.startswith(strip) else m) or m
 
     def node(m):
-        d = {"id": m, "label": label(m)}
+        d = {
+            "id": m,
+            "label": label(m),
+            "provenance": {"path": os.path.relpath(modules[m], root)},
+        }
         if args.group:
             rest = label(m).split("/")
-            if len(rest) > 1:                            # has a sub-directory
-                d["group"] = "/".join(rest[:-1])         # full directory path -> nested boxes
+            if len(rest) > 1:  # has a sub-directory
+                d["group"] = "/".join(rest[:-1])  # full directory path -> nested boxes
         return d
 
     graph = {
@@ -151,6 +171,7 @@ def main():
     }
     text = json.dumps(graph, indent=2)
     if args.output:
+        # pi-lens-ignore: ast-grep:unchecked-throwing-call-python
         with open(args.output, "w", encoding="utf-8") as f:
             f.write(text)
         sys.stderr.write(f"wrote {args.output}\n")

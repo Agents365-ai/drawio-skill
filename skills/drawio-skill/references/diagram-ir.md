@@ -95,7 +95,29 @@ Views are pages over the same model rather than copied models. Nodes carry the
 same `data-model-id`; nodes present in several pages link to the next applicable
 view. The executive view selects at most twelve high-importance/high-degree
 nodes. Deployment/data/security views use semantic properties and fall back to
-the complete model when metadata is insufficient.
+the complete model when metadata is insufficient. Each view reports a
+`fallback` flag with a `fallback_reason` and a `hint` naming the metadata that
+would make it distinctive, so a fallback is never silent:
+
+```bash
+python3 scripts/diagramctl.py views model.ir.json -o views.drawio
+# views[].fallback / fallback_reason / hint
+```
+
+## v3.2 semantic fidelity
+
+- **Source-kind profiles**: building from a code importer (`--from python`,
+  `js`, `go`, `rust`, `pyclasses`) assigns real `module` / `library` /
+  `command` kinds from the file name instead of a blanket `service` — package
+  roots (`__init__.py`, `lib.rs`) are `library`, entrypoints
+  (`__main__.py`, `main.rs`, `cli.py`) are `command`, everything else is
+  `module`. Ownership / observability contract rules therefore do not fire on
+  ordinary source modules.
+- **Precise provenance**: importer node provenance records the exact file
+  path (resolved against the scanned root), and Python edges carry the line
+  of the import statement that pulled them in.
+- **Profile reporting**: `diagramctl test` reports a `profile` field —
+  `code` for module/library/command graphs, `architecture` otherwise.
 
 ## Compatibility
 

@@ -291,6 +291,74 @@ class TestDiagramCtl(unittest.TestCase):
         data = json.loads(r.stdout)
         self.assertIn("not executed", data["drawio"]["note"])
 
+    def test_build_python_gets_source_profile_and_provenance(self):
+        # v3.2 P0: a code build must produce module/library/command kinds (not
+        # a blanket "service"), precise per-file provenance, and no
+        # ownership/observability noise on source modules.
+        with tempfile.TemporaryDirectory() as td:
+            pkg = os.path.join(td, "pkg")
+            sub = os.path.join(pkg, "sub")
+            os.makedirs(sub)
+            for rel, text in (
+                (os.path.join("pkg", "__init__.py"), "from .cli import main\n"),
+                (os.path.join("pkg", "cli.py"), "from . import util\n"),
+                (os.path.join("pkg", "util.py"), "x = 1\n"),
+                (os.path.join("pkg", "__main__.py"), "from .cli import main\n"),
+                (os.path.join("pkg", "sub", "mod.py"), "from .. import util\n"),
+            ):
+                with open(os.path.join(td, rel), "w", encoding="utf-8") as fh:
+                    fh.write(text)
+            ir_json = os.path.join(td, "out.ir.json")
+            out = os.path.join(td, "out.drawio")
+            r = self.run_cli(
+                "build", os.path.join(td, "pkg"), "--from", "python",
+                "--ir-output", ir_json, "-o", out,
+            )
+            self.assertEqual(0, r.returncode, r.stderr)
+            with open(ir_json, encoding="utf-8") as fh:
+                ir = json.load(fh)
+            by_id = {n["id"]: n for n in ir["nodes"]}
+            # source profile: package root library, entrypoint command, rest module
+            self.assertEqual(by_id["pkg"]["kind"], "library")
+            self.assertEqual(by_id["pkg.cli"]["kind"], "command")
+            self.assertEqual(by_id["pkg.util"]["kind"], "module")
+            self.assertEqual(by_id["pkg.sub.mod"]["kind"], "module")
+            # precise provenance: real file path (absolute) + importer tag
+            self.assertEqual(
+                os.path.basename(by_id["pkg.cli"]["provenance"]["path"]), "cli.py"
+            )
+            self.assertEqual(by_id["pkg.cli"]["provenance"]["importer"], "python")
+            # line-level edge provenance survived the build
+            edge = next(e for e in ir["edges"] if e["source"] == "pkg.cli")
+            self.assertEqual(edge["provenance"]["line"], 1)
+
+    def test_view_fallback_reports_metadata_gap(self):
+        # A model with no deployment/security/data metadata must say so, with a
+        # hint, instead of silently falling back to the whole graph.
+        bare = d.normalize_ir({"nodes": [
+            {"id": "a", "label": "A", "kind": "module"},
+            {"id": "b", "label": "B", "kind": "module"},
+        ], "edges": [{"source": "a", "target": "b"}]})
+        views = d.project_views(bare, ["deployment", "dataflow", "system"])
+        dep = next(v for v in views if v["name"] == "Deployment")
+        self.assertTrue(dep["fallback"])
+        self.assertIn("no deployment metadata", dep["fallback_reason"])
+        self.assertIn("properties.environment", dep["hint"])
+        flow = next(v for v in views if v["name"] == "Dataflow")
+        self.assertTrue(flow["fallback"])
+        self.assertIn("data-flow", flow["fallback_reason"])
+        syst = next(v for v in views if v["name"] == "System")
+        self.assertFalse(syst.get("fallback", False))
+
+    def test_infer_profile(self):
+        code = d.normalize_ir({"nodes": [{"id": "a", "kind": "module"}]})
+        self.assertEqual(d.infer_profile(code), "code")
+        arch = d.normalize_ir(
+            {"nodes": [{"id": "a", "kind": "service"},
+                        {"id": "b", "kind": "database"}]}
+        )
+        self.assertEqual(d.infer_profile(arch), "architecture")
+
 
 if __name__ == "__main__":
     unittest.main()
