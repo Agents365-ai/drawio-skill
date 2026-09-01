@@ -1,0 +1,409 @@
+<mxfile host="drawio-skill" agent="diagram-ir" version="3.0.0">
+  <diagram id="executive" name="Executive">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="Shopper" link="data:page/id,system" id="executive--shopper" data-model-id="shopper" data-kind="actor" data-properties="{&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:7}" data-source-properties="{&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:7}" data-source-label="Shopper" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-boundary="public">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+            <mxGeometry x="180" y="0" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="API Gateway" link="data:page/id,system" id="executive--gateway" data-model-id="gateway" data-kind="gateway" data-properties="{&quot;owner&quot;:&quot;platform&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;edge&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:10}" data-source-properties="{&quot;owner&quot;:&quot;platform&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;edge&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:10}" data-source-label="API Gateway" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="platform" data-boundary="public">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+            <mxGeometry x="180" y="110" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Order Service" link="data:page/id,system" id="executive--orders" data-model-id="orders" data-kind="service" data-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:9}" data-source-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:9}" data-source-label="Order Service" data-provenance="{&quot;path&quot;:&quot;services/orders.py&quot;,&quot;line&quot;:12}" data-owner="checkout" data-boundary="private">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+            <mxGeometry x="180" y="210" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Inventory Service" link="data:page/id,system" id="executive--inventory" data-model-id="inventory" data-kind="service" data-properties="{&quot;owner&quot;:&quot;catalog&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:6}" data-source-properties="{&quot;owner&quot;:&quot;catalog&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:6}" data-source-label="Inventory Service" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="catalog" data-boundary="private">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+            <mxGeometry x="0" y="320" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Orders DB" link="data:page/id,system" id="executive--orders-db" data-model-id="orders-db" data-kind="database" data-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;observability&quot;:&quot;database metrics&quot;,&quot;trust_boundary&quot;:&quot;data&quot;,&quot;importance&quot;:8}" data-source-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;observability&quot;:&quot;database metrics&quot;,&quot;trust_boundary&quot;:&quot;data&quot;,&quot;importance&quot;:8}" data-source-label="Orders DB" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="checkout" data-boundary="data">
+          <mxCell style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+            <mxGeometry x="180" y="320" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Stripe" link="data:page/id,system" id="executive--stripe" data-model-id="stripe" data-kind="external" data-properties="{&quot;owner&quot;:&quot;payments&quot;,&quot;region&quot;:&quot;global&quot;,&quot;trust_boundary&quot;:&quot;external&quot;,&quot;importance&quot;:5}" data-source-properties="{&quot;owner&quot;:&quot;payments&quot;,&quot;region&quot;:&quot;global&quot;,&quot;trust_boundary&quot;:&quot;external&quot;,&quot;importance&quot;:5}" data-source-label="Stripe" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="payments" data-boundary="external">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+            <mxGeometry x="360" y="320" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="e0" value="HTTPS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="executive--shopper" target="executive--gateway" data-model-id="shopper-gateway" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;}" data-source-label="HTTPS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="70" />
+              <mxPoint x="260" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e1" value="mTLS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="executive--gateway" target="executive--orders" data-model-id="gateway-orders" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;mTLS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;mTLS&quot;}" data-source-label="mTLS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="180" />
+              <mxPoint x="260" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="gRPC" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="executive--orders" target="executive--inventory" data-model-id="orders-inventory" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;mTLS&quot;,&quot;timeout&quot;:&quot;800ms&quot;,&quot;isolates_failure&quot;:true}" data-source-properties="{&quot;protocol&quot;:&quot;mTLS&quot;,&quot;timeout&quot;:&quot;800ms&quot;,&quot;isolates_failure&quot;:true}" data-source-label="gRPC">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="130" y="250" />
+              <mxPoint x="80" y="250" />
+              <mxPoint x="80" y="250" />
+              <mxPoint x="80" y="250" />
+              <mxPoint x="80" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" value="PostgreSQL/TLS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="executive--orders" target="executive--orders-db" data-model-id="orders-db" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;TLS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;TLS&quot;}" data-source-label="PostgreSQL/TLS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="280" />
+              <mxPoint x="260" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" value="HTTPS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="executive--orders" target="executive--stripe" data-model-id="orders-stripe" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;,&quot;timeout&quot;:&quot;2s&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;,&quot;timeout&quot;:&quot;2s&quot;}" data-source-label="HTTPS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="390" y="250" />
+              <mxPoint x="440" y="250" />
+              <mxPoint x="440" y="250" />
+              <mxPoint x="440" y="250" />
+              <mxPoint x="440" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="system" name="System">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="Shopper" link="data:page/id,dataflow" id="system--shopper" data-model-id="shopper" data-kind="actor" data-properties="{&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:7}" data-source-properties="{&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:7}" data-source-label="Shopper" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-boundary="public">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+            <mxGeometry x="180" y="0" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="API Gateway" link="data:page/id,deployment" id="system--gateway" data-model-id="gateway" data-kind="gateway" data-properties="{&quot;owner&quot;:&quot;platform&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;edge&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:10}" data-source-properties="{&quot;owner&quot;:&quot;platform&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;edge&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:10}" data-source-label="API Gateway" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="platform" data-boundary="public">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+            <mxGeometry x="180" y="110" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Order Service" link="data:page/id,deployment" id="system--orders" data-model-id="orders" data-kind="service" data-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:9}" data-source-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:9}" data-source-label="Order Service" data-provenance="{&quot;path&quot;:&quot;services/orders.py&quot;,&quot;line&quot;:12}" data-owner="checkout" data-boundary="private">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+            <mxGeometry x="180" y="210" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Inventory Service" link="data:page/id,deployment" id="system--inventory" data-model-id="inventory" data-kind="service" data-properties="{&quot;owner&quot;:&quot;catalog&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:6}" data-source-properties="{&quot;owner&quot;:&quot;catalog&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:6}" data-source-label="Inventory Service" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="catalog" data-boundary="private">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+            <mxGeometry x="0" y="320" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Orders DB" link="data:page/id,deployment" id="system--orders-db" data-model-id="orders-db" data-kind="database" data-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;observability&quot;:&quot;database metrics&quot;,&quot;trust_boundary&quot;:&quot;data&quot;,&quot;importance&quot;:8}" data-source-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;observability&quot;:&quot;database metrics&quot;,&quot;trust_boundary&quot;:&quot;data&quot;,&quot;importance&quot;:8}" data-source-label="Orders DB" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="checkout" data-boundary="data">
+          <mxCell style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+            <mxGeometry x="180" y="320" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Stripe" link="data:page/id,deployment" id="system--stripe" data-model-id="stripe" data-kind="external" data-properties="{&quot;owner&quot;:&quot;payments&quot;,&quot;region&quot;:&quot;global&quot;,&quot;trust_boundary&quot;:&quot;external&quot;,&quot;importance&quot;:5}" data-source-properties="{&quot;owner&quot;:&quot;payments&quot;,&quot;region&quot;:&quot;global&quot;,&quot;trust_boundary&quot;:&quot;external&quot;,&quot;importance&quot;:5}" data-source-label="Stripe" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="payments" data-boundary="external">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+            <mxGeometry x="360" y="320" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="e0" value="HTTPS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="system--shopper" target="system--gateway" data-model-id="shopper-gateway" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;}" data-source-label="HTTPS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="70" />
+              <mxPoint x="260" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e1" value="mTLS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="system--gateway" target="system--orders" data-model-id="gateway-orders" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;mTLS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;mTLS&quot;}" data-source-label="mTLS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="180" />
+              <mxPoint x="260" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="gRPC" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="system--orders" target="system--inventory" data-model-id="orders-inventory" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;mTLS&quot;,&quot;timeout&quot;:&quot;800ms&quot;,&quot;isolates_failure&quot;:true}" data-source-properties="{&quot;protocol&quot;:&quot;mTLS&quot;,&quot;timeout&quot;:&quot;800ms&quot;,&quot;isolates_failure&quot;:true}" data-source-label="gRPC">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="130" y="250" />
+              <mxPoint x="80" y="250" />
+              <mxPoint x="80" y="250" />
+              <mxPoint x="80" y="250" />
+              <mxPoint x="80" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" value="PostgreSQL/TLS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="system--orders" target="system--orders-db" data-model-id="orders-db" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;TLS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;TLS&quot;}" data-source-label="PostgreSQL/TLS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="280" />
+              <mxPoint x="260" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" value="HTTPS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="system--orders" target="system--stripe" data-model-id="orders-stripe" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;,&quot;timeout&quot;:&quot;2s&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;,&quot;timeout&quot;:&quot;2s&quot;}" data-source-label="HTTPS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="390" y="250" />
+              <mxPoint x="440" y="250" />
+              <mxPoint x="440" y="250" />
+              <mxPoint x="440" y="250" />
+              <mxPoint x="440" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="deployment" name="Deployment">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="API Gateway" link="data:page/id,dataflow" id="deployment--gateway" data-model-id="gateway" data-kind="gateway" data-properties="{&quot;owner&quot;:&quot;platform&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;edge&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:10}" data-source-properties="{&quot;owner&quot;:&quot;platform&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;edge&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:10}" data-source-label="API Gateway" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="platform" data-boundary="public">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+            <mxGeometry x="180" y="0" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Order Service" link="data:page/id,dataflow" id="deployment--orders" data-model-id="orders" data-kind="service" data-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:9}" data-source-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:9}" data-source-label="Order Service" data-provenance="{&quot;path&quot;:&quot;services/orders.py&quot;,&quot;line&quot;:12}" data-owner="checkout" data-boundary="private">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+            <mxGeometry x="180" y="110" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Inventory Service" link="data:page/id,dataflow" id="deployment--inventory" data-model-id="inventory" data-kind="service" data-properties="{&quot;owner&quot;:&quot;catalog&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:6}" data-source-properties="{&quot;owner&quot;:&quot;catalog&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:6}" data-source-label="Inventory Service" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="catalog" data-boundary="private">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+            <mxGeometry x="0" y="210" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Orders DB" link="data:page/id,dataflow" id="deployment--orders-db" data-model-id="orders-db" data-kind="database" data-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;observability&quot;:&quot;database metrics&quot;,&quot;trust_boundary&quot;:&quot;data&quot;,&quot;importance&quot;:8}" data-source-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;observability&quot;:&quot;database metrics&quot;,&quot;trust_boundary&quot;:&quot;data&quot;,&quot;importance&quot;:8}" data-source-label="Orders DB" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="checkout" data-boundary="data">
+          <mxCell style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+            <mxGeometry x="180" y="210" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Stripe" link="data:page/id,dataflow" id="deployment--stripe" data-model-id="stripe" data-kind="external" data-properties="{&quot;owner&quot;:&quot;payments&quot;,&quot;region&quot;:&quot;global&quot;,&quot;trust_boundary&quot;:&quot;external&quot;,&quot;importance&quot;:5}" data-source-properties="{&quot;owner&quot;:&quot;payments&quot;,&quot;region&quot;:&quot;global&quot;,&quot;trust_boundary&quot;:&quot;external&quot;,&quot;importance&quot;:5}" data-source-label="Stripe" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="payments" data-boundary="external">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+            <mxGeometry x="360" y="210" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="e0" value="mTLS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="deployment--gateway" target="deployment--orders" data-model-id="gateway-orders" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;mTLS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;mTLS&quot;}" data-source-label="mTLS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="70" />
+              <mxPoint x="260" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e1" value="gRPC" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="deployment--orders" target="deployment--inventory" data-model-id="orders-inventory" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;mTLS&quot;,&quot;timeout&quot;:&quot;800ms&quot;,&quot;isolates_failure&quot;:true}" data-source-properties="{&quot;protocol&quot;:&quot;mTLS&quot;,&quot;timeout&quot;:&quot;800ms&quot;,&quot;isolates_failure&quot;:true}" data-source-label="gRPC">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="130" y="140" />
+              <mxPoint x="80" y="140" />
+              <mxPoint x="80" y="140" />
+              <mxPoint x="80" y="140" />
+              <mxPoint x="80" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="PostgreSQL/TLS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="deployment--orders" target="deployment--orders-db" data-model-id="orders-db" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;TLS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;TLS&quot;}" data-source-label="PostgreSQL/TLS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="180" />
+              <mxPoint x="260" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" value="HTTPS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="deployment--orders" target="deployment--stripe" data-model-id="orders-stripe" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;,&quot;timeout&quot;:&quot;2s&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;,&quot;timeout&quot;:&quot;2s&quot;}" data-source-label="HTTPS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="390" y="140" />
+              <mxPoint x="440" y="140" />
+              <mxPoint x="440" y="140" />
+              <mxPoint x="440" y="140" />
+              <mxPoint x="440" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="dataflow" name="Dataflow">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="Shopper" link="data:page/id,security" id="dataflow--shopper" data-model-id="shopper" data-kind="actor" data-properties="{&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:7}" data-source-properties="{&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:7}" data-source-label="Shopper" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-boundary="public">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+            <mxGeometry x="180" y="0" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="API Gateway" link="data:page/id,security" id="dataflow--gateway" data-model-id="gateway" data-kind="gateway" data-properties="{&quot;owner&quot;:&quot;platform&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;edge&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:10}" data-source-properties="{&quot;owner&quot;:&quot;platform&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;edge&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:10}" data-source-label="API Gateway" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="platform" data-boundary="public">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+            <mxGeometry x="180" y="110" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Order Service" link="data:page/id,security" id="dataflow--orders" data-model-id="orders" data-kind="service" data-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:9}" data-source-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:9}" data-source-label="Order Service" data-provenance="{&quot;path&quot;:&quot;services/orders.py&quot;,&quot;line&quot;:12}" data-owner="checkout" data-boundary="private">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+            <mxGeometry x="180" y="210" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Inventory Service" link="data:page/id,security" id="dataflow--inventory" data-model-id="inventory" data-kind="service" data-properties="{&quot;owner&quot;:&quot;catalog&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:6}" data-source-properties="{&quot;owner&quot;:&quot;catalog&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:6}" data-source-label="Inventory Service" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="catalog" data-boundary="private">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+            <mxGeometry x="0" y="320" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Orders DB" link="data:page/id,security" id="dataflow--orders-db" data-model-id="orders-db" data-kind="database" data-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;observability&quot;:&quot;database metrics&quot;,&quot;trust_boundary&quot;:&quot;data&quot;,&quot;importance&quot;:8}" data-source-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;observability&quot;:&quot;database metrics&quot;,&quot;trust_boundary&quot;:&quot;data&quot;,&quot;importance&quot;:8}" data-source-label="Orders DB" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="checkout" data-boundary="data">
+          <mxCell style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+            <mxGeometry x="180" y="320" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Stripe" link="data:page/id,security" id="dataflow--stripe" data-model-id="stripe" data-kind="external" data-properties="{&quot;owner&quot;:&quot;payments&quot;,&quot;region&quot;:&quot;global&quot;,&quot;trust_boundary&quot;:&quot;external&quot;,&quot;importance&quot;:5}" data-source-properties="{&quot;owner&quot;:&quot;payments&quot;,&quot;region&quot;:&quot;global&quot;,&quot;trust_boundary&quot;:&quot;external&quot;,&quot;importance&quot;:5}" data-source-label="Stripe" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="payments" data-boundary="external">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+            <mxGeometry x="360" y="320" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="e0" value="HTTPS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="dataflow--shopper" target="dataflow--gateway" data-model-id="shopper-gateway" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;}" data-source-label="HTTPS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="70" />
+              <mxPoint x="260" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e1" value="mTLS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="dataflow--gateway" target="dataflow--orders" data-model-id="gateway-orders" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;mTLS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;mTLS&quot;}" data-source-label="mTLS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="180" />
+              <mxPoint x="260" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="gRPC" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="dataflow--orders" target="dataflow--inventory" data-model-id="orders-inventory" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;mTLS&quot;,&quot;timeout&quot;:&quot;800ms&quot;,&quot;isolates_failure&quot;:true}" data-source-properties="{&quot;protocol&quot;:&quot;mTLS&quot;,&quot;timeout&quot;:&quot;800ms&quot;,&quot;isolates_failure&quot;:true}" data-source-label="gRPC">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="130" y="250" />
+              <mxPoint x="80" y="250" />
+              <mxPoint x="80" y="250" />
+              <mxPoint x="80" y="250" />
+              <mxPoint x="80" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" value="PostgreSQL/TLS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="dataflow--orders" target="dataflow--orders-db" data-model-id="orders-db" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;TLS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;TLS&quot;}" data-source-label="PostgreSQL/TLS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="280" />
+              <mxPoint x="260" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" value="HTTPS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="dataflow--orders" target="dataflow--stripe" data-model-id="orders-stripe" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;,&quot;timeout&quot;:&quot;2s&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;,&quot;timeout&quot;:&quot;2s&quot;}" data-source-label="HTTPS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="390" y="250" />
+              <mxPoint x="440" y="250" />
+              <mxPoint x="440" y="250" />
+              <mxPoint x="440" y="250" />
+              <mxPoint x="440" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="security" name="Security">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="Shopper" link="data:page/id,executive" id="security--shopper" data-model-id="shopper" data-kind="actor" data-properties="{&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:7}" data-source-properties="{&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:7}" data-source-label="Shopper" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-boundary="public">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+            <mxGeometry x="180" y="0" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="API Gateway" link="data:page/id,executive" id="security--gateway" data-model-id="gateway" data-kind="gateway" data-properties="{&quot;owner&quot;:&quot;platform&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;edge&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:10}" data-source-properties="{&quot;owner&quot;:&quot;platform&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;edge&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;public&quot;,&quot;importance&quot;:10}" data-source-label="API Gateway" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="platform" data-boundary="public">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+            <mxGeometry x="180" y="110" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Order Service" link="data:page/id,executive" id="security--orders" data-model-id="orders" data-kind="service" data-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:9}" data-source-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:9}" data-source-label="Order Service" data-provenance="{&quot;path&quot;:&quot;services/orders.py&quot;,&quot;line&quot;:12}" data-owner="checkout" data-boundary="private">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+            <mxGeometry x="180" y="210" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Inventory Service" link="data:page/id,executive" id="security--inventory" data-model-id="inventory" data-kind="service" data-properties="{&quot;owner&quot;:&quot;catalog&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:6}" data-source-properties="{&quot;owner&quot;:&quot;catalog&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;runtime&quot;:&quot;Kubernetes&quot;,&quot;observability&quot;:&quot;OpenTelemetry&quot;,&quot;trust_boundary&quot;:&quot;private&quot;,&quot;importance&quot;:6}" data-source-label="Inventory Service" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="catalog" data-boundary="private">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+            <mxGeometry x="0" y="320" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Orders DB" link="data:page/id,executive" id="security--orders-db" data-model-id="orders-db" data-kind="database" data-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;observability&quot;:&quot;database metrics&quot;,&quot;trust_boundary&quot;:&quot;data&quot;,&quot;importance&quot;:8}" data-source-properties="{&quot;owner&quot;:&quot;checkout&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;region&quot;:&quot;eu-west-1&quot;,&quot;observability&quot;:&quot;database metrics&quot;,&quot;trust_boundary&quot;:&quot;data&quot;,&quot;importance&quot;:8}" data-source-label="Orders DB" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="checkout" data-boundary="data">
+          <mxCell style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+            <mxGeometry x="180" y="320" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Stripe" link="data:page/id,executive" id="security--stripe" data-model-id="stripe" data-kind="external" data-properties="{&quot;owner&quot;:&quot;payments&quot;,&quot;region&quot;:&quot;global&quot;,&quot;trust_boundary&quot;:&quot;external&quot;,&quot;importance&quot;:5}" data-source-properties="{&quot;owner&quot;:&quot;payments&quot;,&quot;region&quot;:&quot;global&quot;,&quot;trust_boundary&quot;:&quot;external&quot;,&quot;importance&quot;:5}" data-source-label="Stripe" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/checkout.ir.json&quot;}" data-owner="payments" data-boundary="external">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+            <mxGeometry x="360" y="320" width="160" height="70" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="e0" value="HTTPS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="security--shopper" target="security--gateway" data-model-id="shopper-gateway" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;}" data-source-label="HTTPS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="70" />
+              <mxPoint x="260" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e1" value="mTLS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="security--gateway" target="security--orders" data-model-id="gateway-orders" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;mTLS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;mTLS&quot;}" data-source-label="mTLS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="180" />
+              <mxPoint x="260" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="gRPC" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="security--orders" target="security--inventory" data-model-id="orders-inventory" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;mTLS&quot;,&quot;timeout&quot;:&quot;800ms&quot;,&quot;isolates_failure&quot;:true}" data-source-properties="{&quot;protocol&quot;:&quot;mTLS&quot;,&quot;timeout&quot;:&quot;800ms&quot;,&quot;isolates_failure&quot;:true}" data-source-label="gRPC">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="130" y="250" />
+              <mxPoint x="80" y="250" />
+              <mxPoint x="80" y="250" />
+              <mxPoint x="80" y="250" />
+              <mxPoint x="80" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" value="PostgreSQL/TLS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="security--orders" target="security--orders-db" data-model-id="orders-db" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;TLS&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;TLS&quot;}" data-source-label="PostgreSQL/TLS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="280" />
+              <mxPoint x="260" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" value="HTTPS" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="security--orders" target="security--stripe" data-model-id="orders-stripe" data-kind="sync" data-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;,&quot;timeout&quot;:&quot;2s&quot;}" data-source-properties="{&quot;protocol&quot;:&quot;HTTPS&quot;,&quot;timeout&quot;:&quot;2s&quot;}" data-source-label="HTTPS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="390" y="250" />
+              <mxPoint x="440" y="250" />
+              <mxPoint x="440" y="250" />
+              <mxPoint x="440" y="250" />
+              <mxPoint x="440" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

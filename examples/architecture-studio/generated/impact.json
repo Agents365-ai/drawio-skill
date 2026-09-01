@@ -1,0 +1,21 @@
+{
+  "failed": "orders",
+  "impacted": [
+    "orders-db",
+    "stripe"
+  ],
+  "paths": {
+    "orders": [
+      "orders"
+    ],
+    "orders-db": [
+      "orders",
+      "orders-db"
+    ],
+    "stripe": [
+      "orders",
+      "stripe"
+    ]
+  },
+  "drawio": "generated/checkout-failure.drawio"
+}

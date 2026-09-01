@@ -27,6 +27,8 @@ python3 skills/drawio-skill/scripts/diagramctl.py story architecture.ir.json \
 
 模型、规则、来源追溯和无障碍行为详见 `references/diagram-ir.md` 与
 `references/semantic-workflows.md`。
+完整的可重建工作流见
+[`examples/architecture-studio/`](../examples/architecture-studio/)。
 
 [English](USAGE.md)
 

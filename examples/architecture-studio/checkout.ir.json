@@ -1,0 +1,20 @@
+{
+  "schema": "drawio-skill/diagram-ir/v1",
+  "metadata": {"title": "Resilient checkout", "created": "2026-09-01T00:00:00+00:00"},
+  "nodes": [
+    {"id": "shopper", "label": "Shopper", "kind": "actor", "style": "rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;", "properties": {"trust_boundary": "public", "importance": 7}, "provenance": {"path": "examples/architecture-studio/checkout.ir.json"}, "labels": {"zh": "顾客"}},
+    {"id": "gateway", "label": "API Gateway", "kind": "gateway", "properties": {"owner": "platform", "environment": "production", "region": "eu-west-1", "runtime": "edge", "observability": "OpenTelemetry", "trust_boundary": "public", "importance": 10}, "provenance": {"path": "examples/architecture-studio/checkout.ir.json"}, "labels": {"zh": "API 网关"}},
+    {"id": "orders", "label": "Order Service", "kind": "service", "properties": {"owner": "checkout", "environment": "production", "region": "eu-west-1", "runtime": "Kubernetes", "observability": "OpenTelemetry", "trust_boundary": "private", "importance": 9}, "provenance": {"path": "services/orders.py", "line": 12}, "labels": {"zh": "订单服务"}},
+    {"id": "inventory", "label": "Inventory Service", "kind": "service", "properties": {"owner": "catalog", "environment": "production", "region": "eu-west-1", "runtime": "Kubernetes", "observability": "OpenTelemetry", "trust_boundary": "private", "importance": 6}, "provenance": {"path": "examples/architecture-studio/checkout.ir.json"}, "labels": {"zh": "库存服务"}},
+    {"id": "orders-db", "label": "Orders DB", "kind": "database", "properties": {"owner": "checkout", "environment": "production", "region": "eu-west-1", "observability": "database metrics", "trust_boundary": "data", "importance": 8}, "provenance": {"path": "examples/architecture-studio/checkout.ir.json"}, "labels": {"zh": "订单数据库"}},
+    {"id": "stripe", "label": "Stripe", "kind": "external", "properties": {"owner": "payments", "region": "global", "trust_boundary": "external", "importance": 5}, "provenance": {"path": "examples/architecture-studio/checkout.ir.json"}, "labels": {"zh": "支付平台"}}
+  ],
+  "edges": [
+    {"id": "shopper-gateway", "source": "shopper", "target": "gateway", "label": "HTTPS", "kind": "sync", "properties": {"protocol": "HTTPS"}},
+    {"id": "gateway-orders", "source": "gateway", "target": "orders", "label": "mTLS", "kind": "sync", "properties": {"protocol": "mTLS"}},
+    {"id": "orders-inventory", "source": "orders", "target": "inventory", "label": "gRPC", "kind": "sync", "properties": {"protocol": "mTLS", "timeout": "800ms", "isolates_failure": true}},
+    {"id": "orders-db", "source": "orders", "target": "orders-db", "label": "PostgreSQL/TLS", "kind": "sync", "properties": {"protocol": "TLS"}},
+    {"id": "orders-stripe", "source": "orders", "target": "stripe", "label": "HTTPS", "kind": "sync", "properties": {"protocol": "HTTPS", "timeout": "2s"}}
+  ],
+  "views": []
+}

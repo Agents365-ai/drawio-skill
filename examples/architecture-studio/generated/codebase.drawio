@@ -1,0 +1,60 @@
+<mxfile host="drawio-skill" agent="diagram-ir" version="3.0.0">
+  <diagram id="system" name="System">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="group_0" value="checkout" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#6c8ebf;fontColor=#6c8ebf;verticalAlign=top;fontStyle=2;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="6" y="86" width="388" height="328" as="geometry" />
+        </mxCell>
+        <mxCell id="checkout.gateway" value="checkout.gateway" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="group_0" data-model-id="checkout.gateway" data-kind="gateway" data-properties="{}" data-source-properties="{}" data-source-label="checkout.gateway" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/codebase&quot;,&quot;importer&quot;:&quot;python&quot;}">
+          <mxGeometry x="114" y="24" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="checkout.persistence" value="checkout.persistence" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="group_0" data-model-id="checkout.persistence" data-kind="service" data-properties="{}" data-source-properties="{}" data-source-label="checkout.persistence" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/codebase&quot;,&quot;importer&quot;:&quot;python&quot;}">
+          <mxGeometry x="24" y="234" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="checkout.payments" value="checkout.payments" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="group_0" data-model-id="checkout.payments" data-kind="service" data-properties="{}" data-source-properties="{}" data-source-label="checkout.payments" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/codebase&quot;,&quot;importer&quot;:&quot;python&quot;}">
+          <mxGeometry x="204" y="234" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="checkout" value="checkout" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1" data-model-id="checkout" data-kind="service" data-properties="{}" data-source-properties="{}" data-source-label="checkout" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/codebase&quot;,&quot;importer&quot;:&quot;python&quot;}">
+          <mxGeometry x="120" y="0" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="checkout.orders" value="checkout.orders" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="group_0" data-model-id="checkout.orders" data-kind="service" data-properties="{}" data-source-properties="{}" data-source-label="checkout.orders" data-provenance="{&quot;path&quot;:&quot;examples/architecture-studio/codebase&quot;,&quot;importer&quot;:&quot;python&quot;}">
+          <mxGeometry x="114" y="124" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="e0" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="checkout" target="checkout.gateway" data-model-id="checkout--checkout.gateway" data-kind="relation" data-properties="{}" data-source-properties="{}" data-source-label="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="70" />
+              <mxPoint x="200" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e1" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="checkout.gateway" target="checkout.orders" data-model-id="checkout.gateway--checkout.orders" data-kind="relation" data-properties="{}" data-source-properties="{}" data-source-label="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="180" />
+              <mxPoint x="200" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="checkout.orders" target="checkout.payments" data-model-id="checkout.orders--checkout.payments" data-kind="relation" data-properties="{}" data-source-properties="{}" data-source-label="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="250" y="280" />
+              <mxPoint x="250" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="checkout.orders" target="checkout.persistence" data-model-id="checkout.orders--checkout.persistence" data-kind="relation" data-properties="{}" data-source-properties="{}" data-source-label="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="160" y="280" />
+              <mxPoint x="160" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

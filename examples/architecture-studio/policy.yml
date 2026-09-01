@@ -1,0 +1,7 @@
+rules:
+  - no-direct-internet-to-database
+  - every-service-has-owner
+  - production-has-observability
+  - external-dependencies-have-timeouts
+  - trust-boundaries-use-protocol
+  - accessible-contrast

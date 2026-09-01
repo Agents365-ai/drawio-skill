@@ -6,7 +6,9 @@ semantic-ish versioning (the `metadata.version` field in
 `skills/drawio-skill/SKILL.md`).
 
 ## [3.0.0] — 2026-09-01
+
 ### Added
+
 - **Versioned Diagram IR** (`drawio-skill/diagram-ir/v1`) with a published JSON
   Schema, stable semantic IDs, node/edge properties, provenance, multilingual
   labels, and readers for JSON plus compressed/uncompressed `.drawio` pages.
@@ -37,8 +39,15 @@ semantic-ish versioning (the `metadata.version` field in
 - **Codex UI metadata** in `agents/openai.yaml`, explicit `allowed-tools`
   disclosure, offline/security guidance, and allowlisted hosts for optional AI
   and Databricks icon fetching.
+- **Maintained Architecture Studio showcase** covering code-to-IR generation,
+  three-way sync conflicts, linked views, policy checks, what-if analysis, and
+  offline Story publishing, with semantic regression tests.
+- **Release evidence** from native draw.io E2E execution and a dogfood run
+  against the repository's own script toolbox; observed gaps are tracked in the
+  evidence-based 3.1 roadmap.
 
 ### Changed
+
 - Reworked `SKILL.md` from a 355-line capability catalog into a 131-line
   progressive-disclosure router. Detailed semantic, IR, and security workflows
   now live in focused references.
@@ -51,7 +60,9 @@ semantic-ish versioning (the `metadata.version` field in
   and CLI workflows.
 
 ## [2.3.0] — 2026-08-27
+
 ### Added
+
 - **Structured diagnostics in `scripts/validate.py`** — findings render as
   `error: [E-DANGLING-END] ... (fix: ...)` with 12 stable codes and a fix hint
   per finding, so an agent can act on lint output mechanically; `--json` emits
@@ -68,7 +79,9 @@ semantic-ish versioning (the `metadata.version` field in
   archify investigation, PR #107.)
 
 ## [2.2.0] — 2026-08-27
+
 ### Added
+
 - **`scripts/dbxicons.py`** — Databricks product icon resolver, following the
   `aiicons.py` pattern. draw.io has no Databricks shape set, so lakehouse
   architectures rendered as generic boxes; only the bare Databricks logo
@@ -85,7 +98,9 @@ semantic-ish versioning (the `metadata.version` field in
   accents, capability-node style) in `references/databricks.md`.
 
 ## [2.1.1] — 2026-08-23
+
 ### Fixed
+
 - **Embed images in SVG exports** (`--embed-svg-images` in `scripts/svgflow.py`,
   `scripts/drawiohtml.py`, and the documented export command in `SKILL.md`):
   without the flag draw.io wrote `file:///` references into its app bundle, so
@@ -94,7 +109,9 @@ semantic-ish versioning (the `metadata.version` field in
   the `argv` of both Python call sites. (Thanks to @rjain21, PR #104.)
 
 ## [2.1.0] — 2026-07-25
+
 ### Added
+
 - **`scripts/edgeports.py`** — deterministic edge port assignment, the real
   replacement for the `--layout libavoid` flag removed in 2.0.0. draw.io's
   floating connections attach every edge to the middle of whichever side faces
@@ -113,7 +130,9 @@ semantic-ish versioning (the `metadata.version` field in
   since it only scores edges carrying explicit waypoints.
 
 ## [2.0.0] — 2026-07-25
+
 ### Removed
+
 - **`--layout libavoid` is gone from the documented interface.** It never
   worked; anyone who copied it from `SKILL.md` or `references/autolayout.md`
   hit a hang, not an error. There is **no CLI flag that reroutes edges without
@@ -122,6 +141,7 @@ semantic-ish versioning (the `metadata.version` field in
   draw.io desktop and use its editor-side obstacle-avoiding router.
 
 ### Fixed
+
 - **Removed the non-existent `--layout libavoid` CLI flag from the docs**
   (regression from #95). draw.io desktop's `--layout` accepts only the ELK
   presets `verticalFlow`, `horizontalFlow`, `verticalTree`, `horizontalTree`,
@@ -136,7 +156,9 @@ semantic-ish versioning (the `metadata.version` field in
   `libavoidRouting=1` style-stamp claim was dropped. Reported in #96.
 
 ## [1.34.0] — 2026-07-14
+
 ### Added
+
 - **`scripts/tubemap.py`** — Tube-Map Mode: restyle a graph as a London-
   Underground-style metro map. From a metro JSON (coloured *lines* = ordered
   stations on an integer grid, shared stations = interchanges) it draws thick
@@ -150,7 +172,9 @@ semantic-ish versioning (the `metadata.version` field in
   table, toolbox (quick-guide + §1), and a README/README_CN example + demo image.
 
 ## [1.33.0] — 2026-07-14
+
 ### Added
+
 - **`scripts/raster2drawio.py`** — image → editable `.drawio`. Converts a
   vision-extracted image graph (JSON: nodes with `x`/`y`/`shape`/`fill`, edges with
   `dashed`/`arrow`) — read off a whiteboard photo, legacy PNG, or Visio screenshot —
@@ -187,7 +211,9 @@ semantic-ish versioning (the `metadata.version` field in
   `test_prdiff` 8, `test_compress` 9, `test_runbook` 6).
 
 ## [1.32.0] — 2026-07-14
+
 ### Added
+
 - **`scripts/ciimports.py`** — CI pipelines as diagrams. Reads GitHub Actions
   workflows (`.github/workflows/*.yml`, or a repo root) and/or `.gitlab-ci.yml`
   (auto-detected) and emits an autolayout graph: job nodes labeled with runner,
@@ -201,7 +227,9 @@ semantic-ish versioning (the `metadata.version` field in
   `docs/CI.md`/`CI_CN.md`, and 2 regression tests (81 total).
 
 ## [1.31.0] — 2026-07-13
+
 ### Added
+
 - **`scripts/relabel.py`** — language variants / bulk text swaps of an existing
   `.drawio` with layout, styles, and ids untouched. `--extract` dumps every label
   (vertices, edges, UserObjects, page names) as an identity JSON map; translate the
@@ -217,7 +245,9 @@ semantic-ish versioning (the `metadata.version` field in
   `style-presets.md`, and 6 new regression tests (79 total). Scripts: 28 → 30.
 
 ## [1.30.0] — 2026-07-13
+
 ### Added
+
 - **Three new diagram-type presets** in `references/diagram-types.md`, filling gaps the
   frontmatter description already promised (same pattern as the 1.29.0 SysML preset):
   - **BPMN (Business Process)** — pools/lanes, `mxgraph.bpmn.task2` typed tasks
@@ -235,7 +265,9 @@ semantic-ish versioning (the `metadata.version` field in
   three new rows in the diagram-type dispatch table. Presets: 8 → 11.
 
 ## [1.29.0] — 2026-07-13
+
 ### Added
+
 - **SysML diagram preset** ([#83](https://github.com/Agents365-ai/drawio-skill/issues/83)) —
   new SysML section in `references/diagram-types.md` covering the four SysML-unique
   diagram kinds: Block Definition (bdd, «block» compartments + composite/reference
@@ -250,7 +282,9 @@ semantic-ish versioning (the `metadata.version` field in
   "requirement diagram", "parametric diagram", "MBSE" requests route to the new preset.
 
 ## [1.28.1] — 2026-07-10
+
 ### Changed
+
 - **Refreshed the `vs Other draw.io Skills & Tools` comparison** (README, README_CN,
   `docs/COMPARISON.md`, `docs/COMPARISON_CN.md`) to match the current state of the
   official [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp), which has grown
@@ -260,14 +294,18 @@ semantic-ish versioning (the `metadata.version` field in
   and **Browser fallback** (its Claude Code plugin now emits a diagrams.net `url`, not
   just an inline preview). Added a pointer to the official plugin's install command with
   a one-line statement of how drawio-skill stays complementary. Bumped the audit date.
+
 ### Added
+
 - **libavoid routing note** in `references/xml-authoring.md` — documents draw.io's newer
   editor-side obstacle-avoiding connector router (`libavoidRouting=1`), clarifies it is
   not a headless CLI `--layout` flag (those are ELK node layouts), and gives the practical
   path for CLI-authored files. Also noted in the comparison's edge-routing row.
 
 ## [1.28.0] — 2026-07-04
+
 ### Added
+
 - **Interactive HTML viewer** (`scripts/drawiohtml.py`) — publish a `.drawio` as
   ONE self-contained `.html`: every page exported to SVG via the draw.io CLI and
   inlined with page tabs, drag-pan, wheel-zoom (cursor-anchored), node search
@@ -283,7 +321,9 @@ semantic-ish versioning (the `metadata.version` field in
     router + toolbox.md + READMEs updated; script count 27 → 28. Suite now 73.
 
 ## [1.27.0] — 2026-07-04
+
 ### Added
+
 - **OpenAPI / Swagger → API diagram** (`scripts/openapiimports.py`) — turn an
   OpenAPI 3 or Swagger 2 spec (JSON, or YAML with PyYAML) into a graph for
   autolayout: one node per operation **coloured by HTTP method** (GET blue, POST
@@ -305,7 +345,9 @@ semantic-ish versioning (the `metadata.version` field in
     updated; script count 25 → 27. Suite now 69.
 
 ## [1.26.1] — 2026-07-04
+
 ### Added
+
 - **`references/toolbox.md`** — a use-case map of all 25 bundled scripts
   (author / import code / import IaC / live infra / compare / reverse-export /
   utilities) with an "I have X, I want Y → use Z" decision guide and the shared
@@ -313,7 +355,9 @@ semantic-ish versioning (the `metadata.version` field in
   resource table points to it as the "not sure which script fits" entry.
 
 ## [1.26.0] — 2026-07-04
+
 ### Added
+
 - **Diagram → Mermaid** (`scripts/drawio2mermaid.py`) — convert a `.drawio` into
   a Mermaid `flowchart` you can paste into Markdown and have GitHub / GitLab /
   docs render natively (diagrams-as-code). Containers become `subgraph`s, edge
@@ -327,7 +371,9 @@ semantic-ish versioning (the `metadata.version` field in
     SKILL.md router + READMEs updated. Suite now 63.
 
 ## [1.25.0] — 2026-07-03
+
 ### Added
+
 - **Animated data-flow SVG** (`scripts/svgflow.py`) — export a `.drawio` to SVG
   and turn every edge into a marching-ants animation (dashes travel along each
   connector in the arrow's direction), so the diagram shows data/flow moving
@@ -341,7 +387,9 @@ semantic-ish versioning (the `metadata.version` field in
     Suite now 61.
 
 ## [1.24.0] — 2026-07-03
+
 ### Added
+
 - **Diagram → PowerPoint** (`scripts/drawio2pptx.py`) — export a (multi-page)
   `.drawio` to a 16:9 `.pptx`, one page per slide, the page name as the slide
   title and the diagram centred + scaled to fit. A C4 model
@@ -353,7 +401,9 @@ semantic-ish versioning (the `metadata.version` field in
   - SKILL.md router + READMEs updated. Suite now 59.
 
 ## [1.23.0] — 2026-07-03
+
 ### Added
+
 - **Diagram → Markdown** (`scripts/explain.py`) — the inverse of the generators:
   read a `.drawio` and describe it as structured Markdown. Lists components
   grouped by their container / swimlane / tier, relations (`A —label→ B`, the
@@ -365,7 +415,9 @@ semantic-ish versioning (the `metadata.version` field in
   - SKILL.md router + READMEs updated. Suite now 56.
 
 ## [1.22.0] — 2026-07-03
+
 ### Added
+
 - **Architecture time-lapse** (`scripts/timelapse.py`) — animate how a codebase's
   structure grew across git history. Walks a directory's commits, re-runs a
   bundled importer at each sampled commit (tree pulled with `git archive`; the
@@ -382,7 +434,9 @@ semantic-ish versioning (the `metadata.version` field in
     Suite now 54.
 
 ## [1.21.0] — 2026-07-03
+
 ### Added
+
 - **Diagram diff** (`scripts/drawiodiff.py`) — compare two `.drawio` files into a
   single colour-coded "what changed" graph for autolayout: nodes/edges **added**
   (green), **removed** (red, dashed), **changed** (orange — a matched node whose
@@ -396,7 +450,9 @@ semantic-ish versioning (the `metadata.version` field in
     Suite now 52.
 
 ## [1.20.0] — 2026-07-03
+
 ### Added
+
 - **Live-infrastructure importers** — draw what's *actually running / deployed*,
   not just the declared config:
   - `scripts/tfstate.py` — `terraform show -json | tfstate.py -` renders the
@@ -416,7 +472,9 @@ semantic-ish versioning (the `metadata.version` field in
   one-liners + caveats); router + autolayout reference updated. Suite now 50.
 
 ## [1.19.0] — 2026-07-03
+
 ### Added
+
 - **Accessibility built-in presets**: `colorblind-safe` (Okabe-Ito palette —
   all seven role colors distinguishable under color-vision deficiency, plus
   `strokeWidth=2`) and `dark` (dark fills + dark page background, light
@@ -431,7 +489,9 @@ semantic-ish versioning (the `metadata.version` field in
 - Built-in preset conformance test (suite now 46).
 
 ## [1.18.0] — 2026-07-03
+
 ### Added
+
 - **Mermaid authoring path** (draw.io CLI ≥ 30, discovered via
   jgraph/drawio-mcp): for standard diagram types with no custom styling/icon
   needs, write Mermaid text and convert natively —
@@ -449,7 +509,9 @@ semantic-ish versioning (the `metadata.version` field in
   argument parsing, so both paths are skipped (verified 29.7.8 vs 30.2.6).
 
 ## [1.17.0] — 2026-07-03
+
 ### Added
+
 - **`c4.py` — C4 model diagrams with drill-down.** Levels JSON (System
   Context → Containers → Components, any depth) in, one multi-page `.drawio`
   out: official C4 shapes/colors (`mxgraph.c4.person2`, c4model.com
@@ -464,13 +526,17 @@ semantic-ish versioning (the `metadata.version` field in
   hand-authored diagrams that use links/metadata).
 - `references/diagram-types.md`: C4 Model section (styles, label format,
   drill-down recipe); SKILL.md routes "C4", "container diagram", etc. to it.
+
 ### Fixed
+
 - SKILL.md export flags: `--page-index` is **1-based** in current
   drawio-desktop (verified on 29.7.8) — previously documented as 0-based.
 - Tests: 45.
 
 ## [1.16.0] — 2026-07-02
+
 ### Added
+
 - **`seqlayout.py` — deterministic sequence diagrams.** Participants +
   messages JSON in, finished `.drawio` out: lifeline, activation-bar and
   arrow geometry are computed (not hand-placed), with automatic activation
@@ -488,7 +554,9 @@ semantic-ish versioning (the `metadata.version` field in
   readability score (through-vertex ×20, crossings ×10, overlaps ×5).
 - `autolayout.py` honours per-edge `style` in the graph JSON (used by
   sqlerd's ER edges).
+
 ### Changed
+
 - **SKILL.md slimmed 488 → 313 lines**: the XML-authoring tutorial (skeleton,
   shape/edge cells, containers, connection distribution, palette, layout
   tips) moved to `references/xml-authoring.md`, read on demand before
@@ -497,7 +565,9 @@ semantic-ish versioning (the `metadata.version` field in
   passthrough).
 
 ## [1.15.0] — 2026-07-02
+
 ### Added
+
 - **IaC → architecture diagram.** Two new importers feed autolayout:
   - `tfimports.py` parses Terraform `.tf` files (regex + brace matching, no
     HCL dependency) into a resource-reference graph. Each resource type is
@@ -517,7 +587,9 @@ semantic-ish versioning (the `metadata.version` field in
 - Test coverage for both importers and the autolayout additions (suite now 38).
 
 ## [1.14.0] — 2026-06-03
+
 ### Added
+
 - `aiicons.py` resolves common RAG/LLM **data-store brands** (Qdrant, Redis,
   Postgres, Mongo, Elasticsearch, Milvus, Supabase, Neo4j, … 18 total) via the
   [simple-icons](https://simpleicons.org) (CC0) CDN when lobe-icons lacks them;
@@ -528,26 +600,36 @@ semantic-ish versioning (the `metadata.version` field in
   search, and AI logos.
 
 ## [1.13.1] — 2026-06-03
+
 ### Added
+
 - Dependency-free `unittest` regression suite (`tests/`) + GitHub Actions CI.
+
 ### Fixed
+
 - Unclosed file handle in `autolayout.load_palette()`.
 
 ## [1.13.0] — 2026-06-03
+
 ### Added
+
 - **Palette-based group colouring** in auto-layout: grouped code-visualization
   diagrams now tint each top-level group with a distinct colour from the skill's
   own palette (`styles/built-in/default.json`), with matching container borders —
   so related modules read as a coloured cluster instead of monochrome boxes.
 - `autolayout.py --mono` to opt out and keep the previous monochrome look.
 - README example images for Shape Search and AI/LLM brand logos.
+
 ### Changed
+
 - `pyclasses.py` no longer hard-codes a node colour; its grouped output is
   coloured by module. Styleless nodes are tinted by group; an explicit node
   `style` always wins. Ungrouped output is unchanged.
 
 ## [1.12.0] — 2026-06-03
+
 ### Added
+
 - **AI / LLM brand logos** via `aiicons.py` — resolves a brand (OpenAI, Claude,
   Gemini, Mistral, Llama, Ollama, LangChain, … 321 brands) to a draw.io image
   style backed by [lobe-icons](https://github.com/lobehub/lobe-icons) (MIT).
@@ -555,95 +637,136 @@ semantic-ish versioning (the `metadata.version` field in
   self-contained data URI for offline use. draw.io ships none of these logos.
 
 ## [1.11.1] — 2026-06-03
+
 ### Changed
+
 - Shape search ranks **title-exact matches above tag-only neighbours** (e.g.
   `dynamodb` now returns *DynamoDB*, not *Attribute*). Scoring/candidate set is
   unchanged; only the within-score-tier order changes.
+
 ### Added
+
 - READMEs document shape search, the editable browser URL, and WSL2 support.
 
 ## [1.11.0] — 2026-06-02
+
 Ideas adapted from [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp) (Apache-2.0).
+
 ### Added
+
 - **Shape search** across 10,000+ official draw.io shapes (`shapesearch.py`) —
   resolves the exact `style` for AWS/Azure/GCP/Cisco/Kubernetes/UML/BPMN/ER/
   electrical/P&ID instead of guessing `shape=mxgraph.*` names.
 - **WSL2 / Windows** CLI detection + browser-open guidance (the `.url`-file
   fragment workaround).
 - `encode_drawio_url.py --edit` for an editable `app.diagrams.net` URL.
+
 ### Fixed
+
 - Browser-URL encoder now `encodeURIComponent`s before deflate, so URLs no
   longer throw "URI malformed" on a literal `%` or non-ASCII (e.g. CJK) label.
 
 ## [1.10.0] — 2026-06-02
+
 ### Added
+
 - **Rust** module-use importer (`rustimports.py`) — intra-crate `use` graph.
 
 ## [1.9.0] — 2026-06-02
+
 ### Added
+
 - **Nested containers** in auto-layout (deep `/`-delimited group paths).
 - **Python class-inheritance** graph (`pyclasses.py`) — one node per class,
   edges from subclass to base, boxed by module with `--group`.
 
 ## [1.8.0] — 2026-06-02
+
 ### Added
+
 - **Structural validator** (`validate.py`) — deterministic `.drawio` lint
   (dangling edges, duplicate/reserved ids, broken parents, overlaps).
 - **JS/TS** (`jsimports.py`) and **Go** (`goimports.py`) import-graph importers.
 - Container / cluster layout (`--group`) in auto-layout.
 
 ## [1.7.0] — 2026-06-02
+
 ### Added
+
 - **Python** import-graph importer (`pyimports.py`) — intra-project module graph,
   transitive-reduced.
 
 ## [1.6.0] — 2026-06-02
+
 ### Added
+
 - **Graphviz auto-layout** (`autolayout.py`) — places nodes and routes
   orthogonal edges for medium/large graphs, removing the manual-coordinate
   ceiling.
 
 ## [1.5.3] — 2026-06-02
+
 ### Changed
+
 - Finalize the `drawio` binary rename and sync reference docs.
 - Major docs/landing-page overhaul (comparison tables, hero, sub-doc split),
   `sync-365-skills` CI, macOS sandbox-isolation notes.
 
 ## [1.5.2] — 2026-05-17
+
 ### Fixed
+
 - Add a top-level `version` field for ClawHub compatibility.
 
 ## [1.5.1] — 2026-05-06
+
 ### Added
+
 - Claude Code **plugin marketplace** support; restructure for the 365-skills
   umbrella submodule.
 
 ## [1.5.0] — 2026-05-06
+
 ### Changed
+
 - Split `SKILL.md` into modular references + scripts.
 
 ## [1.4.0] — 2026-04-23
+
 ### Added
+
 - Custom output directory support.
+
 ### Fixed
+
 - Browser fallback fix; repair truncated IEND chunk in `-e` PNG export (issues #8/#9).
 
 ## [1.3.0] — 2026-04-23
+
 ### Added
+
 - **Style presets** — learn a visual style from a `.drawio`/image and reuse it.
 
 ## [1.2.0] — 2026-04-19
+
 ### Added
+
 - Auto-update check; Opencode support.
 
 ## [1.1.1] — 2026-04-06
+
 ### Added
+
 - GitHub Pages landing page.
+
 ### Fixed
+
 - Security flag fixes.
 
 ## [1.1.0] — 2026-04-06
+
 ### Added
+
 - Diagram-type presets, ML/Deep-Learning model support, and quality-of-life
   enhancements.
 

@@ -1,0 +1,100 @@
+{
+  "schema": "drawio-skill/diagram-ir/v1",
+  "metadata": {
+    "title": "Checkout codebase",
+    "created": "2026-09-01T00:00:00+00:00",
+    "source": "examples/architecture-studio/codebase",
+    "importer": "python"
+  },
+  "nodes": [
+    {
+      "id": "checkout.gateway",
+      "label": "checkout.gateway",
+      "kind": "gateway",
+      "properties": {},
+      "group": "checkout",
+      "provenance": {
+        "path": "examples/architecture-studio/codebase",
+        "importer": "python"
+      }
+    },
+    {
+      "id": "checkout.persistence",
+      "label": "checkout.persistence",
+      "kind": "service",
+      "properties": {},
+      "group": "checkout",
+      "provenance": {
+        "path": "examples/architecture-studio/codebase",
+        "importer": "python"
+      }
+    },
+    {
+      "id": "checkout.payments",
+      "label": "checkout.payments",
+      "kind": "service",
+      "properties": {},
+      "group": "checkout",
+      "provenance": {
+        "path": "examples/architecture-studio/codebase",
+        "importer": "python"
+      }
+    },
+    {
+      "id": "checkout",
+      "label": "checkout",
+      "kind": "service",
+      "properties": {},
+      "provenance": {
+        "path": "examples/architecture-studio/codebase",
+        "importer": "python"
+      }
+    },
+    {
+      "id": "checkout.orders",
+      "label": "checkout.orders",
+      "kind": "service",
+      "properties": {},
+      "group": "checkout",
+      "provenance": {
+        "path": "examples/architecture-studio/codebase",
+        "importer": "python"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "checkout--checkout.gateway",
+      "source": "checkout",
+      "target": "checkout.gateway",
+      "label": "",
+      "kind": "relation",
+      "properties": {}
+    },
+    {
+      "id": "checkout.gateway--checkout.orders",
+      "source": "checkout.gateway",
+      "target": "checkout.orders",
+      "label": "",
+      "kind": "relation",
+      "properties": {}
+    },
+    {
+      "id": "checkout.orders--checkout.payments",
+      "source": "checkout.orders",
+      "target": "checkout.payments",
+      "label": "",
+      "kind": "relation",
+      "properties": {}
+    },
+    {
+      "id": "checkout.orders--checkout.persistence",
+      "source": "checkout.orders",
+      "target": "checkout.persistence",
+      "label": "",
+      "kind": "relation",
+      "properties": {}
+    }
+  ],
+  "views": []
+}
