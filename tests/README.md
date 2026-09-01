@@ -1,5 +1,15 @@
 # Tests
 
+Tests that launch the Electron-based draw.io desktop CLI are opt-in because a
+binary can be installed yet unusable in a headless or macOS sandbox session.
+Run the deterministic unit suite normally, and enable native export tests only
+in a desktop-capable environment:
+
+```bash
+python3 -m unittest discover -s tests
+DRAWIO_E2E=1 python3 -m unittest discover -s tests
+```
+
 Dependency-free regression tests for the bundled scripts (stdlib `unittest`
 only — no pip install). They live at the repo root so they are **not** shipped
 with the skill package.

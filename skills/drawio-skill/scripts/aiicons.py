@@ -28,6 +28,7 @@ import json
 import os
 import re
 import sys
+import urllib.parse
 import urllib.request
 
 MANIFEST = os.path.join(os.path.dirname(__file__), "..", "data", "lobe-icons.json")
@@ -39,6 +40,7 @@ _VARIANT = re.compile(r"-(?:color|text(?:-[a-z]{2})?|brand(?:-color)?)$")
 # slugs (https://simpleicons.org, CC0). Served from the simple-icons CDN. Each
 # slug below is verified to return HTTP 200 at https://cdn.simpleicons.org/<slug>.
 _SIMPLEICONS_CDN = "https://cdn.simpleicons.org/"
+_ALLOWED_HOSTS = {"unpkg.com", "cdn.simpleicons.org"}
 _SUPPLEMENT = {
     "qdrant": "qdrant",
     "milvus": "milvus",
@@ -72,6 +74,18 @@ def families(icons):
 
 def squish(s):
     return re.sub(r"[^a-z0-9]", "", s.lower())
+
+
+def safe_url(url):
+    """Reject a tampered manifest before emitting or fetching its URL."""
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme != "https" or parsed.hostname not in _ALLOWED_HOSTS:
+        raise ValueError(f"refusing icon URL outside allowlist: {url}")
+    return url
+
+
+def fetch(url):
+    return urllib.request.urlopen(safe_url(url), timeout=15).read()
 
 
 def search(fam, query, limit):
@@ -141,7 +155,7 @@ def main():
     with open(MANIFEST, encoding="utf-8") as f:
         manifest = json.load(f)
     fam = families(manifest["icons"])
-    cdn = manifest["cdn"]
+    cdn = safe_url(manifest["cdn"])
 
     if args.list:
         for base in sorted(fam):
@@ -159,7 +173,7 @@ def main():
             url = f"{cdn}{file}.svg"
             if args.embed:
                 try:
-                    svg = urllib.request.urlopen(url, timeout=15).read()
+                    svg = fetch(url)
                 except Exception as exc:                   # noqa: BLE001 - report and skip
                     sys.stderr.write(f"warning: could not fetch {url} ({exc})\n")
                     continue
@@ -181,7 +195,7 @@ def main():
             image = url
             if args.embed:
                 try:
-                    svg = urllib.request.urlopen(url, timeout=15).read()
+                    svg = fetch(url)
                     # Marker-less base64 (see issue #80 note above).
                     image = "data:image/svg+xml," + base64.b64encode(svg).decode()
                 except Exception as exc:                   # noqa: BLE001 - keep the CDN URL

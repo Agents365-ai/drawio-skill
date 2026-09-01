@@ -42,6 +42,7 @@ import json
 import os
 import re
 import sys
+import urllib.parse
 import urllib.request
 
 MANIFEST = os.path.join(os.path.dirname(__file__), "..", "data", "databricks-icons.json")
@@ -54,6 +55,8 @@ _SOURCE = f"https://github.com/{_REPO}"
 _HOSTED = "https://oieduardorabelo.github.io/databricks-architecture-icons"
 _RAW = f"https://raw.githubusercontent.com/{_REPO}/"
 _API_COMMIT = f"https://api.github.com/repos/{_REPO}/commits/"
+_ALLOWED_HOSTS = {"raw.githubusercontent.com", "api.github.com",
+                  "oieduardorabelo.github.io"}
 
 # Curated aliases beyond the upstream catalog's former names ("aka"), for the
 # names people still use after Databricks renamed the product. Source of truth
@@ -139,6 +142,9 @@ def resolve(products, query, limit):
 # ---------------------------------------------------------------- refresh ---
 
 def _fetch(url, accept=None):
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme != "https" or parsed.hostname not in _ALLOWED_HOSTS:
+        raise ValueError(f"refusing icon URL outside allowlist: {url}")
     headers = {"User-Agent": "drawio-skill-dbxicons"}
     if accept:
         headers["Accept"] = accept
@@ -242,6 +248,9 @@ def main():
         sys.exit(f"error: manifest not found at {MANIFEST}")
     with open(MANIFEST, encoding="utf-8") as f:
         manifest = json.load(f)
+    hosted = urllib.parse.urlparse(manifest.get("hostedBase", ""))
+    if hosted.scheme != "https" or hosted.hostname not in _ALLOWED_HOSTS:
+        sys.exit("error: manifest hostedBase is outside the icon host allowlist")
     products = manifest["products"]
 
     if args.list:

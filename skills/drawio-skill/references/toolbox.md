@@ -1,6 +1,7 @@
 # Toolbox — every bundled script, by use-case
 
-A map of the 39 bundled scripts grouped by what you're trying to do. The
+A map of the 39 focused tools, the unified `diagramctl.py` orchestrator, and its
+internal `diagram_ir.py` model grouped by what you're trying to do. The
 per-task routing table in `SKILL.md` says *when* to reach for each; this says
 *how they fit together*. Read it when you're not sure which script a request
 maps to, or you want to chain several.
@@ -13,11 +14,28 @@ exports it:
 <extractor> → graph.json → autolayout.py → diagram.drawio → validate.py → (export PNG/SVG/PDF)
 ```
 
+For new workflows, prefer the semantic backbone. It retains provenance and
+supports incremental updates instead of one-shot regeneration:
+
+```
+source → diagramctl build → Diagram IR → views/test/review/story
+                              ↕
+                       diagramctl sync ↔ existing .drawio
+```
+
+Use focused scripts directly when you need their narrow interface; use
+`diagramctl.py` when a task crosses several stages.
+
 ## Quick decision guide
 
 | I have… | I want… | Use |
 |---|---|---|
 | a description in words | a styled diagram | hand-write XML (`references/xml-authoring.md`) or `autolayout.py` |
+| code/IaC/spec/IR | one command that detects, builds, and records provenance | `diagramctl build` |
+| a source-backed `.drawio` + changed source | update it without losing manual layout/style | `diagramctl sync` |
+| one architecture model | executive/system/deployment/data/security pages | `diagramctl views` |
+| a diagram or IR | queries, policy tests, architecture review, failure impact | `diagramctl query/test/review/whatif` |
+| a diagram or IR | an accessible guided offline walkthrough | `diagramctl story` |
 | a big/complex graph | it laid out for me | `autolayout.py` (`--tune` picks direction) |
 | a Python/JS/Go/Rust project | its module/class structure | `pyimports` · `jsimports` · `goimports` · `rustimports` · `pyclasses` |
 | Terraform/K8s/compose files | the **declared** architecture | `tfimports` · `k8simports` · `composeimports` |

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Draw.io Architecture Studio"
+  short_description: "Build, sync, test, and publish editable diagrams"
+  brand_color: "#1A73E8"
+  default_prompt: "Use $drawio-skill to create an editable, validated draw.io diagram and show me the result."
+policy:
+  allow_implicit_invocation: true

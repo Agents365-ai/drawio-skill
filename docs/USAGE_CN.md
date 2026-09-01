@@ -1,5 +1,33 @@
 # 使用方式
 
+## 统一语义工作流（3.0）
+
+```bash
+# 不启动 GUI，先检查本机能力
+python3 skills/drawio-skill/scripts/diagramctl.py doctor
+
+# 构建并保留可复用的语义模型
+python3 skills/drawio-skill/scripts/diagramctl.py build ./infra --from terraform \
+  --group --ir-output architecture.ir.json -o architecture.drawio
+
+# 源变化后同步，同时保留手工位置与样式
+python3 skills/drawio-skill/scripts/diagramctl.py sync architecture.drawio ./infra \
+  --from terraform -o architecture.next.drawio
+
+# 投影多视图、执行契约、体检、故障模拟并发布
+python3 skills/drawio-skill/scripts/diagramctl.py views architecture.ir.json \
+  --views executive,system,deployment,dataflow,security -o views.drawio
+python3 skills/drawio-skill/scripts/diagramctl.py test architecture.drawio --rules policy.yml
+python3 skills/drawio-skill/scripts/diagramctl.py review architecture.drawio -o review.md
+python3 skills/drawio-skill/scripts/diagramctl.py whatif architecture.ir.json \
+  --fail gateway --drawio gateway-failure.drawio -o impact.json
+python3 skills/drawio-skill/scripts/diagramctl.py story architecture.ir.json \
+  -o walkthrough.html
+```
+
+模型、规则、来源追溯和无障碍行为详见 `references/diagram-ir.md` 与
+`references/semantic-workflows.md`。
+
 [English](USAGE.md)
 
 直接描述你想要的图表：

@@ -1,5 +1,33 @@
 # Usage
 
+## Unified semantic workflow (3.0)
+
+```bash
+# Discover capabilities without launching the GUI
+python3 skills/drawio-skill/scripts/diagramctl.py doctor
+
+# Build and retain a reusable semantic sidecar
+python3 skills/drawio-skill/scripts/diagramctl.py build ./infra --from terraform \
+  --group --ir-output architecture.ir.json -o architecture.drawio
+
+# Keep manual positions/styles while source changes
+python3 skills/drawio-skill/scripts/diagramctl.py sync architecture.drawio ./infra \
+  --from terraform -o architecture.next.drawio
+
+# Project views, enforce a contract, review, simulate, and publish
+python3 skills/drawio-skill/scripts/diagramctl.py views architecture.ir.json \
+  --views executive,system,deployment,dataflow,security -o views.drawio
+python3 skills/drawio-skill/scripts/diagramctl.py test architecture.drawio --rules policy.yml
+python3 skills/drawio-skill/scripts/diagramctl.py review architecture.drawio -o review.md
+python3 skills/drawio-skill/scripts/diagramctl.py whatif architecture.ir.json \
+  --fail gateway --drawio gateway-failure.drawio -o impact.json
+python3 skills/drawio-skill/scripts/diagramctl.py story architecture.ir.json \
+  -o walkthrough.html
+```
+
+See `references/diagram-ir.md` and `references/semantic-workflows.md` for the
+model, rule catalog, provenance, and accessibility behavior.
+
 [中文](USAGE_CN.md)
 
 Just describe what you want:

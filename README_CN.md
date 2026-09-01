@@ -13,7 +13,7 @@
 
 [English](README.md) · **中文** · [📖 在线文档](https://agents365-ai.github.io/drawio-skill/)
 
-一个把自然语言描述变成 `.drawio` XML，并通过 draw.io 桌面版原生 CLI 导出 PNG / SVG / PDF / JPG 的技能。它还能把**现有代码库**（Python / JS-TS / Go / Rust）、**Terraform / Kubernetes / docker-compose 基础设施**或 **SQL schema** 转成自动布局的图表。支持 **Claude Code、Cursor、Copilot、OpenClaw、Codex、Autohand Code、Hermes** 等任何兼容 [Agent Skills](https://agentskills.io) 规范的 agent。
+一个把自然语言和真实系统源转换成可持续维护的 `.drawio` 架构模型的技能。除了生成与导出，它还能保留人工布局地增量同步、从同一模型投影多种视图、执行架构规则、查询依赖、模拟故障传播，并发布无外部依赖的互动讲解页。支持 **Claude Code、Cursor、Copilot、OpenClaw、Codex、Autohand Code、Hermes** 等任何兼容 [Agent Skills](https://agentskills.io) 规范的 agent。
 
 <p align="center">
   <img src="assets/microservices-example.png" width="900" alt="微服务架构图 —— 来自一条自然语言提示词">
@@ -21,6 +21,12 @@
 
 ## ✨ 核心亮点
 
+- **架构数字孪生 / Diagram IR** —— 图的语义、来源与几何分离；同一模型可生成高管、系统、部署、数据流、安全五种可下钻视图
+- **增量同步且不丢人工布局** —— `diagramctl sync` 只更新变化的节点和关系，保留手调坐标、样式与注释；删除项默认进入可审查状态
+- **Diagram-as-Test** —— 用 YAML/JSON 规则检查直连数据库、循环依赖、孤立节点、owner、生产可观测性、外部超时、信任边界协议与颜色对比度
+- **架构查询与体检** —— 查询任意组件/owner/边界/调用路径，发现单点连接、高耦合、缺失元数据，并生成 Markdown/JSON 审查报告
+- **What-if + Story Mode** —— 模拟节点故障传播并生成高亮图；发布键盘可用、带文本替代/来源信息/多语言切换的离线 HTML 讲解页
+- **统一 CLI** —— `doctor/build/sync/views/query/test/review/whatif/story/publish/transform` 串起全部能力，核心语义工作流仅需 Python 且默认离线
 - **11 种图表类型预设** —— ER 图、UML 类图、序列图、C4、架构图、ML/深度学习、流程图、SysML（BDD / IBD / 需求图 / 参数图）、BPMN、网络拓扑、跨职能泳道图
 - **Mermaid → 原生 .drawio**（draw.io ≥ 30）—— 28 种标准类型直接用 Mermaid 文本作图（**mindmap、gantt、timeline、journey、pie、sankey、kanban**……），CLI 原生转成已布局、可编辑的 `.drawio` —— 只管结构，布局白送
 - **可视化代码库** —— 提取并自动布局一个 Python / JS-TS / Go / Rust 项目的结构（导入关系图）或 Python 类继承层级 —— Graphviz 布点、传递约简、按子包嵌套的容器
@@ -34,7 +40,7 @@
 - **迭代反馈循环** —— 最多 5 轮定向优化
 - **样式预设** —— 用 `.drawio` 文件或图片"教会"Skill 你的风格，命名保存后随时复用
 - **整洁布局** —— 网格对齐，间距随图表规模缩放，连线避开节点
-- **多智能体、零配置** —— 从单个 SKILL.md 运行，无需 MCP、无后台 daemon（可选的 `npx` 安装器需要 Node，skill 本身不需要）
+- **多智能体、无后台服务** —— 可移植的 Agent Skills 包，无需 MCP 或 daemon；核心语义工作流只需 Python，原生导出按需安装
 
 ## 🗺️ 功能全景
 
