@@ -350,27 +350,6 @@ Skill 会提取配色、形状、字体和连线风格，渲染预览图，**确
 
 ## 🆚 对比
 
-### 对比原生智能体（无 skill）
-
-| 功能 | 原生智能体 | drawio-skill |
-| ------ | ----------- | -------------- |
-| 导出后自检 | ❌ | ✅ 读取 PNG 自动修复 6 类问题 |
-| 迭代审查循环 | ❌ 需手动重新提问 | ✅ 定向编辑，5 轮安全阀 |
-| 图表类型预设 | ❌ | ✅ 7 种（ERD、UML、序列、C4、架构、ML、流程） |
-| Mermaid → 可编辑 .drawio | ❌ | ✅ 28 种类型，CLI 原生转换（≥ v30） |
-| 可视化代码库 | ❌ | ✅ 导入关系图（Py/JS/Go/Rust）+ 类图 |
-| IaC → 架构图 | ❌ | ✅ Terraform / K8s / compose → 官方云图标 |
-| SQL DDL → ER 图 | ❌ | ✅ `CREATE TABLE` → PK/FK 表节点 + 鸦爪连线 |
-| 时序图 | ❌ 手摆坐标易出错 | ✅ 确定性几何引擎（`seqlayout.py`） |
-| C4 模型 | ❌ | ✅ 多页 Context→Container→Component + 点击下钻 |
-| 大图自动布局 | ❌ 手动摆放、易重叠 | ✅ Graphviz 布点、正交路由、嵌套容器 |
-| 结构校验 | ❌ | ✅ 确定性 `.drawio` linter |
-| 官方形状搜索 | ❌ 靠猜、变空白框 | ✅ 1 万+ AWS/Azure/GCP/UML 形状的精确 style |
-| AI/LLM 品牌图标 | ❌ 没有 | ✅ 321 个 AI logo + 18 个数据存储品牌，经 aiicons.py |
-| 网格对齐布局 | ❌ | ✅ 10px 对齐、路由走廊 |
-| 配色方案 | 随机 / 不一致 | ✅ 7 色语义系统 |
-| 样式预设 | ❌ | ✅ 从 `.drawio` 文件或图片学习 |
-
 ### 对比其他 draw.io Skills 与工具
 
 | 功能 | drawio-skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp)（官方）<br>![stars](https://img.shields.io/github/stars/jgraph/drawio-mcp?style=flat-square&logo=github&v=2) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills)<br>![stars](https://img.shields.io/github/stars/bahayonghang/drawio-skills?style=flat-square&logo=github) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio)<br>![stars](https://img.shields.io/github/stars/GBSOSS/ai-drawio?style=flat-square&logo=github) |
