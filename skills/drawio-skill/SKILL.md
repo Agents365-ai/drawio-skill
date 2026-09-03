@@ -3,7 +3,7 @@ name: drawio-skill
 description: Create, edit, synchronize, inspect, test, and publish editable draw.io diagrams. Use when the user explicitly requests draw.io/diagrams.net, needs a polished architecture, ERD, UML, sequence, C4, SysML, BPMN, network, swimlane, ML, or infrastructure diagram, wants code/IaC/SQL/OpenAPI converted into a diagram, or wants an existing diagram queried, reviewed, diffed, restyled, kept in sync, or made interactive. Prefer Mermaid/PlantUML elsewhere when the requested artifact is diagrams-as-code rather than an editable draw.io file.
 license: MIT
 allowed-tools: [Bash, Read, Write, WebFetch]
-metadata: {"openclaw":{"requires":{"anyBins":["python3"]},"emoji":"📐","os":["darwin","linux","win32"],"install":[{"id":"brew-drawio","kind":"brew","formula":"drawio","bins":["drawio"],"label":"Install draw.io for native exports","os":["darwin"],"optional":true},{"id":"brew-graphviz","kind":"brew","formula":"graphviz","bins":["dot"],"label":"Install Graphviz for automatic layout","os":["darwin"],"optional":true}]},"hermes":{"tags":["drawio","diagram","architecture","visualization","uml"],"category":"design","requires_tools":["python3"],"related_skills":["mermaid","excalidraw","plantuml"]},"author":"Agents365-ai","version":"3.2.0","homepage":"https://github.com/Agents365-ai/drawio-skill","compatibility":"Core IR, XML, sync, query, test, review, and Story workflows need Python 3 only; native export needs draw.io; Graphviz is optional.","platforms":["macos","linux","windows"]}
+metadata: {"openclaw":{"requires":{"anyBins":["python3"]},"emoji":"📐","os":["darwin","linux","win32"],"install":[{"id":"brew-drawio","kind":"brew","formula":"drawio","bins":["drawio"],"label":"Install draw.io for native exports","os":["darwin"],"optional":true},{"id":"brew-graphviz","kind":"brew","formula":"graphviz","bins":["dot"],"label":"Install Graphviz for automatic layout","os":["darwin"],"optional":true}]},"hermes":{"tags":["drawio","diagram","architecture","visualization","uml"],"category":"design","requires_tools":["python3"],"related_skills":["mermaid","excalidraw","plantuml"]},"author":"Agents365-ai","version":"3.2.1","homepage":"https://github.com/Agents365-ai/drawio-skill","compatibility":"Core IR, XML, sync, query, test, review, and Story workflows need Python 3 only; native export needs draw.io; Graphviz is optional.","platforms":["macos","linux","windows"]}
 ---
 
 # Draw.io Architecture Studio
@@ -29,6 +29,7 @@ and accessible publishing over a shared Diagram IR.
 | Existing `.drawio` to HTML/PPTX/Mermaid/Markdown/animation/runbook | Read `references/toolbox.md`; `diagramctl.py transform` exposes the existing tools |
 | Shape, cloud/vendor, AI, or Databricks icon | Read `references/shapes.md` or `references/databricks.md`; never guess shape names |
 | Learn/apply/manage a visual style | Read `references/style-presets.md` |
+| Existing image to editable diagram (screenshot, whiteboard photo, legacy PNG) | Read `references/derasterize.md` |
 | Export/platform problem | Read `references/troubleshooting.md`; for access/network questions read `references/security.md` |
 
 ## Unified CLI

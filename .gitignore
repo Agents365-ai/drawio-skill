@@ -1,3 +1,6 @@
+# Local dev notes (never pushed)
+CLAUDE.md
+
 # macOS
 .DS_Store
 
@@ -6,6 +9,8 @@
 logs/
 __pycache__/
 *.pyc
+.pytest_cache/
+.ruff_cache/
 
 # Auto-update timestamp (written by SKILL.md step 0)
 .last_update
