@@ -353,27 +353,6 @@ Behind the scenes: **check dependencies → plan layout → generate `.drawio` X
 
 ## 🆚 Comparison
 
-### vs Native Agent (no skill)
-
-| Feature | Native agent | drawio-skill |
-| --- | --- | --- |
-| Self-check after export | ❌ | ✅ reads PNG, auto-fixes 6 issue types |
-| Iterative review loop | ❌ manual re-prompt | ✅ targeted edits, 5-round safety valve |
-| Diagram type presets | ❌ | ✅ 7 presets (ERD, UML, Seq, C4, Arch, ML, Flow) |
-| Mermaid → editable .drawio | ❌ | ✅ 28 types via native CLI conversion (≥ v30) |
-| Visualize a codebase | ❌ | ✅ import graphs (Py/JS/Go/Rust) + class diagrams |
-| IaC → architecture diagram | ❌ | ✅ Terraform / K8s / compose → official cloud icons |
-| SQL DDL → ER diagram | ❌ | ✅ `CREATE TABLE` → PK/FK tables, crow's-foot edges |
-| Sequence diagrams | ❌ hand-placed coordinates | ✅ deterministic geometry engine (`seqlayout.py`) |
-| C4 model | ❌ | ✅ multi-page Context→Container→Component with click-to-drill-down |
-| Auto-layout for large graphs | ❌ hand-places, overlaps | ✅ Graphviz placement, ortho routing, nested containers |
-| Structural validation | ❌ | ✅ deterministic `.drawio` linter |
-| Official shape search | ❌ guesses, blank boxes | ✅ exact style for 10k+ AWS/Azure/GCP/UML shapes |
-| AI/LLM brand logos | ❌ none | ✅ 321 AI + 18 data-store logos via aiicons.py |
-| Grid-aligned layout | ❌ | ✅ 10px snap, routing corridors |
-| Color palette | random / inconsistent | ✅ 7-color semantic system |
-| Style presets | ❌ | ✅ learn from `.drawio` file or image |
-
 ### vs Other draw.io Skills & Tools
 
 | Feature | drawio-skill | [jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp) (official)<br>![stars](https://img.shields.io/github/stars/jgraph/drawio-mcp?style=flat-square&logo=github&v=2) | [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills)<br>![stars](https://img.shields.io/github/stars/bahayonghang/drawio-skills?style=flat-square&logo=github) | [GBSOSS/ai-drawio](https://github.com/GBSOSS/ai-drawio)<br>![stars](https://img.shields.io/github/stars/GBSOSS/ai-drawio?style=flat-square&logo=github) |

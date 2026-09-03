@@ -5,6 +5,14 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `metadata.version` field in
 `skills/drawio-skill/SKILL.md`).
 
+## [Unreleased]
+
+### Changed
+
+- **README / README_CN**: removed the "vs Native Agent (no skill)" comparison
+  table and its Chinese counterpart. The Comparison section now covers only
+  other draw.io skills and tools; `docs/COMPARISON.md` keeps the full version.
+
 ## [3.2.1] - 2026-09-03
 
 ### Changed
