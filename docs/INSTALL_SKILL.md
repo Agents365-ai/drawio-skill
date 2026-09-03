@@ -19,7 +19,7 @@ git clone https://github.com/Agents365-ai/drawio-skill.git ~/.autohand/skills/dr
 git clone https://github.com/Agents365-ai/drawio-skill.git .autohand/skills/drawio-skill
 ```
 
-Common paths: `~/.claude/skills/` (Claude Code), `~/.config/opencode/skills/` (Opencode), `~/.openclaw/skills/` (OpenClaw), `~/.agents/skills/` (Codex), `~/.autohand/skills/` (Autohand Code global), and `<project>/.autohand/skills/` (Autohand Code project). Also indexed on [SkillsMP](https://skillsmp.com/skills/agents365-ai-drawio-skill-skills-drawio-skill-skill-md) and [ClawHub](https://clawhub.ai/agents365-ai/drawio-pro-skill).
+Common paths: `~/.claude/skills/` (Claude Code), `~/.config/opencode/skills/` (Opencode), `~/.openclaw/skills/` (OpenClaw), `~/.agents/skills/` (Codex), `~/.autohand/skills/` (Autohand Code global), and `<project>/.autohand/skills/` (Autohand Code project). Also indexed on [SkillsMP](https://skillsmp.com/skills/agents365-ai-drawio-skill-skills-drawio-skill-skill-md).
 
 Autohand Code supports `autohand --skill-install` for cataloged skills, with `--project` for workspace-level installs. Until this skill is listed there, use the direct clone path above.
 
@@ -30,9 +30,6 @@ Updates flow through whatever channel you installed from:
 ```bash
 # Claude Code plugin
 /plugin update drawio
-
-# OpenClaw
-clawhub update drawio-pro-skill
 
 # SkillsMP
 skills update drawio-skill

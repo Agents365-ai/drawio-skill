@@ -5,6 +5,24 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `metadata.version` field in
 `skills/drawio-skill/SKILL.md`).
 
+## [3.2.1] - 2026-09-03
+
+### Changed
+
+- **Agent-agnostic docs**: removed the ClawHub badge, the "indexed on ClawHub"
+  mentions, `clawhub install/update` commands, and the ClawHub install tab on
+  the docs site, so no single agent or marketplace is emphasized. The skill
+  stays a universal Agent Skills package: per-agent install snippets and the
+  platform list remain parallel, ending in "any agent compatible with the
+  Agent Skills format".
+- **README / README_CN**: removed the Support (donation) section; the footer
+  is now Author, then License.
+- **SKILL.md routing table**: added an entry for turning screenshots,
+  whiteboard photos, or legacy PNGs into editable diagrams
+  (`references/derasterize.md`).
+- **Docs site**: theme-toggle button uses `textContent` instead of
+  `innerHTML` (static emoji strings, no behavioral change).
+
 ## [3.2.0] — 2026-09-01
 
 ### Added
