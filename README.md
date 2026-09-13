@@ -31,7 +31,7 @@ A skill that turns natural language and real system sources into maintainable `.
 
 - **Visualize a codebase** — import graphs for Python / JS-TS / Go / Rust and Python class hierarchies, with Graphviz placement, transitive reduction, and nested module containers
 - **IaC and live infrastructure** — Terraform, Kubernetes, and docker-compose configs become diagrams with official AWS / Azure / GCP / K8s icons; snapshot what's *actually deployed* from `terraform show -json`, `docker inspect`, or `kubectl get -o json`
-- **Schemas and pipelines** — SQL DDL → ER diagram, OpenAPI/Swagger → API diagram coloured by HTTP method, AsyncAPI → event-driven architecture diagram, Protocol Buffers → message/service diagram, GitHub Actions / GitLab CI → pipeline DAG
+- **Schemas and pipelines** — SQL DDL → ER diagram, OpenAPI/Swagger → API diagram coloured by HTTP method, AsyncAPI → event-driven architecture diagram, Protocol Buffers → message/service diagram, GraphQL SDL → entity type diagram, GitHub Actions / GitLab CI → pipeline DAG
 
 - **Deterministic engines** — sequence diagrams with computed lifelines and activation bars; multi-page C4 models with click-to-drill-down
 
@@ -201,7 +201,7 @@ The full toolbox, grouped by stage:
 
 | Stage | Tools |
 | --- | --- |
-| **Import** | 15 extractors: **Python · JS/TS · Go · Rust** import graphs, **Python class inheritance**, **Terraform / Kubernetes / docker-compose** with official cloud icons, **live** infra from `terraform show -json` / `docker inspect` / `kubectl get -o json`, **SQL DDL → ERD**, **OpenAPI → API diagram** (coloured by HTTP method), **AsyncAPI → event-driven architecture diagram**, **Protobuf → message/service diagram**, **GitHub Actions + GitLab CI → DAG** |
+| **Import** | 16 extractors: **Python · JS/TS · Go · Rust** import graphs, **Python class inheritance**, **Terraform / Kubernetes / docker-compose** with official cloud icons, **live** infra from `terraform show -json` / `docker inspect` / `kubectl get -o json`, **SQL DDL → ERD**, **OpenAPI → API diagram** (coloured by HTTP method), **AsyncAPI → event-driven architecture diagram**, **Protobuf → message/service diagram**, **GraphQL SDL → entity type diagram**, **GitHub Actions + GitLab CI → DAG** |
 | **Compare & evolve** | `drawiodiff.py` colour-codes drift between two diagrams or two live snapshots (added=green, removed=red, changed=orange); `timelapse.py` replays git history as an HTML player; `prdiff.py` renders PR diffs in CI |
 | **Repurpose** | `explain.py` → Markdown, `drawiohtml.py` → pan/zoom/search HTML viewer, `drawio2pptx.py` → deck, `svgflow.py` → animated SVG, `drawio2mermaid.py` → diagrams-as-code, `runbook.py` → clickable triage app, `compress.py` → exec summary with drill-down, `buildup.py` → self-drawing player, `tubemap.py` → metro map |
 | **Restyle & enrich** | `restyle.py` applies presets by hue remap, `relabel.py` produces translated twins with layout untouched, `heatmap.py` shades nodes from a metrics CSV/JSON, `edgeports.py` un-stacks edges at shape boundaries |

@@ -1,6 +1,6 @@
 ---
 name: drawio-skill
-description: Create, edit, synchronize, inspect, test, and publish editable draw.io diagrams. Use when the user explicitly requests draw.io/diagrams.net, needs a polished architecture, ERD, UML, sequence, C4, SysML, BPMN, network, swimlane, ML, or infrastructure diagram, wants code/IaC/SQL/OpenAPI/AsyncAPI/Protobuf converted into a diagram, or wants an existing diagram queried, reviewed, diffed, restyled, kept in sync, or made interactive. Prefer Mermaid/PlantUML elsewhere when the requested artifact is diagrams-as-code rather than an editable draw.io file.
+description: Create, edit, synchronize, inspect, test, and publish editable draw.io diagrams. Use when the user explicitly requests draw.io/diagrams.net, needs a polished architecture, ERD, UML, sequence, C4, SysML, BPMN, network, swimlane, ML, or infrastructure diagram, wants code/IaC/SQL/OpenAPI/AsyncAPI/Protobuf/GraphQL converted into a diagram, or wants an existing diagram queried, reviewed, diffed, restyled, kept in sync, or made interactive. Prefer Mermaid/PlantUML elsewhere when the requested artifact is diagrams-as-code rather than an editable draw.io file.
 license: MIT
 allowed-tools: [Bash, Read, Write, WebFetch]
 metadata: {"openclaw":{"requires":{"anyBins":["python3"]},"emoji":"📐","os":["darwin","linux","win32"],"install":[{"id":"brew-drawio","kind":"brew","formula":"drawio","bins":["drawio"],"label":"Install draw.io for native exports","os":["darwin"],"optional":true},{"id":"brew-graphviz","kind":"brew","formula":"graphviz","bins":["dot"],"label":"Install Graphviz for automatic layout","os":["darwin"],"optional":true}]},"hermes":{"tags":["drawio","diagram","architecture","visualization","uml"],"category":"design","requires_tools":["python3"],"related_skills":["mermaid","excalidraw","plantuml"]},"author":"Agents365-ai","version":"3.3.0","homepage":"https://github.com/Agents365-ai/drawio-skill","compatibility":"Core IR, XML, sync, query, test, review, and Story workflows need Python 3 only; native export needs draw.io; Graphviz is optional.","platforms":["macos","linux","windows"]}
@@ -22,6 +22,7 @@ and accessible publishing over a shared Diagram IR.
 | Large graph (~15+ nodes) that needs automatic layout | Use `autolayout.py`; read `references/autolayout.md` before passing any `--layout` value |
 | Code, Terraform, K8s, compose, SQL, OpenAPI, AsyncAPI, or CI source | Use `diagramctl.py build`; read `references/diagram-ir.md` |
 | Protocol Buffers schema (.proto) | Use `protoimports.py` or `diagramctl.py build`; read `references/toolbox.md` |
+| GraphQL SDL schema (.graphql/.gql) or introspection JSON | Use `graphqlerd.py` or `diagramctl.py build`; read `references/toolbox.md` |
 | Running cluster/stack/cloud (actual state, not declared config) | Read `references/live-infra.md`, then use `tfstate.py`, `dockerimports.py`, or `k8simports.py -` |
 | Update a generated diagram without losing manual layout | Use `diagramctl.py sync`; read `references/diagram-ir.md` |
 | Executive/system/deployment/data-flow/security views | Use `diagramctl.py views`; read `references/diagram-ir.md` |

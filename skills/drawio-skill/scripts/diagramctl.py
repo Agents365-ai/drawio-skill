@@ -53,6 +53,7 @@ IMPORTERS = {
     "openapi": "openapiimports.py",
     "asyncapi": "asyncapiimports.py",
     "proto": "protoimports.py",
+    "graphql": "graphqlerd.py",
     "ci": "ciimports.py",
 }
 CODE_IMPORTERS = {"python", "javascript", "js", "go", "rust", "pyclasses"}
@@ -92,14 +93,18 @@ def detect_source(path):
             return "javascript"
         if (p / ".github" / "workflows").exists() or (p / ".gitlab-ci.yml").exists():
             return "ci"
-        # Last, because a .proto file is often one schema inside a project whose
-        # own language markers above describe the repository better.
+        # Last, because a .proto or .graphql file is often one schema inside a
+        # project whose own language markers above describe the repository better.
         if list(p.rglob("*.proto")):
             return "proto"
+        if list(p.rglob("*.graphql")) or list(p.rglob("*.gql")):
+            return "graphql"
         return "python"
     suffix = p.suffix.lower()
     if suffix == ".proto":
         return "proto"
+    if suffix in {".graphql", ".gql"}:
+        return "graphql"
     if suffix == ".sql":
         return "sql"
     if suffix in {".tf", ".tfvars"}:
@@ -175,6 +180,7 @@ def importer_ir(source, source_type, group=False):
             "openapi",
             "asyncapi",
             "proto",
+            "graphql",
         }:
             cmd.insert(-2, "--group")
         proc = subprocess.run(cmd, text=True, capture_output=True)
@@ -516,7 +522,7 @@ def parser():
     p = sub.add_parser(
         "build",
         help="build a draw.io from IR, graph JSON, code, IaC, SQL, OpenAPI, "
-        "AsyncAPI or Protobuf",
+        "AsyncAPI, Protobuf or GraphQL",
     )
     p.add_argument("source")
     p.add_argument("-o", "--output", required=True)

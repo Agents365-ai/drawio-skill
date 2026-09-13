@@ -198,7 +198,7 @@ python3 scripts/drawiohtml.py architecture.drawio -o architecture.html
 
 | 阶段 | 工具 |
 | --- | --- |
-| **导入** | 15 个提取器：**Python · JS/TS · Go / Rust** 导入关系图、**Python 类继承**、**Terraform / Kubernetes / docker-compose**（官方云图标）、从 `terraform show -json` / `docker inspect` / `kubectl get -o json` 提取的**实时**基础设施、**SQL DDL → ER 图**、**OpenAPI → API 图**（按 HTTP 方法着色）、**AsyncAPI → 事件驱动架构图**、**Protobuf → 消息/服务图**、**GitHub Actions + GitLab CI → DAG** |
+| **导入** | 16 个提取器：**Python · JS/TS · Go / Rust** 导入关系图、**Python 类继承**、**Terraform / Kubernetes / docker-compose**（官方云图标）、从 `terraform show -json` / `docker inspect` / `kubectl get -o json` 提取的**实时**基础设施、**SQL DDL → ER 图**、**OpenAPI → API 图**（按 HTTP 方法着色）、**AsyncAPI → 事件驱动架构图**、**Protobuf → 消息/服务图**、**GraphQL SDL → 实体类型图**、**GitHub Actions + GitLab CI → DAG** |
 | **对比与演进** | `drawiodiff.py` 用颜色标出两张图或两个实时快照的漂移（新增=绿、删除=红、变更=橙）；`timelapse.py` 把 git 历史重放成 HTML 播放器；`prdiff.py` 在 CI 里渲染 PR diff |
 | **二次利用** | `explain.py` → Markdown，`drawiohtml.py` → 平移缩放搜索的 HTML 查看器，`drawio2pptx.py` → 演示稿，`svgflow.py` → 动画 SVG，`drawio2mermaid.py` → diagrams-as-code，`runbook.py` → 点击式排查应用，`compress.py` → 可下钻的高管摘要，`buildup.py` → 自动绘制播放器，`tubemap.py` → 地铁图 |
 | **换肤与增强** | `restyle.py` 按色相重映射应用预设，`relabel.py` 布局不动地生成翻译变体，`heatmap.py` 按指标 CSV/JSON 给节点上色，`edgeports.py` 解开形状边界上堆叠的连线 |
