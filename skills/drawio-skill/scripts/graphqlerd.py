@@ -218,7 +218,8 @@ def parse_sdl(text, file_path=""):
                 segment = segment[: nxt.start()]
             entry["members"] = [p.strip() for p in segment.split("|") if p.strip()]
         elif kind != "scalar":
-            impl = re.match(r"[^\{\n]*", tail).group(0)
+            impl_m = re.match(r"[^\{\n]*", tail)
+            impl = impl_m.group(0) if impl_m else ""
             if "implements" in impl:
                 after = impl.split("implements", 1)[1].split("@")[0]
                 entry["implements"] = [
@@ -299,6 +300,26 @@ def parse_introspection(payload, file_path=""):
     return defs
 
 
+def merge_extends(defs):
+    """Fold ``extend`` definitions into their base type.
+
+    GraphQL names are unique within a schema, so two entries sharing a name
+    are a base definition and its extends, possibly across different files.
+    Keeping both would emit two nodes with the same id.
+    """
+    merged, order = {}, []
+    for d in defs:
+        base = merged.get(d["name"])
+        if base is None:
+            merged[d["name"]] = d
+            order.append(d)
+        else:
+            base["fields"].extend(d["fields"])
+            base["implements"].extend(d["implements"])
+            base["members"].extend(d["members"])
+    return order
+
+
 def esc(text):
     """Escape HTML metacharacters for draw.io's html=1 labels.
 
@@ -321,6 +342,7 @@ def compute_dimensions(lines):
 
 def build(defs, group=False, direction="TB", show_types=True):
     """Definition dicts -> autolayout graph JSON."""
+    defs = merge_extends(defs)
     nodes, edges, seen_edges = [], [], set()
     known = {d["name"] for d in defs}
 
@@ -422,7 +444,7 @@ def main():
         sys.stdout.write(text)
 
     counts = {}
-    for d in defs:
+    for d in merge_extends(defs):
         counts[d["kind"]] = counts.get(d["kind"], 0) + 1
     summary = ", ".join("%d %ss" % (counts[k], k) for k in KINDS if k in counts)
     sys.stderr.write("%s, %d edges\n" % (summary, len(graph["edges"])))

@@ -213,6 +213,31 @@ class TestGraphqlErdGraph(unittest.TestCase):
         self.assertIn("\nf", graph["nodes"][0]["label"])
         self.assertNotIn("String", graph["nodes"][0]["label"])
 
+    def test_extends_merge_into_a_single_node(self):
+        defs = self.importer.parse_sdl(
+            "type Foo { a: Int }\n"
+            "extend type Foo { b: String @deprecated }\n"
+            "interface Bar { c: ID! }\n"
+            "extend interface Bar implements Foo { d: Foo }"
+        )
+        graph = self.importer.build(defs)
+        self.assertEqual([n["id"] for n in graph["nodes"]], ["Foo", "Bar"])
+        labels = dict((n["id"], n["label"]) for n in graph["nodes"])
+        self.assertIn("a: Int", labels["Foo"])
+        self.assertIn("b: String (deprecated)", labels["Foo"])
+        self.assertIn(("Bar", "Foo", "implements"),
+                      set((e["source"], e["target"], e["label"])
+                          for e in graph["edges"]))
+
+    def test_extends_merge_across_schema_files(self):
+        base = self.importer.parse_sdl("union U = A | B\n", file_path="a.graphql")
+        ext = self.importer.parse_sdl("extend union U = C\n", file_path="b.graphql")
+        graph = self.importer.build(base + ext)
+        self.assertEqual([n["id"] for n in graph["nodes"]], ["U"])
+        members = [line for line in graph["nodes"][0]["label"].split("\n")
+                   if line in ("A", "B", "C")]
+        self.assertEqual(members, ["A", "B", "C"])
+
 
 class TestGraphqlErdIntrospection(unittest.TestCase):
     PAYLOAD = {
