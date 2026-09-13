@@ -144,6 +144,14 @@ Show RPC methods on the service nodes, group by proto package, and link request/
 and referenced field types. Output PNG + editable .drawio.
 ```
 
+## GraphQL schema type diagram
+
+```text
+Turn our GraphQL SDL under ./schema into an entity type diagram.
+Show each type's fields with their types, link field references and implements,
+group by schema file, and dim the enums. Output PNG + editable .drawio.
+```
+
 ## ML / deep-learning model
 
 ```text

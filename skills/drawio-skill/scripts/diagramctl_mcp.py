@@ -54,7 +54,8 @@ TOOLS = [
         "name": "build",
         "description": (
             "Build an editable .drawio diagram from code, IaC, SQL, OpenAPI, "
-            "AsyncAPI, Protobuf, compose, a graph JSON, or an existing IR file. "
+            "AsyncAPI, Protobuf, GraphQL, compose, a graph JSON, or an existing IR "
+            "file. "
             "Auto-detects the "
             "source type. Returns a JSON report and writes the .drawio (and "
             "optionally the IR JSON)."
@@ -67,7 +68,7 @@ TOOLS = [
                     "type": "string",
                     "description": "Override auto-detection "
                     "(python|javascript|go|rust|pyclasses|terraform|kubernetes|"
-                    "compose|sql|openapi|asyncapi|proto|ci|graph|ir|drawio)",
+                    "compose|sql|openapi|asyncapi|proto|graphql|ci|graph|ir|drawio)",
                 },
                 "group": {
                     "type": "boolean",

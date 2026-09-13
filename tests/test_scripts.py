@@ -1598,6 +1598,29 @@ class TestImportersCli(unittest.TestCase):
             self.assertEqual(len(graph["edges"]), 2)
             self.assertEqual({n.get("group") for n in graph["nodes"]}, {"service.v1"})
 
+    def test_graphqlerd_types_interfaces_and_enums(self):
+        sdl = (
+            "interface Node { id: ID! }\n"
+            "type Product implements Node {\n"
+            "  id: ID!\n"
+            "  status: Status\n"
+            "  reviews(first: Int): [Review!]!\n"
+            "}\n"
+            "type Review { body: String }\n"
+            "enum Status { DRAFT PUBLISHED }\n"
+        )
+        with tempfile.TemporaryDirectory() as d:
+            p = os.path.join(d, "catalog.graphql")
+            self._write(p, sdl)
+            graph = json.loads(run("graphqlerd.py", p, "--group").stdout)
+            ids = {n["id"] for n in graph["nodes"]}
+            self.assertEqual(ids, {"Node", "Product", "Review", "Status"})
+            edges = {(e["source"], e["target"], e["label"]) for e in graph["edges"]}
+            self.assertIn(("Product", "Node", "implements"), edges)
+            self.assertIn(("Product", "Review", "reviews"), edges)
+            self.assertIn(("Product", "Status", "status"), edges)
+            self.assertEqual({n.get("group") for n in graph["nodes"]}, {"catalog"})
+
 
 class TestDrawioHtml(unittest.TestCase):
     @classmethod

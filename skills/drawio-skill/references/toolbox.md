@@ -1,6 +1,6 @@
 # Toolbox — every bundled script, by use-case
 
-A map of the 41 focused tools, the unified `diagramctl.py` orchestrator
+A map of the 42 focused tools, the unified `diagramctl.py` orchestrator
 (and its MCP server wrapper), and its
 internal `diagram_ir.py` model grouped by what you're trying to do. The
 per-task routing table in `SKILL.md` says *when* to reach for each; this says
@@ -45,6 +45,7 @@ Use focused scripts directly when you need their narrow interface; use
 | an OpenAPI / Swagger spec | an API diagram (by method) | `openapiimports` |
 | an AsyncAPI 2 / 3 spec | an event-driven architecture diagram | `asyncapiimports` |
 | a Protocol Buffers (.proto) schema | a message/service diagram | `protoimports` |
+| a GraphQL SDL schema | an entity type diagram | `graphqlerd` |
 | CI workflows (GH Actions / GitLab) | the pipeline as a DAG | `ciimports` |
 | a diagram + a metrics file | it coloured by the data | `heatmap` |
 | a sequence of interactions | a UML sequence diagram | `seqlayout` |
@@ -92,6 +93,7 @@ All emit graph JSON → `autolayout.py`.
 - **`openapiimports.py`** — OpenAPI 3 / Swagger 2 spec → API diagram: one node per operation (coloured by HTTP method) + one per component schema, with edges to the schemas each operation uses and between nested schemas. `--group` by tag.
 - **`asyncapiimports.py`** — AsyncAPI 2 / 3 spec → event-driven architecture diagram: channel, publish/subscribe operation, and payload-schema nodes with provenance. `--group` by operation tag, channel tag, or channel prefix.
 - **`protoimports.py`** — Protocol Buffers (`.proto`) → message/service diagram: one node per message, service (with RPC methods), or enum; edges for referenced message field types and service request/response types. `--group` by proto package.
+- **`graphqlerd.py`** — GraphQL SDL (`.graphql` / `.gql`) or an introspection dump → entity type diagram: one node per `type`, `interface`, `input`, `enum`, `union` or custom `scalar`, listing its fields with types and marking `@deprecated`; edges for field references, `implements` and union membership. Enums and custom scalars are dimmed. `--group` by source schema file.
 
 ## 4. Live infrastructure → diagram (actually running)
 

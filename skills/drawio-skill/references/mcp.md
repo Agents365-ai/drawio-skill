@@ -30,7 +30,7 @@ call shells out to `scripts/diagramctl.py`, the same CLI the skill uses.
 | Tool | Maps to | Purpose |
 | --- | --- | --- |
 | `doctor` | `diagramctl doctor` | Check python/draw.io/Graphviz availability without launching anything |
-| `build` | `build` | Code / IaC / SQL / OpenAPI / AsyncAPI / Protobuf / graph / IR → editable `.drawio` (+ optional IR) |
+| `build` | `build` | Code / IaC / SQL / OpenAPI / AsyncAPI / Protobuf / GraphQL / graph / IR → editable `.drawio` (+ optional IR) |
 | `sync` | `sync` | Incremental re-sync of a diagram from its changed source, preserving manual layout |
 | `views` | `views` | Project an IR file into linked executive/system/deployment/dataflow/security pages |
 | `architecture_test` | `test` | Deterministic architecture contract rules (policy YAML/JSON); `isError` mirrors the CI exit code |

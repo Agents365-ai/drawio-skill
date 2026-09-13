@@ -5,6 +5,19 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `metadata.version` field in
 `skills/drawio-skill/SKILL.md`).
 
+## [Unreleased]
+
+### Added
+
+- **GraphQL importer** (`graphqlerd.py`): parse GraphQL SDL (`.graphql` / `.gql`)
+  or an introspection JSON dump into an entity type diagram. One node per
+  `type`, `interface`, `input`, `enum`, `union` or custom `scalar`, listing each
+  field with its type and marking `@deprecated`, with source provenance, edges
+  for field references, `implements` and union membership, dimmed enum and
+  scalar leaves, and optional grouping by source schema file. Wired into
+  `diagramctl.py build` (auto-detected from `.graphql` / `.gql`) and the MCP
+  server.
+
 ## [3.3.0] - 2026-09-12
 
 ### Added
