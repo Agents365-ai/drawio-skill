@@ -530,7 +530,7 @@
           </p>
           <div class="hero-install">
             <code id="install-cmd"
-              >/plugin marketplace add Agents365-ai/365-skills</code
+              >npx skills add Agents365-ai/drawio-skill -g</code
             >
             <button class="copy-btn" onclick="copyInstall()">复制</button>
           </div>
@@ -871,11 +871,6 @@
                   <td class="cross">&#x2717;</td>
                   <td class="check">&#x2713; 学习、保存并应用命名样式</td>
                 </tr>
-                <tr>
-                  <td>插件市场安装</td>
-                  <td class="cross">&#x2717;</td>
-                  <td class="check">&#x2713; 通过 Agents365-ai/365-skills</td>
-                </tr>
               </tbody>
             </table>
           </div>
@@ -936,14 +931,10 @@
           </div>
           <div id="tab-claude" class="tab-content active" role="tabpanel">
             <pre>
-# 插件市场（推荐）
-/plugin marketplace add Agents365-ai/365-skills
-/plugin install drawio
-
-# 手动全局安装
+# 全局安装
 git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio-skill
 
-# 手动项目级安装
+# 项目级安装
 git clone https://github.com/Agents365-ai/drawio-skill.git .claude/skills/drawio-skill</pre>
           </div>
           <div id="tab-opencode" class="tab-content" role="tabpanel">

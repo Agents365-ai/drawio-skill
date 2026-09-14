@@ -28,6 +28,15 @@ semantic-ish versioning (the `metadata.version` field in
   viewer DOM and assert `<path d>` segments and label anchors) with two new
   failure-mode rows. Creation workflow step 5 now points at that fallback.
 
+### Removed
+
+- **365-skills sync and marketplace distribution**: the `sync-365-skills`
+  workflow is gone and this repository is the only source for the skill.
+  Documentation no longer advertises
+  `/plugin marketplace add Agents365-ai/365-skills` or `/plugin install drawio`;
+  the any-agent path is now `npx skills add Agents365-ai/drawio-skill -g`, and the
+  manual clone instructions are unchanged.
+
 ## [3.3.0] - 2026-09-12
 
 ### Added

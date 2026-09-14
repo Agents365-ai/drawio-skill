@@ -4,11 +4,7 @@
 
 ```bash
 # Any agent (Claude Code, Cursor, Copilot, etc.)
-npx skills add Agents365-ai/365-skills -g
-
-# Claude Code only
-> /plugin marketplace add Agents365-ai/365-skills
-> /plugin install drawio
+npx skills add Agents365-ai/drawio-skill -g
 ```
 
 Manual install — clone into your agent's skills directory:
@@ -28,9 +24,6 @@ Autohand Code supports `autohand --skill-install` for cataloged skills, with `--
 Updates flow through whatever channel you installed from:
 
 ```bash
-# Claude Code plugin
-/plugin update drawio
-
 # SkillsMP
 skills update drawio-skill
 ```

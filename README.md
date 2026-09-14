@@ -7,7 +7,6 @@
 [![Last Commit](https://img.shields.io/github/last-commit/Agents365-ai/drawio-skill?logo=github)](https://github.com/Agents365-ai/drawio-skill/commits/main)
 
 [![SkillsMP](https://img.shields.io/badge/SkillsMP-listed-1f6feb)](https://skillsmp.com/skills/agents365-ai-drawio-skill-skills-drawio-skill-skill-md)
-[![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-plugin-8a2be2)](https://github.com/Agents365-ai/365-skills)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-2ea44f)](https://agentskills.io)
 
 **English** · [中文](README_CN.md) · [📖 Online Docs](https://agents365-ai.github.io/drawio-skill/)
@@ -74,13 +73,7 @@ Verify with `drawio --version`. **Version ≥ 30 recommended** — it unlocks Me
 
 ```bash
 # Any agent (Claude Code, Cursor, Copilot, ...)
-npx skills add Agents365-ai/365-skills -g
-```
-
-```text
-# Claude Code plugin marketplace
-> /plugin marketplace add Agents365-ai/365-skills
-> /plugin install drawio
+npx skills add Agents365-ai/drawio-skill -g
 ```
 
 ```bash
@@ -101,7 +94,7 @@ Autohand Code also supports `autohand --skill-install` for cataloged skills, wit
 
 Also indexed on [SkillsMP](https://skillsmp.com/skills/agents365-ai-drawio-skill-skills-drawio-skill-skill-md).
 
-**Updating:** `/plugin update drawio` (Claude Code), `skills update drawio-skill` (SkillsMP), or `git pull` for manual installs — see [docs/INSTALL_SKILL.md#updates](docs/INSTALL_SKILL.md#updates). Release history in [CHANGELOG.md](CHANGELOG.md).
+**Updating:** `skills update drawio-skill` (SkillsMP) or `git pull` for manual installs. See [docs/INSTALL_SKILL.md#updates](docs/INSTALL_SKILL.md#updates). Release history in [CHANGELOG.md](CHANGELOG.md).
 
 ## ⚡ Quick Start
 

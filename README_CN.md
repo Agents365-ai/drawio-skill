@@ -7,7 +7,6 @@
 [![Last Commit](https://img.shields.io/badge/last--commit-latest-1f6feb?logo=github)](https://github.com/Agents365-ai/drawio-skill/commits/main)
 
 [![SkillsMP](https://img.shields.io/badge/SkillsMP-listed-1f6feb)](https://skillsmp.com/skills/agents365-ai-drawio-skill-skills-drawio-skill-skill-md)
-[![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-plugin-8a2be2)](https://github.com/Agents365-ai/365-skills)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-2ea44f)](https://agentskills.io)
 
 [English](README.md) · **中文** · [📖 在线文档](https://agents365-ai.github.io/drawio-skill/)
@@ -74,13 +73,7 @@
 
 ```bash
 # 任意 Agent（Claude Code、Cursor、Copilot 等）
-npx skills add Agents365-ai/365-skills -g
-```
-
-```text
-# Claude Code 插件市场
-> /plugin marketplace add Agents365-ai/365-skills
-> /plugin install drawio
+npx skills add Agents365-ai/drawio-skill -g
 ```
 
 ```bash
@@ -101,7 +94,7 @@ Autohand Code 也支持通过 `autohand --skill-install` 安装已收录在 Auto
 
 同时索引于 [SkillsMP](https://skillsmp.com/skills/agents365-ai-drawio-skill-skills-drawio-skill-skill-md)。
 
-**更新：** `/plugin update drawio`（Claude Code）、`skills update drawio-skill`（SkillsMP），或 `git pull`（手动安装）—— 详见 [docs/INSTALL_SKILL_CN.md#更新](docs/INSTALL_SKILL_CN.md#更新)。版本历史见 [CHANGELOG.md](CHANGELOG.md)。
+**更新：** `skills update drawio-skill`（SkillsMP）或 `git pull`（手动安装）。详见 [docs/INSTALL_SKILL_CN.md#更新](docs/INSTALL_SKILL_CN.md#更新)。版本历史见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## ⚡ 快速开始
 

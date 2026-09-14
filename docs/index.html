@@ -543,7 +543,7 @@
           </p>
           <div class="hero-install">
             <code id="install-cmd"
-              >/plugin marketplace add Agents365-ai/365-skills</code
+              >npx skills add Agents365-ai/drawio-skill -g</code
             >
             <button class="copy-btn" onclick="copyInstall()">Copy</button>
           </div>
@@ -899,11 +899,6 @@
                     &#x2713; Learn, save &amp; apply named styles
                   </td>
                 </tr>
-                <tr>
-                  <td>Plugin marketplace install</td>
-                  <td class="cross">&#x2717;</td>
-                  <td class="check">&#x2713; via Agents365-ai/365-skills</td>
-                </tr>
               </tbody>
             </table>
           </div>
@@ -964,14 +959,10 @@
           </div>
           <div id="tab-claude" class="tab-content active" role="tabpanel">
             <pre>
-# Plugin marketplace (recommended)
-/plugin marketplace add Agents365-ai/365-skills
-/plugin install drawio
-
-# Manual global install
+# Global install
 git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio-skill
 
-# Manual project-level install
+# Project-level install
 git clone https://github.com/Agents365-ai/drawio-skill.git .claude/skills/drawio-skill</pre>
           </div>
           <div id="tab-opencode" class="tab-content" role="tabpanel">
