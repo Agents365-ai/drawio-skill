@@ -8,7 +8,6 @@ on:
       - "skills/drawio-skill/styles/**"
       - "skills/drawio-skill/SKILL.md"
       - "tests/**"
-      - ".github/workflows/sync-365-skills.yml"
       - ".github/workflows/tests.yml"
   pull_request:
     paths:
@@ -17,7 +16,6 @@ on:
       - "skills/drawio-skill/styles/**"
       - "skills/drawio-skill/SKILL.md"
       - "tests/**"
-      - ".github/workflows/sync-365-skills.yml"
       - ".github/workflows/tests.yml"
 
 jobs:

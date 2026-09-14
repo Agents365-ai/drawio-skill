@@ -4,11 +4,7 @@
 
 ```bash
 # 任意 Agent（Claude Code、Cursor、Copilot 等）
-npx skills add Agents365-ai/365-skills -g
-
-# 仅 Claude Code
-> /plugin marketplace add Agents365-ai/365-skills
-> /plugin install drawio
+npx skills add Agents365-ai/drawio-skill -g
 ```
 
 手动安装 —— 克隆到你的 Agent skills 目录：
@@ -28,9 +24,6 @@ Autohand Code 支持通过 `autohand --skill-install` 安装已收录在 Autohan
 按你的安装渠道走对应的更新命令：
 
 ```bash
-# Claude Code 插件
-/plugin update drawio
-
 # SkillsMP
 skills update drawio-skill
 ```
