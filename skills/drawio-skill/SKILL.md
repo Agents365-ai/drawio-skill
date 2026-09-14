@@ -87,6 +87,11 @@ commands are offline and stdlib-only.
 5. Export a draft PNG without embedded XML and inspect it visually. Fix obvious
    overlap, clipping, disconnected edges, edge-through-node routing, stacked
    edges, and unreadable labels. Stop automatic vision repair after two rounds.
+   When the drawio binary is unavailable or a visual check is inconclusive,
+   verify the renderer's own DOM instead (`--dump-dom` on the viewer URL, see
+   `references/troubleshooting.md`): read each edge's `<path>` segments and
+   label anchor coordinates directly — vision alone both misses geometry
+   defects and hallucinates new ones.
 6. Show the draft and apply targeted edits. Preserve existing geometry for
    local changes. Use `sync` for source-backed changes and write a reviewable
    output; use `--prune` only when deletion was requested.

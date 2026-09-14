@@ -28,6 +28,8 @@ Read this when something looks wrong in the output (rendering, export, layout, e
 | WSL2: `drawio` / `draw.io` not found | The CLI lives on the Windows side. Use the Windows desktop exe via `/mnt/c`: `"/mnt/c/Program Files/draw.io/draw.io.exe"` (or per-user `"/mnt/c/Users/<you>/AppData/Local/Programs/draw.io/draw.io.exe"`). |
 | WSL2: opening an exported file fails with a `/mnt/c/...`-style path | `cmd.exe` can't resolve WSL paths — convert first: `cmd.exe /c start "" "$(wslpath -w diagram.drawio.png)"`. The empty `""` after `start` is the (required) window title. |
 | Browser URL opens to a blank/empty diagram (Windows/WSL2) | `cmd.exe`'s `start` treats `&` as a separator and drops everything after `#` — so the `#R…`/`#create=…` fragment (the whole diagram) is lost. Never pass the URL straight to `start`. Write a `.url` shortcut file and open *that* (see "WSL2 / Windows" below). |
+| `viewer.diagrams.net` intermittently drops connections (`ERR_CONNECTION_CLOSED`) during headless draft rendering | Retry in a loop with a fresh `--user-data-dir` per attempt, and gate each screenshot on a palette check: count pixels of a known fill color (e.g. the blue `#dae8fc`) and require thousands — an error page also "has colors", so a naive size/variance check passes it. |
+| Vision review approves a broken render (or hallucinates routing such as "the arrow wraps around the box") | Never let vision be the only gate for edge geometry. Verify the DOM: `--dump-dom` on the viewer URL, then parse `<path d="…">` per edge (straight? single intended segments? tip before the target border?) and `foreignObject` `padding-top/margin-left` for label anchors — see "Verifying the rendered output" below. |
 
 ## WSL2 / Windows specifics
 
@@ -61,3 +63,30 @@ cmd.exe /c start "" "$(wslpath -w "$TMP")"
 
 On native Windows the same `.url`-file trick applies (`start "" "%TEMP%\d.url"`).
 On macOS/Linux just `open "$URL"` / `xdg-open "$URL"` — no workaround needed.
+
+## Verifying the rendered output (viewer.diagrams.net)
+
+When the drawio binary is unavailable (or the render pipeline is flaky), verify
+geometry from the viewer's own output instead of eyeballing a screenshot:
+
+```bash
+URL=$(python3 <this-skill-dir>/scripts/encode_drawio_url.py diagram.drawio)
+msedge --headless=new --disable-gpu --user-data-dir="$(mktemp -d)" \
+  --virtual-time-budget=25000 --dump-dom "$URL" > dom.html
+# any recent Chromium works: `msedge` / `chromium` / `google-chrome`,
+# or the macOS app binary
+```
+
+Then check with a script, not by eye:
+
+- **Edge paths**: every stroke `<path d="M …">` should contain only the segments
+  you intended. A segment crossing a shape it does not terminate at, an
+  unexpected `Q` pair mid-segment (the 1–2 px S-wiggle from a misaligned
+  `entryX`), or an arrow tip past the target border are XML defects — fix the
+  file, don't re-route by hand.
+- **Label anchors**: label `foreignObject`s expose `padding-top: <y>px;
+  margin-left: <x>px`; assert each label box lands in empty space (no edge
+  segment, no shape boundary, no second label).
+- **Screenshot gating**: when a PNG is required, retry `ERR_CONNECTION_CLOSED`
+  with a fresh `--user-data-dir` and accept the file only after counting pixels
+  of a known palette fill — error pages pass naive "has content" checks.
