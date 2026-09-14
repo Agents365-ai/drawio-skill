@@ -5,7 +5,7 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `metadata.version` field in
 `skills/drawio-skill/SKILL.md`).
 
-## [Unreleased]
+## [3.4.0] - 2026-09-14
 
 ### Added
 
