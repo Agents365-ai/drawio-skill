@@ -18,6 +18,16 @@ semantic-ish versioning (the `metadata.version` field in
   `diagramctl.py build` (auto-detected from `.graphql` / `.gql`) and the MCP
   server.
 
+### Changed
+
+- **Rendered-output pitfalls documented**: `references/xml-authoring.md` gains a
+  decision-diamond section (outward vertex exits, or straight `edgeStyle=none`
+  lines from the lower edge midpoints; full-precision `entryX`/`exitX` pins;
+  `endArrow=block;endSize=8`; micro-labels only on the line), and
+  `references/troubleshooting.md` gains a DOM-verification workflow (dump the
+  viewer DOM and assert `<path d>` segments and label anchors) with two new
+  failure-mode rows. Creation workflow step 5 now points at that fallback.
+
 ## [3.3.0] - 2026-09-12
 
 ### Added
