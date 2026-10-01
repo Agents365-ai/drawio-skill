@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 name: drawio-skill
 description: Create, edit, synchronize, inspect, test, and publish editable draw.io diagrams. Use when the user explicitly requests draw.io/diagrams.net, needs a polished architecture, ERD, UML, sequence, C4, SysML, BPMN, network, swimlane, ML, or infrastructure diagram, wants code/IaC/SQL/OpenAPI/AsyncAPI/Protobuf/GraphQL converted into a diagram, or wants an existing diagram queried, reviewed, diffed, restyled, kept in sync, or made interactive. Prefer Mermaid/PlantUML elsewhere when the requested artifact is diagrams-as-code rather than an editable draw.io file.
 license: MIT
