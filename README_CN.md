@@ -76,25 +76,26 @@
 npx skills add Agents365-ai/drawio-skill -g
 ```
 
+手动安装：先克隆到一个固定路径，再把 skill 子目录链接进宿主 skills 根目录（以 Claude Code 为例）。宿主不支持符号链接时改用 `cp -R`。目标路径必须尚未存在；如果已经装有 `drawio-skill`，请先移走旧条目。
+
 ```bash
-# 手动安装
-git clone https://github.com/Agents365-ai/drawio-skill.git \
-  ~/.claude/skills/drawio-skill
+mkdir -p ~/src
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/src/drawio-skill
+mkdir -p ~/.claude/skills
+ln -s ~/src/drawio-skill/skills/drawio-skill ~/.claude/skills/drawio-skill
 
-# Autohand Code 全局安装
-git clone https://github.com/Agents365-ai/drawio-skill.git \
-  ~/.autohand/skills/drawio-skill
-
-# Autohand Code 项目级安装
-git clone https://github.com/Agents365-ai/drawio-skill.git \
-  .autohand/skills/drawio-skill
+# Copy alternative, for hosts that do not follow symlinks
+# mkdir -p ~/.claude/skills
+# cp -R ~/src/drawio-skill/skills/drawio-skill ~/.claude/skills/drawio-skill
 ```
 
-Autohand Code 也支持通过 `autohand --skill-install` 安装已收录在 Autohand catalog 中的 skill，并可通过 `--project` 安装到当前项目。在该 skill 收录前，请使用上面的直接克隆方式。
+Skill 位于仓库的 `skills/drawio-skill/` 子目录，宿主条目必须让 `SKILL.md` 直接可见：`<skills root>/drawio-skill/SKILL.md`。不要把仓库根目录克隆进 skills 目录。其他宿主路径（Opencode、OpenClaw、Codex、Autohand Code 全局与项目级）见 [docs/INSTALL_SKILL_CN.md](docs/INSTALL_SKILL_CN.md)。
+
+Autohand Code 也支持通过 `autohand --skill-install` 安装已收录在 Autohand catalog 中的 skill，并可通过 `--project` 安装到当前项目。在该 skill 收录前，请按上面的手动安装方式，把 `skills/drawio-skill` 链接到 `~/.autohand/skills/`（全局）或 `<project>/.autohand/skills/`（项目级）。
 
 同时索引于 [SkillsMP](https://skillsmp.com/skills/agents365-ai-drawio-skill-skills-drawio-skill-skill-md)。
 
-**更新：** `skills update drawio-skill`（SkillsMP）或 `git pull`（手动安装）。详见 [docs/INSTALL_SKILL_CN.md#更新](docs/INSTALL_SKILL_CN.md#更新)。版本历史见 [CHANGELOG.md](CHANGELOG.md)。
+**更新：** 安装器安装的用 `npx skills update drawio-skill -g`（skills CLI）更新；链接安装用 `git -C ~/src/drawio-skill pull` 更新，复制安装需要手动刷新。详见 [docs/INSTALL_SKILL_CN.md#更新](docs/INSTALL_SKILL_CN.md#更新)。版本历史见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## ⚡ 快速开始
 

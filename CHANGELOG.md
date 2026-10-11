@@ -30,6 +30,13 @@ semantic-ish versioning (the `metadata.version` field in
   `ValueError` listing the unrecognized ids and the valid rules instead of
   silently skipping the check; `diagramctl test` reports it on stderr and
   exits 2. `review()` and all eight existing rule ids are unchanged.
+- **Installation docs: corrected manual placement and update attribution**:
+  the manual recipes now clone the repository once and link or copy the
+  `skills/drawio-skill/` subdirectory into the host skills root, so `SKILL.md`
+  sits directly under the host entry. The recommended update command is
+  attributed to the skills CLI (`npx skills update drawio-skill -g`), and
+  SkillsMP is described as a listing only. The website install tabs carry the
+  same corrections.
 
 ## [3.4.0] - 2026-09-14
 
