@@ -266,6 +266,57 @@ def call_tool(name, arguments):
     return proc.returncode, text
 
 
+def validate_arguments(tool, arguments):
+    """Validate tool arguments against the tool's flat input schema.
+
+    Returns the arguments unchanged, or raises MethodError(-32602) with a
+    readable diagnostic. Without this check a missing key reaches argv
+    construction and surfaces as a misleading unknown-tool error.
+    """
+    if arguments is None:
+        arguments = {}
+    name = tool["name"]
+    if not isinstance(arguments, dict):
+        raise MethodError(
+            -32602, f"invalid params: arguments for tool {name!r} must be an object"
+        )
+    schema = tool["inputSchema"]
+    missing = [key for key in schema["required"] if key not in arguments]
+    if missing:
+        raise MethodError(
+            -32602,
+            f"invalid params: missing required argument(s) "
+            f"{', '.join(missing)} for tool {name!r}",
+        )
+    for key, value in arguments.items():
+        spec = schema["properties"].get(key)
+        if spec is None:
+            raise MethodError(
+                -32602, f"invalid params: unknown argument {key!r} for tool {name!r}"
+            )
+        expected = spec["type"]
+        if expected == "boolean" and not isinstance(value, bool):
+            raise MethodError(
+                -32602,
+                f"invalid params: argument {key!r} for tool {name!r} "
+                f"must be a {expected}",
+            )
+        if expected == "string" and not isinstance(value, str):
+            raise MethodError(
+                -32602,
+                f"invalid params: argument {key!r} for tool {name!r} "
+                f"must be a {expected}",
+            )
+        allowed = spec.get("enum")
+        if allowed is not None and value not in allowed:
+            raise MethodError(
+                -32602,
+                f"invalid params: argument {key!r} for tool {name!r} "
+                f"must be one of {', '.join(str(a) for a in allowed)}",
+            )
+    return arguments
+
+
 def dispatch(method, params):
     if method == "initialize":
         return {
@@ -288,10 +339,14 @@ def dispatch(method, params):
         }
     if method == "tools/call":
         name = params.get("name", "")
+        if not isinstance(name, str):
+            raise MethodError(-32602, "invalid params: tool name must be a string")
+        tool = next((t for t in TOOLS if t["name"] == name), None)
+        if tool is None:
+            raise MethodError(-32602, f"unknown tool {name!r}")
+        arguments = validate_arguments(tool, params.get("arguments"))
         try:
-            code, text = call_tool(name, params.get("arguments") or {})
-        except KeyError:
-            raise MethodError(-32602, f"unknown tool {name!r}") from None
+            code, text = call_tool(name, arguments)
         except ValueError as exc:
             return {"content": [{"type": "text", "text": str(exc)}], "isError": True}
         except subprocess.TimeoutExpired:
@@ -306,7 +361,7 @@ def dispatch(method, params):
             }
         return {
             "content": [{"type": "text", "text": text}],
-            "isError": code not in (0, 1),
+            "isError": code != 0,
         }
     raise MethodError(-32601, f"method not found: {method}")
 
@@ -318,22 +373,57 @@ class MethodError(Exception):
         self.message = message
 
 
+def error_response(id_value, code, message):
+    return {
+        "jsonrpc": "2.0",
+        "id": id_value,
+        "error": {"code": code, "message": message},
+    }
+
+
 def handle(line):
     """Handle one JSON-RPC message; returns a response dict or None (notification)."""
     try:
         msg = json.loads(line)
     except ValueError:
-        return {
-            "jsonrpc": "2.0",
-            "id": None,
-            "error": {"code": -32700, "message": "parse error"},
-        }
-    method = msg.get("method", "")
-    is_notification = "id" not in msg
-    if method.startswith("notifications/"):
+        return error_response(None, -32700, "parse error")
+    if not isinstance(msg, dict):
+        return error_response(None, -32600, "invalid request: expected a JSON object")
+    method = msg.get("method")
+    if isinstance(method, str) and method.startswith("notifications/"):
+        # Legacy notification-method suppression (MCP names such as
+        # notifications/initialized): never answered, valid or not.
         return None
+    if "id" in msg:
+        id_value = msg["id"]
+        is_valid_id = id_value is None or (
+            not isinstance(id_value, bool)
+            and isinstance(id_value, (str, int, float))
+        )
+        if not is_valid_id:
+            return error_response(
+                None,
+                -32600,
+                "invalid request: id must be a string, number, or null",
+            )
+    if msg.get("jsonrpc") != "2.0":
+        return error_response(
+            msg.get("id"), -32600, "invalid request: jsonrpc must be '2.0'"
+        )
+    if not isinstance(method, str):
+        return error_response(
+            msg.get("id"), -32600, "invalid request: method must be a string"
+        )
+    is_notification = "id" not in msg
+    params = msg.get("params")
+    if params is not None and not isinstance(params, dict):
+        if is_notification:
+            return None
+        return error_response(
+            msg.get("id"), -32602, "invalid params: expected an object"
+        )
     try:
-        result = dispatch(method, msg.get("params") or {})
+        result = dispatch(method, params or {})
         return (
             None
             if is_notification
