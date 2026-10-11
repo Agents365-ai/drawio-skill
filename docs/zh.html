@@ -931,40 +931,92 @@
           </div>
           <div id="tab-claude" class="tab-content active" role="tabpanel">
             <pre>
-# 全局安装
-git clone https://github.com/Agents365-ai/drawio-skill.git ~/.claude/skills/drawio-skill
+# Install with the skills CLI (global)
+npx skills add Agents365-ai/drawio-skill -g --agent claude-code
 
-# 项目级安装
-git clone https://github.com/Agents365-ai/drawio-skill.git .claude/skills/drawio-skill</pre>
+# Manual alternative: clone once, then link the skill subdirectory
+# Use an unused source location, or skip this clone if you already have a clone to reuse
+mkdir -p ~/src
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/src/drawio-skill
+
+# Target entries must not exist yet: move an existing drawio-skill entry
+# aside before linking (global and project). Plain ln -s nests inside an existing directory.
+mkdir -p ~/.claude/skills
+ln -s ~/src/drawio-skill/skills/drawio-skill ~/.claude/skills/drawio-skill
+
+# Project-level: link the same subdirectory under .claude/skills/
+mkdir -p .claude/skills
+ln -s ~/src/drawio-skill/skills/drawio-skill .claude/skills/drawio-skill
+
+# Guide: https://github.com/Agents365-ai/drawio-skill/blob/main/docs/INSTALL_SKILL_CN.md</pre>
           </div>
           <div id="tab-opencode" class="tab-content" role="tabpanel">
             <pre>
-# 全局安装（Opencode 原生路径）
-git clone https://github.com/Agents365-ai/drawio-skill.git ~/.config/opencode/skills/drawio-skill
+# Install with the skills CLI (global)
+npx skills add Agents365-ai/drawio-skill -g --agent opencode
 
-# 项目级安装
-git clone https://github.com/Agents365-ai/drawio-skill.git .opencode/skills/drawio-skill
+# Manual alternative: clone once, then link the skill subdirectory
+# Use an unused source location, or skip this clone if you already have a clone to reuse
+mkdir -p ~/src
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/src/drawio-skill
 
-# 也可自动识别已有的 Claude Code 安装
-# （~/.claude/skills/ 和 .claude/skills/ 会被自动读取）</pre>
+# Target entries must not exist yet: move an existing drawio-skill entry
+# aside before linking (global and project). Plain ln -s nests inside an existing directory.
+mkdir -p ~/.config/opencode/skills
+ln -s ~/src/drawio-skill/skills/drawio-skill ~/.config/opencode/skills/drawio-skill
+
+# Project-level: link the same subdirectory under .opencode/skills/
+mkdir -p .opencode/skills
+ln -s ~/src/drawio-skill/skills/drawio-skill .opencode/skills/drawio-skill
+
+# Opencode also reads ~/.claude/skills/ and .claude/skills/ automatically
+# Guide: https://github.com/Agents365-ai/drawio-skill/blob/main/docs/INSTALL_SKILL_CN.md</pre>
           </div>
           <div id="tab-openclaw" class="tab-content" role="tabpanel">
             <pre>
-# 手动安装
-git clone https://github.com/Agents365-ai/drawio-skill.git ~/.openclaw/skills/drawio-skill</pre>
+# Install with the skills CLI (global)
+npx skills add Agents365-ai/drawio-skill -g --agent openclaw
+
+# Manual alternative: clone once, then link the skill subdirectory
+# Use an unused source location, or skip this clone if you already have a clone to reuse
+mkdir -p ~/src
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/src/drawio-skill
+
+# The target entry must not exist yet: move an existing drawio-skill entry
+# aside before linking. Plain ln -s nests inside an existing directory.
+mkdir -p ~/.openclaw/skills
+ln -s ~/src/drawio-skill/skills/drawio-skill ~/.openclaw/skills/drawio-skill
+
+# Guide: https://github.com/Agents365-ai/drawio-skill/blob/main/docs/INSTALL_SKILL_CN.md</pre>
           </div>
           <div id="tab-skillsmp" class="tab-content" role="tabpanel">
             <pre>
-# 通过 SkillsMP CLI
-skills install drawio-skill</pre>
+# SkillsMP is an index, not an installer. Listing:
+# https://skillsmp.com/skills/agents365-ai-drawio-skill-skills-drawio-skill-skill-md
+
+# Install with the skills CLI
+npx skills add Agents365-ai/drawio-skill -g</pre>
           </div>
           <div id="tab-codex" class="tab-content" role="tabpanel">
             <pre>
-# 用户级安装
-git clone https://github.com/Agents365-ai/drawio-skill.git ~/.agents/skills/drawio-skill
+# Install with the skills CLI (user-level)
+npx skills add Agents365-ai/drawio-skill -g --agent codex
 
-# 项目级安装
-git clone https://github.com/Agents365-ai/drawio-skill.git .agents/skills/drawio-skill</pre>
+# Manual alternative: clone once, then link the skill subdirectory
+# Use an unused source location, or skip this clone if you already have a clone to reuse
+mkdir -p ~/src
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/src/drawio-skill
+
+# Target entries must not exist yet: move an existing drawio-skill entry
+# aside before linking (global and project). Plain ln -s nests inside an existing directory.
+mkdir -p ~/.agents/skills
+ln -s ~/src/drawio-skill/skills/drawio-skill ~/.agents/skills/drawio-skill
+
+# Project-level: link the same subdirectory under .agents/skills/
+mkdir -p .agents/skills
+ln -s ~/src/drawio-skill/skills/drawio-skill .agents/skills/drawio-skill
+
+# Guide: https://github.com/Agents365-ai/drawio-skill/blob/main/docs/INSTALL_SKILL_CN.md</pre>
           </div>
         </div>
       </section>

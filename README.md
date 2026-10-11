@@ -76,25 +76,26 @@ Verify with `drawio --version`. **Version ≥ 30 recommended** — it unlocks Me
 npx skills add Agents365-ai/drawio-skill -g
 ```
 
+Manual install: clone once to a persistent path, then link the skill subdirectory (Claude Code shown). Use `cp -R` instead of `ln -s` on hosts that do not follow symlinks. The destination must not exist yet, so move an existing `drawio-skill` entry aside first.
+
 ```bash
-# Manual install
-git clone https://github.com/Agents365-ai/drawio-skill.git \
-  ~/.claude/skills/drawio-skill
+mkdir -p ~/src
+git clone https://github.com/Agents365-ai/drawio-skill.git ~/src/drawio-skill
+mkdir -p ~/.claude/skills
+ln -s ~/src/drawio-skill/skills/drawio-skill ~/.claude/skills/drawio-skill
 
-# Autohand Code global install
-git clone https://github.com/Agents365-ai/drawio-skill.git \
-  ~/.autohand/skills/drawio-skill
-
-# Autohand Code project-level install
-git clone https://github.com/Agents365-ai/drawio-skill.git \
-  .autohand/skills/drawio-skill
+# Copy alternative, for hosts that do not follow symlinks
+# mkdir -p ~/.claude/skills
+# cp -R ~/src/drawio-skill/skills/drawio-skill ~/.claude/skills/drawio-skill
 ```
 
-Autohand Code also supports `autohand --skill-install` for cataloged skills, with `--project` for workspace-level installs. Until this skill is listed there, use the direct clone path above.
+The skill is the `skills/drawio-skill/` subdirectory, so `SKILL.md` must sit directly under the host entry: `<skills root>/drawio-skill/SKILL.md`. Do not clone the repository root into a skills directory. Other host roots (Opencode, OpenClaw, Codex, Autohand Code global and project): [docs/INSTALL_SKILL.md](docs/INSTALL_SKILL.md).
+
+Autohand Code also supports `autohand --skill-install` for cataloged skills, with `--project` for workspace-level installs. Until this skill is listed there, use the manual recipe above with the Autohand Code skills root: `~/.autohand/skills/` (global) or `<project>/.autohand/skills/` (project).
 
 Also indexed on [SkillsMP](https://skillsmp.com/skills/agents365-ai-drawio-skill-skills-drawio-skill-skill-md).
 
-**Updating:** `skills update drawio-skill` (SkillsMP) or `git pull` for manual installs. See [docs/INSTALL_SKILL.md#updates](docs/INSTALL_SKILL.md#updates). Release history in [CHANGELOG.md](CHANGELOG.md).
+**Updating:** `npx skills update drawio-skill -g` (skills CLI) for installer installs; link installs update with `git -C ~/src/drawio-skill pull`, and copy installs need a manual refresh. See [docs/INSTALL_SKILL.md#updates](docs/INSTALL_SKILL.md#updates). Release history in [CHANGELOG.md](CHANGELOG.md).
 
 ## ⚡ Quick Start
 
