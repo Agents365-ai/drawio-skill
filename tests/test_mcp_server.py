@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 HERE = Path(__file__).resolve().parent
 SCRIPTS = HERE.parent / "skills" / "drawio-skill" / "scripts"
@@ -165,6 +166,14 @@ class TestMcpTools(unittest.TestCase):
             self.assertEqual(tool["inputSchema"]["type"], "object")
             self.assertIn("description", tool)
 
+    def test_build_schema_requires_only_source_and_output(self):
+        tools = rpc("tools/list")["result"]["tools"]
+        build = next(t for t in tools if t["name"] == "build")
+        self.assertEqual(["source", "output"], build["inputSchema"]["required"])
+        self.assertEqual(
+            "string", build["inputSchema"]["properties"]["ir_output"]["type"]
+        )
+
     def test_doctor_call(self):
         resp = rpc("tools/call", {"name": "doctor"})
         result = resp["result"]
@@ -185,25 +194,57 @@ class TestMcpTools(unittest.TestCase):
                         "source": str(graph),
                         "output": str(out),
                         "source_type": "graph",
+                        "ir_output": str(ir),
                     },
                 },
             )
             self.assertFalse(resp["result"]["isError"], resp["result"]["content"])
-            self.assertTrue(out.exists())
-            self.assertTrue(ir.exists() is False)  # ir-output not requested
             report = json.loads(resp["result"]["content"][0]["text"])
-            self.assertEqual(report["nodes"], 2)
+            self.assertEqual(2, report["nodes"])
+            self.assertEqual(1, report["edges"])
+            self.assertEqual(str(ir), report["ir"])
+            self.assertTrue(out.exists())
+            self.assertTrue(ir.exists())
+            document = json.loads(ir.read_text(encoding="utf-8"))
+            self.assertEqual("drawio-skill/diagram-ir/v1", document["schema"])
+            self.assertEqual(["web", "db"], [n["id"] for n in document["nodes"]])
+            self.assertEqual(
+                [["web", "db"]],
+                [[e["source"], e["target"]] for e in document["edges"]],
+            )
 
             resp = rpc(
                 "tools/call",
+                {"name": "architecture_test", "arguments": {"input": str(ir)}},
+            )
+            result = resp["result"]
+            self.assertFalse(result["isError"], result["content"])
+            findings = json.loads(result["content"][0]["text"])
+            self.assertEqual(0, findings["errors"])
+            self.assertEqual(0, findings["warnings"])
+            self.assertEqual([], findings["findings"])
+
+    def test_build_without_ir_output_writes_only_drawio(self):
+        with tempfile.TemporaryDirectory() as td:
+            graph = Path(td) / "graph.json"
+            graph.write_text(json.dumps(GRAPH))
+            out = Path(td) / "out.drawio"
+            resp = rpc(
+                "tools/call",
                 {
-                    "name": "architecture_test",
-                    "arguments": {"input": str(ir if ir.exists() else graph)},
+                    "name": "build",
+                    "arguments": {
+                        "source": str(graph),
+                        "output": str(out),
+                        "source_type": "graph",
+                    },
                 },
             )
-            # graph is not IR; the call must fail cleanly with isError, not crash
-            if not resp["result"]["isError"]:
-                self.assertIn("errors", resp["result"]["content"][0]["text"])
+            self.assertFalse(resp["result"]["isError"], resp["result"]["content"])
+            report = json.loads(resp["result"]["content"][0]["text"])
+            self.assertIsNone(report["ir"])
+            self.assertTrue(out.exists())
+            self.assertEqual([], sorted(Path(td).glob("*.ir.json")))
 
     def test_bad_arguments_is_clean_error(self):
         resp = rpc(
@@ -243,6 +284,24 @@ class TestMcpToolArgumentValidation(unittest.TestCase):
         resp = rpc("tools/call", {"name": "doctor", "arguments": {"probe": "yes"}})
         self.assertEqual(-32602, resp["error"]["code"])
         self.assertIn("probe", resp["error"]["message"])
+
+    def test_wrong_type_ir_output_is_invalid_params(self):
+        for value in (5, ["out.ir.json"], True):
+            with mock.patch.object(mcp.subprocess, "run") as run:
+                resp = rpc(
+                    "tools/call",
+                    {
+                        "name": "build",
+                        "arguments": {
+                            "source": "s.json",
+                            "output": "o.drawio",
+                            "ir_output": value,
+                        },
+                    },
+                )
+            self.assertEqual(-32602, resp["error"]["code"], value)
+            self.assertIn("ir_output", resp["error"]["message"])
+            run.assert_not_called()
 
     def test_unknown_argument_is_invalid_params(self):
         resp = rpc(
@@ -376,10 +435,30 @@ class TestMcpStdioProcess(unittest.TestCase):
             text=True,
             timeout=60,
         )
+        self.assertEqual(0, proc.returncode, proc.stderr)
+        self.assertEqual("", proc.stderr)
         lines = [json.loads(line) for line in proc.stdout.splitlines() if line.strip()]
-        self.assertEqual(len(lines), 2)  # notifications produce no response
-        self.assertEqual(lines[0]["result"]["serverInfo"]["name"], "drawio-skill")
-        self.assertIn("tools", lines[1]["result"])
+        self.assertEqual(2, len(lines))  # notifications produce no response
+        self.assertEqual([1, 2], [line["id"] for line in lines])
+        self.assertEqual(["2.0", "2.0"], [line["jsonrpc"] for line in lines])
+        for line in lines:
+            self.assertIn("result", line)
+        self.assertEqual("drawio-skill", lines[0]["result"]["serverInfo"]["name"])
+        self.assertEqual("2024-11-05", lines[0]["result"]["protocolVersion"])
+        self.assertEqual(
+            {
+                "doctor",
+                "build",
+                "sync",
+                "views",
+                "architecture_test",
+                "review",
+                "query",
+                "whatif",
+                "story",
+            },
+            {t["name"] for t in lines[1]["result"]["tools"]},
+        )
 
     def test_malformed_requests_do_not_stop_the_server(self):
         msgs = [

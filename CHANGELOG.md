@@ -7,6 +7,14 @@ semantic-ish versioning (the `metadata.version` field in
 
 ## [Unreleased]
 
+### Added
+
+- **MCP server: optional `ir_output` for `build`**: the `build` tool accepts an
+  `ir_output` path and forwards it as `--ir-output`, so a host can save the
+  Diagram IR in the same call and reuse it for `views`, `architecture_test`,
+  `query`, `whatif`, or `story`. The argument stays optional: without it only
+  the `.drawio` is written and the report's `ir` field is `null`.
+
 ### Fixed
 
 - **MCP server: nonzero tool exits now set `isError`**: `architecture_test`
