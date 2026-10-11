@@ -43,6 +43,27 @@ Outputs are files (`.drawio`, `.html`, `.json`); tool results return the JSON
 report or report text plus the written paths, so the host can open or attach
 them.
 
+### Optional IR output
+
+`build` requires only `source` and `output`. Add `ir_output` to save the
+Diagram IR JSON that the other tools consume:
+
+```json
+{
+  "name": "build",
+  "arguments": {
+    "source": "/path/to/terraform",
+    "output": "/path/to/architecture.drawio",
+    "ir_output": "/path/to/architecture.ir.json"
+  }
+}
+```
+
+Without `ir_output`, `build` writes only the `.drawio` and the report's `ir`
+field is `null`; no IR file is created implicitly. With it, the `views`,
+`architecture_test`, `query`, `whatif`, and `story` tools can consume the same
+file.
+
 ## Behavior and safety
 
 - Offline by default: no tool performs network access; native PNG export is

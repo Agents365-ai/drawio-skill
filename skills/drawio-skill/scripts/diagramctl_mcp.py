@@ -64,6 +64,10 @@ TOOLS = [
             {
                 "source": {"type": "string", "description": "Path to source dir/file"},
                 "output": {"type": "string", "description": "Output .drawio path"},
+                "ir_output": {
+                    "type": "string",
+                    "description": "Optional Diagram IR JSON output path",
+                },
                 "source_type": {
                     "type": "string",
                     "description": "Override auto-detection "
@@ -83,6 +87,7 @@ TOOLS = [
             ["source", "output"],
         ),
         "argv": lambda a: ["build", a["source"], "-o", a["output"]]
+        + (["--ir-output", a["ir_output"]] if a.get("ir_output") else [])
         + (["--from", a["source_type"]] if a.get("source_type") else [])
         + (["--group"] if a.get("group") else [])
         + (["--views", a["views"]] if a.get("views") else [])
