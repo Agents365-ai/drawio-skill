@@ -5,6 +5,24 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `metadata.version` field in
 `skills/drawio-skill/SKILL.md`).
 
+## [Unreleased]
+
+### Fixed
+
+- **MCP server: nonzero tool exits now set `isError`**: `architecture_test`
+  contract failures (exit 1) and strict-warning failures were reported as
+  success. Any nonzero `diagramctl` exit now maps to `isError: true`.
+- **MCP server: malformed JSON-RPC input no longer terminates the stdio
+  server**: a non-object request, a wrong `jsonrpc` version, a non-string
+  method, non-object `params`, or tool arguments with missing, wrong-typed,
+  unknown, or out-of-enum fields now return JSON-RPC `-32600` / `-32602`
+  errors with readable diagnostics, and later requests in the same process are
+  still served. Unknown tools keep a distinct message.
+- **Unknown architecture rule ids are rejected**: `semantic_findings` raises
+  `ValueError` listing the unrecognized ids and the valid rules instead of
+  silently skipping the check; `diagramctl test` reports it on stderr and
+  exits 2. `review()` and all eight existing rule ids are unchanged.
+
 ## [3.4.0] - 2026-09-14
 
 ### Added

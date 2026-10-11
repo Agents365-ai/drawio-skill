@@ -752,6 +752,20 @@ DEFAULT_RULES = [
     "accessible-contrast",
 ]
 
+# Every rule id semantic_findings can evaluate, including the optional rules a
+# policy or review() selects on top of DEFAULT_RULES. An id outside this set is
+# a configuration error, never a silently skipped check.
+SEMANTIC_RULES = (
+    "no-direct-internet-to-database",
+    "no-cycles",
+    "no-orphans",
+    "every-service-has-owner",
+    "production-has-observability",
+    "external-dependencies-have-timeouts",
+    "trust-boundaries-use-protocol",
+    "accessible-contrast",
+)
+
 ARCHITECTURE_KINDS = {
     "service",
     "gateway",
@@ -780,6 +794,14 @@ def infer_profile(ir):
 def semantic_findings(ir, rule_ids=None):
     ir = normalize_ir(ir)
     rules = rule_ids or DEFAULT_RULES
+    unknown = [r for r in rules if r not in SEMANTIC_RULES]
+    if unknown:
+        raise ValueError(
+            "unknown semantic rule(s): "
+            + ", ".join(str(r) for r in unknown)
+            + "; valid rules: "
+            + ", ".join(SEMANTIC_RULES)
+        )
     nodes = {n["id"]: n for n in ir["nodes"]}
     incoming, outgoing = adjacency(ir, reverse=True), adjacency(ir)
     findings = []

@@ -153,6 +153,50 @@ class TestDiagramIR(unittest.TestCase):
         findings = d.semantic_findings(ir, ["no-direct-internet-to-database"])
         self.assertEqual("error", findings[0]["severity"])
 
+    def test_all_eight_semantic_rules_remain_supported(self):
+        expected = {
+            "no-direct-internet-to-database",
+            "no-cycles",
+            "no-orphans",
+            "every-service-has-owner",
+            "production-has-observability",
+            "external-dependencies-have-timeouts",
+            "trust-boundaries-use-protocol",
+            "accessible-contrast",
+        }
+        self.assertEqual(expected, set(d.SEMANTIC_RULES))
+        ir = sample_ir()
+        for rule in sorted(expected):
+            self.assertIsInstance(d.semantic_findings(ir, [rule]), list)
+
+    def test_unknown_semantic_rule_is_rejected(self):
+        with self.assertRaises(ValueError) as ctx:
+            d.semantic_findings(sample_ir(), ["no-cycles", "no-cyclse"])
+        message = str(ctx.exception)
+        self.assertIn("unknown semantic rule(s): no-cyclse", message)
+        self.assertIn("; valid rules: ", message)
+        for rule in d.SEMANTIC_RULES:
+            self.assertIn(rule, message)
+
+    def test_default_and_empty_rule_lists_keep_default_selection(self):
+        ir = sample_ir()
+        ir["edges"].append(
+            {
+                "id": "direct",
+                "source": "internet",
+                "target": "db",
+                "label": "",
+                "kind": "relation",
+                "properties": {},
+            }
+        )
+        for selection in (None, []):
+            findings = d.semantic_findings(ir, selection)
+            self.assertTrue(
+                any(f["rule"] == "no-direct-internet-to-database" for f in findings),
+                selection,
+            )
+
     def test_drawio_roundtrip_and_provenance(self):
         with tempfile.TemporaryDirectory() as td:
             path = os.path.join(td, "out.drawio")
@@ -406,6 +450,58 @@ class TestDiagramCtl(unittest.TestCase):
                         {"id": "b", "kind": "database"}]}
         )
         self.assertEqual(d.infer_profile(arch), "architecture")
+
+    def test_policy_with_unknown_rule_fails_readably(self):
+        with tempfile.TemporaryDirectory() as td:
+            ir_path = os.path.join(td, "model.json")
+            ir = sample_ir()
+            ir["edges"].append(
+                {
+                    "id": "direct",
+                    "source": "internet",
+                    "target": "db",
+                    "label": "",
+                    "kind": "relation",
+                    "properties": {},
+                }
+            )
+            with open(ir_path, "w", encoding="utf-8") as fh:
+                json.dump(ir, fh)
+            policy = os.path.join(td, "policy.json")
+            with open(policy, "w", encoding="utf-8") as fh:
+                json.dump({"rules": ["no-direct-internet-to-databse"]}, fh)
+            r = self.run_cli("test", ir_path, "--rules", policy)
+            self.assertEqual(2, r.returncode, r.stdout)
+            self.assertEqual("", r.stdout)
+            self.assertIn("unknown semantic rule", r.stderr)
+            self.assertIn("no-direct-internet-to-databse", r.stderr)
+
+    def test_policy_with_supported_rule_reports_violation(self):
+        with tempfile.TemporaryDirectory() as td:
+            ir_path = os.path.join(td, "model.json")
+            ir = sample_ir()
+            ir["edges"].append(
+                {
+                    "id": "direct",
+                    "source": "internet",
+                    "target": "db",
+                    "label": "",
+                    "kind": "relation",
+                    "properties": {},
+                }
+            )
+            with open(ir_path, "w", encoding="utf-8") as fh:
+                json.dump(ir, fh)
+            policy = os.path.join(td, "policy.json")
+            with open(policy, "w", encoding="utf-8") as fh:
+                json.dump({"rules": ["no-direct-internet-to-database"]}, fh)
+            r = self.run_cli("test", ir_path, "--rules", policy)
+            self.assertEqual(1, r.returncode, r.stderr)
+            report = json.loads(r.stdout)
+            self.assertEqual(1, report["errors"])
+            self.assertEqual(
+                "no-direct-internet-to-database", report["findings"][0]["rule"]
+            )
 
 
 if __name__ == "__main__":

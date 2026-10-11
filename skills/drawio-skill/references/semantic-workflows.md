@@ -30,6 +30,11 @@ Errors always fail. Warnings fail only under `--strict`. These rules inspect
 declared diagram semantics; they do not claim to prove that the running system
 has the same properties.
 
+Every rule id must be one of the eight listed above. An unrecognized id (for
+example a typo in a policy file) is a configuration error: `test` writes the
+offending ids to stderr and exits 2 rather than silently skipping the intended
+check.
+
 ## Query and review
 
 ```bash
