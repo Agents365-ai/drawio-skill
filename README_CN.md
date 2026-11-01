@@ -9,7 +9,7 @@
 [![SkillsMP](https://img.shields.io/badge/SkillsMP-listed-1f6feb)](https://skillsmp.com/skills/agents365-ai-drawio-skill-skills-drawio-skill-skill-md)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-2ea44f)](https://agentskills.io)
 
-[English](README.md) · **中文** · [📖 在线文档](https://agents365-ai.github.io/drawio-skill/)
+[English](README.md) · **中文** · [日本語](README_JA.md) · [📖 在线文档](https://agents365-ai.github.io/drawio-skill/)
 
 一个把自然语言和真实系统源转换成可持续维护的 `.drawio` 架构模型的技能。除了生成与导出，它还能保留人工布局地增量同步、从同一模型投影多种视图、执行架构规则、查询依赖、模拟故障传播，并发布无外部依赖的互动讲解页。支持 **Claude Code、Cursor、Copilot、OpenClaw、Codex、Autohand Code、Hermes** 等任何兼容 [Agent Skills](https://agentskills.io) 规范的 agent。
 
