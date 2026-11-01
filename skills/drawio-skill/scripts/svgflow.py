@@ -5,7 +5,9 @@ Exports a .drawio to SVG (or takes an .svg directly) and turns every edge into a
 marching-ants animation: dashes travel along each connector in the direction of
 the arrow, so the diagram shows data/flow moving through it. The result is a
 single self-contained .svg that loops forever in any browser — nice for a README
-(GitHub renders SVG), a docs page, or a slide background.
+(GitHub renders SVG), a docs page, or a slide background. For selectable SVG text
+labels, set `convertToSvg=1;` in cell styles before export; see
+`references/xml-authoring.md` → "SVG text labels".
 
   python3 svgflow.py architecture.drawio -o architecture-flow.svg
   python3 svgflow.py already-exported.svg  -o flow.svg

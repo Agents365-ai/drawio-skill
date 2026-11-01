@@ -29,6 +29,12 @@ Read this **before hand-writing any `.drawio` XML** (workflow step 3). Skip it w
 - Escape special characters in attribute values: `&amp;`, `&lt;`, `&gt;`, `&quot;`
 - **Multi-line text in labels:** use `&#xa;` for line breaks inside `value` attributes (not literal `\n`). Example: `value="Line 1&#xa;Line 2"`
 
+### SVG text labels
+
+For diagrams destined for web output (including GitHub-rendered SVGs, HTML viewers, or slides rendered as SVG), add `convertToSvg=1;` to each text-bearing cell's style, for example `style="rounded=1;whiteSpace=wrap;html=1;convertToSvg=1;"`. This draw.io 28.0.3+ per-cell setting exports convertible labels as selectable, searchable SVG text instead of raster fallbacks. It is not an export-command switch; generic export commands need no change.
+
+Some content cannot be converted and remains HTML/raster: tables, lists, links, images, cells with `background-color`, and vertical writing. SVG text has no automatic word wrapping; line breaks are fixed at export, so re-export after resizing a shape or lengthening a label. Word-wrapped SVG text requires draw.io 29.6.7 or later.
+
 ### Shape types (vertex)
 
 | Style keyword | Use for |

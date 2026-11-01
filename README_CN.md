@@ -44,7 +44,7 @@
 
 **分享与换肤**
 
-- **一条命令二次利用** —— 交互式 HTML 查看器（平移/缩放/搜索）、PowerPoint 演示稿、数据流动画 SVG、Mermaid 或 Markdown 导出、点击式排查手册、高管摘要压缩
+- **一条命令二次利用** —— 交互式 HTML 查看器（平移/缩放/搜索）、PowerPoint 演示稿（每页为栅格图片，不能单独编辑图形）、数据流动画 SVG、Mermaid 或 Markdown 导出、点击式排查手册、高管摘要压缩
 - **换肤与增强** —— 样式预设（自定义或内置 `dark`/`corporate`……）、布局不动的双语标签变体、数据驱动的热力图、地铁图模式
 - **10,000+ 官方形状 + 321 个 AI/LLM logo** —— 精确解析 AWS / Cisco / K8s / UML 图标 style 而不靠猜，外加 draw.io 自身没有的品牌 logo
 - **统一 CLI，可选 MCP 服务** —— `diagramctl doctor/build/sync/views/query/test/review/whatif/story/publish/transform`，核心工作流纯标准库且默认离线；MCP 服务把同样能力暴露给 Claude Desktop、Cursor、VS Code、Codex 等任何 MCP host。可移植到任何兼容 Agent Skills 的 agent，无需常驻服务

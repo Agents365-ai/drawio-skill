@@ -149,6 +149,8 @@ def main():
             f.write(text)
         sys.stderr.write(f"wrote {args.output}\n")
     else:
+        if not sys.stdout.isatty() and hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8")
         sys.stdout.write(text)
 
 

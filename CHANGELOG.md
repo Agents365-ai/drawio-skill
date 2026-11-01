@@ -7,6 +7,19 @@ semantic-ish versioning (the `metadata.version` field in
 
 ## [Unreleased]
 
+### Changed
+
+- **SVG text labels documented**: explain the per-cell `convertToSvg=1;` style
+  for web-destined diagrams, conversion limitations, version requirements, and
+  re-export caveat; link to the guidance from the SVG and HTML exporter docs.
+- **PPTX export clarified**: state that `drawio2pptx.py` embeds a raster image per
+  slide rather than individually editable PowerPoint shapes.
+
+### Fixed
+
+- **`explain.py` Unicode output on Windows**: encode redirected Markdown as
+  UTF-8 so arrows and other non-ASCII text do not fail under legacy code pages.
+
 ### Added
 
 - **MCP server: optional `ir_output` for `build`**: the `build` tool accepts an

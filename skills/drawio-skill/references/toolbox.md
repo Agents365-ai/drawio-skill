@@ -54,7 +54,7 @@ Use focused scripts directly when you need their narrow interface; use
 | a repo's git history | how its architecture grew | `timelapse` |
 | a `.drawio` | a shareable interactive viewer | `drawiohtml` (→ HTML: pan/zoom/search/tabs) |
 | a `.drawio` | a written description | `explain` (→ Markdown) |
-| a `.drawio` | a slide deck | `drawio2pptx` (→ PPTX) |
+| a `.drawio` | a slide deck (raster page images, not individually editable shapes) | `drawio2pptx` (→ PPTX) |
 | a `.drawio` | an animated data-flow | `svgflow` (→ SVG) |
 | a `.drawio` | diagrams-as-code | `drawio2mermaid` (→ Mermaid) |
 | a `.drawio` | the same diagram in another language | `relabel` (extract → translate → apply) |

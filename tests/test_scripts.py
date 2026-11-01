@@ -40,10 +40,14 @@ def load(name):
 
 def run(script, *args, **kw):
     """Run a script as a subprocess; return CompletedProcess."""
+    env = kw.pop("env", os.environ.copy()).copy()
+    env["PYTHONIOENCODING"] = "utf-8"
     return subprocess.run(
         [sys.executable, os.path.join(SCRIPTS, script), *args],
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        env=env,
         **kw,
     )
 
@@ -1218,6 +1222,27 @@ class TestImportersCli(unittest.TestCase):
             self.assertIn("DB _data store_", md)  # cylinder -> data store
             self.assertIn("A —reads→ DB", md)  # labeled relation
             self.assertNotIn("- Tier _", md)  # container itself isn't a component
+
+    def test_explain_stdout_uses_utf8_when_redirected(self):
+        doc = (
+            '<mxfile><diagram name="P1"><mxGraphModel><root>'
+            + self.EXPLAIN_PAGE
+            + "</root></mxGraphModel></diagram></mxfile>"
+        )
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "arch.drawio")
+            self._write(path, doc)
+            env = os.environ.copy()
+            env.pop("PYTHONIOENCODING", None)
+            proc = subprocess.run(
+                [sys.executable, os.path.join(SCRIPTS, "explain.py"), path],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                env=env,
+            )
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            self.assertIn("A —reads→ DB", proc.stdout)
 
     def test_explain_multipage(self):
         doc = (

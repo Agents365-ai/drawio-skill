@@ -44,7 +44,7 @@ A skill that turns natural language and real system sources into maintainable `.
 
 **Share and restyle**
 
-- **Repurpose with one command** — interactive HTML viewer (pan/zoom/search), PowerPoint deck, animated data-flow SVG, Mermaid or Markdown export, click-through runbook, exec-summary compression
+- **Repurpose with one command** — interactive HTML viewer (pan/zoom/search), PowerPoint deck (raster page images, not individually editable shapes), animated data-flow SVG, Mermaid or Markdown export, click-through runbook, exec-summary compression
 - **Restyle and enrich** — style presets (yours or built-in `dark`/`corporate`/…), bilingual label variants with layout untouched, data-driven heat maps, white-to-metro tubemap mode
 - **10,000+ official shapes + 321 AI/LLM logos** — resolve exact AWS / Cisco / K8s / UML icon styles instead of guessing, plus brand logos draw.io itself lacks
 - **One CLI, optional MCP server** — `diagramctl doctor/build/sync/views/query/test/review/whatif/story/publish/transform`, core workflows stdlib-only and offline; the MCP server exposes them to Claude Desktop, Cursor, VS Code, Codex, and any MCP host. Portable to any Agent Skills-compatible agent, no daemon

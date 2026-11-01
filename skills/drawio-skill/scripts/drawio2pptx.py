@@ -4,7 +4,8 @@
 Exports each page of a (multi-page) .drawio to a PNG via the draw.io CLI and
 lays them into a 16:9 .pptx, one page per slide, scaled to fit with the page
 name as the slide title. A C4 model (Context / Container / Component) becomes a
-ready-to-present deck; any multi-page diagram becomes a slide sequence.
+ready-to-present deck; any multi-page diagram becomes a slide sequence. Each
+page is a PNG image, not a collection of individually editable PowerPoint shapes.
 
   python3 drawio2pptx.py c4.drawio -o c4.pptx
   python3 drawio2pptx.py architecture.drawio          # -> architecture.pptx

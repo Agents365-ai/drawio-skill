@@ -6,7 +6,9 @@ self-contained .html with pan (drag), zoom (wheel / buttons), page tabs,
 node search, and working links — external links open normally and internal
 page links ("data:page/id,…", e.g. a C4 model's drill-down) switch tabs
 inside the viewer. Share the file with anyone: no draw.io, no server,
-no external requests.
+no external requests. For selectable SVG text labels in the viewer, set
+`convertToSvg=1;` in cell styles before export; see
+`references/xml-authoring.md` → "SVG text labels".
 
   python3 drawiohtml.py architecture.drawio -o architecture.html
   python3 drawiohtml.py c4.drawio                # -> c4.html, drill-down works
