@@ -5,7 +5,7 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `metadata.version` field in
 `skills/drawio-skill/SKILL.md`).
 
-## [Unreleased]
+## [3.4.4] - 2026-11-06
 
 ### Changed
 
@@ -29,6 +29,20 @@ semantic-ish versioning (the `metadata.version` field in
   document the Windows name and fallback paths.
 - **`explain.py` Unicode output on Windows**: encode redirected Markdown as
   UTF-8 so arrows and other non-ASCII text do not fail under legacy code pages.
+- **Installation docs: corrected manual placement and update attribution**:
+  the manual recipes now clone the repository once and link or copy the
+  `skills/drawio-skill/` subdirectory into the host skills root, so `SKILL.md`
+  sits directly under the host entry. The recommended update command is
+  attributed to the skills CLI (`npx skills update drawio-skill -g`), and
+  SkillsMP is described as a listing only. The website install tabs carry the
+  same corrections.
+
+### Added
+
+- **Japanese README** (`README_JA.md`): community translation, linked from the
+  language row in the English and Chinese READMEs.
+
+## [3.4.2] - 2026-10-11
 
 ### Added
 
@@ -53,13 +67,6 @@ semantic-ish versioning (the `metadata.version` field in
   `ValueError` listing the unrecognized ids and the valid rules instead of
   silently skipping the check; `diagramctl test` reports it on stderr and
   exits 2. `review()` and all eight existing rule ids are unchanged.
-- **Installation docs: corrected manual placement and update attribution**:
-  the manual recipes now clone the repository once and link or copy the
-  `skills/drawio-skill/` subdirectory into the host skills root, so `SKILL.md`
-  sits directly under the host entry. The recommended update command is
-  attributed to the skills CLI (`npx skills update drawio-skill -g`), and
-  SkillsMP is described as a listing only. The website install tabs carry the
-  same corrections.
 
 ## [3.4.0] - 2026-09-14
 
