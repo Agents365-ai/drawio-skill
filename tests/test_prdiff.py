@@ -146,7 +146,7 @@ class TestFullPipeline(unittest.TestCase):
     def test_build_entry_exports_base_head_diff_pngs(self):
         if os.environ.get("DRAWIO_E2E") != "1":
             self.skipTest("set DRAWIO_E2E=1 to launch the desktop CLI")
-        if shutil.which("drawio") is None:
+        if load("drawio_cli").resolve_drawio() is None:
             self.skipTest("draw.io CLI not installed")
         if shutil.which("dot") is None:
             self.skipTest("Graphviz `dot` not installed (needed by drawiodiff -> autolayout)")

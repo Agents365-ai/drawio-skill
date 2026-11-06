@@ -23,6 +23,10 @@ Download and install from: https://github.com/jgraph/drawio-desktop/releases
 "C:\Program Files\draw.io\draw.io.exe" --version
 ```
 
+The skill resolves this executable itself (`scripts/drawio_cli.py`: both PATH
+names, then the two default install directories), so no PATH change is needed
+for a default install. If you installed elsewhere, add that directory to PATH.
+
 ## Linux
 
 Download `.deb` or `.rpm` from: https://github.com/jgraph/drawio-desktop/releases
@@ -36,5 +40,5 @@ xvfb-run -a drawio --version
 | Platform | Extra step |
 |----------|------------|
 | **macOS** | No extra steps after Homebrew install |
-| **Windows** | Use full path if not in PATH |
+| **Windows** | Use full path if not in PATH; the skill also probes the two default install directories |
 | **Linux** | Wrap commands with `xvfb-run -a` for headless export |

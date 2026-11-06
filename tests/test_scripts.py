@@ -1297,7 +1297,7 @@ class TestImportersCli(unittest.TestCase):
             import pptx  # noqa: F401
         except ImportError:
             self.skipTest("python-pptx not installed")
-        if not (shutil.which("drawio") and shutil.which("dot")):
+        if not (load("drawio_cli").resolve_drawio() and shutil.which("dot")):
             self.skipTest("draw.io CLI / Graphviz not installed")
         graph = {
             "direction": "TB",
@@ -1362,6 +1362,7 @@ class TestImportersCli(unittest.TestCase):
                     return types.SimpleNamespace(returncode=1, stdout=b"", stderr=b"")
 
                 real_run, mod.subprocess.run = mod.subprocess.run, fake_run
+                real_resolve, mod.resolve_drawio = mod.resolve_drawio, lambda: "/fake/draw.io"
                 try:
                     try:
                         call(mod)
@@ -1369,11 +1370,14 @@ class TestImportersCli(unittest.TestCase):
                         pass  # export "fails"; argv is what matters
                 finally:
                     mod.subprocess.run = real_run
+                    mod.resolve_drawio = real_resolve
 
                 self.assertTrue(seen, "the draw.io CLI was never invoked")
                 argv = seen[0]
                 self.assertIn("--embed-svg-images", argv)
-                self.assertEqual(argv[:4], ["drawio", "-x", "-f", "svg"])
+                # The resolved absolute path goes to subprocess, never a bare
+                # name: Windows only appends .exe and cannot run a .cmd shim.
+                self.assertEqual(argv[:4], ["/fake/draw.io", "-x", "-f", "svg"])
 
     def test_drawio2mermaid_flowchart(self):
         # Reuses EXPLAIN_PAGE: container "Tier" with A/B, cylinder DB, edge a->c "reads".
@@ -1698,7 +1702,7 @@ class TestDrawioHtml(unittest.TestCase):
 
         if os.environ.get("DRAWIO_E2E") != "1":
             self.skipTest("set DRAWIO_E2E=1 to launch the desktop CLI")
-        if not shutil.which("drawio"):
+        if not load("drawio_cli").resolve_drawio():
             self.skipTest("draw.io CLI not installed")
         with tempfile.TemporaryDirectory() as d:
             src = os.path.join(d, "two.drawio")

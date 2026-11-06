@@ -17,6 +17,16 @@ semantic-ish versioning (the `metadata.version` field in
 
 ### Fixed
 
+- **Windows binary resolution**: `buildup.py`, `drawio2pptx.py`,
+  `drawiohtml.py`, `prdiff.py`, `svgflow.py`, `timelapse.py`, and
+  `diagramctl.py doctor` now share one `drawio_cli.resolve_drawio()` resolver.
+  It tries `drawio` and `draw.io` on PATH, then the macOS app bundle and the
+  Windows default install directories (`%ProgramFiles%`, `%ProgramFiles(x86)%`,
+  `%LOCALAPPDATA%\Programs`), and passes the **absolute path** to subprocess.
+  On native Windows the CLI is `draw.io.exe`, so the old bare `drawio` name
+  made four exporters crash with `FileNotFoundError` and two report the CLI as
+  missing (#143). `SKILL.md`, `troubleshooting.md`, and the install guides now
+  document the Windows name and fallback paths.
 - **`explain.py` Unicode output on Windows**: encode redirected Markdown as
   UTF-8 so arrows and other non-ASCII text do not fail under legacy code pages.
 

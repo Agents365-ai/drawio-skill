@@ -67,7 +67,7 @@
 | **Windows** | [下载安装包](https://github.com/jgraph/drawio-desktop/releases) |
 | **Linux** | 从 [releases](https://github.com/jgraph/drawio-desktop/releases) 下载 `.deb`/`.rpm`；无头导出需 `sudo apt install xvfb` |
 
-用 `drawio --version` 验证。**推荐 ≥ 30 版本** —— 解锁 Mermaid → `.drawio` 转换和 ELK `--layout` 布局（≤ 29 两者均不可用）。在 **WSL2** 上，CLI 是通过 `/mnt/c` 访问的 Windows 桌面版 exe —— Skill 会自动识别（见[故障排查](skills/drawio-skill/references/troubleshooting.md)）。完整方案见 [docs/INSTALL_CLI_CN.md](docs/INSTALL_CLI_CN.md)。
+用 `drawio --version` 验证（Windows 上为 `draw.io.exe --version`）。**推荐 ≥ 30 版本** —— 解锁 Mermaid → `.drawio` 转换和 ELK `--layout` 布局（≤ 29 两者均不可用）。在 **WSL2** 上，CLI 是通过 `/mnt/c` 访问的 Windows 桌面版 exe —— Skill 会自动识别（见[故障排查](skills/drawio-skill/references/troubleshooting.md)）。完整方案见 [docs/INSTALL_CLI_CN.md](docs/INSTALL_CLI_CN.md)。
 
 ### 2. 安装技能
 
