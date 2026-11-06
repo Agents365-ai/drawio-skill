@@ -132,7 +132,7 @@ class TestBuildupCli(unittest.TestCase):
     def test_full_run_produces_one_frame_per_node(self):
         if os.environ.get("DRAWIO_E2E") != "1":
             self.skipTest("set DRAWIO_E2E=1 to launch the desktop CLI")
-        if not shutil.which("drawio"):
+        if not load("drawio_cli").resolve_drawio():
             self.skipTest("draw.io CLI not installed")
         with tempfile.TemporaryDirectory() as d:
             src = os.path.join(d, "diagram.drawio")

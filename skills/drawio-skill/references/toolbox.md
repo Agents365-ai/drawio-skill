@@ -2,7 +2,8 @@
 
 A map of the 42 focused tools, the unified `diagramctl.py` orchestrator
 (and its MCP server wrapper), and its
-internal `diagram_ir.py` model grouped by what you're trying to do. The
+internal support modules (`diagram_ir.py` model, `drawio_cli.py` binary
+resolver) grouped by what you're trying to do. The
 per-task routing table in `SKILL.md` says *when* to reach for each; this says
 *how they fit together*. Read it when you're not sure which script a request
 maps to, or you want to chain several.

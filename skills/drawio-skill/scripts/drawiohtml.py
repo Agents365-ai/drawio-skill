@@ -30,6 +30,11 @@ import sys
 import tempfile
 import xml.etree.ElementTree as ET
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+if HERE not in sys.path:  # loaded by file path (tests): keep the sibling import working
+    sys.path.insert(0, HERE)
+from drawio_cli import resolve_drawio
+
 PAGE_LINK = "data:page/id,"
 
 
@@ -54,9 +59,12 @@ def rewrite_page_links(tree):
     return n
 
 
-def export_svg(drawio_file, index, out_svg):
+def export_svg(drawio_file, index, out_svg, drawio=None):
     """Export one page (1-based index) to SVG via the draw.io CLI."""
-    r = subprocess.run(["drawio", "-x", "-f", "svg", "--embed-svg-images",
+    exe = drawio or resolve_drawio()
+    if not exe:
+        return False
+    r = subprocess.run([exe, "-x", "-f", "svg", "--embed-svg-images",
                         "--page-index", str(index),
                         "-o", out_svg, drawio_file], capture_output=True)
     return r.returncode == 0 and os.path.exists(out_svg)
@@ -198,6 +206,9 @@ def main():
     meta = pages_of(args.file)
     if not meta:
         sys.exit(f"error: no <diagram> pages in {args.file}")
+    drawio = resolve_drawio()
+    if not drawio:
+        sys.exit("error: draw.io CLI not found on PATH (is the draw.io CLI installed?)")
 
     tree = ET.parse(args.file)
     relinked = rewrite_page_links(tree)
@@ -210,7 +221,7 @@ def main():
             tree.write(src, encoding="utf-8", xml_declaration=False)
         for i, (pid, name) in enumerate(meta, 1):   # draw.io --page-index is 1-based
             out = os.path.join(tmp, f"p{i}.svg")
-            if not export_svg(src, i, out):
+            if not export_svg(src, i, out, drawio):
                 sys.stderr.write(f"warning: page {i} ({name}) export failed — skipped\n")
                 continue
             with open(out, encoding="utf-8") as f:

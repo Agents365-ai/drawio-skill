@@ -30,11 +30,15 @@ import copy
 import io
 import json
 import os
-import shutil
 import subprocess
 import sys
 import tempfile
 import xml.etree.ElementTree as ET
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+if HERE not in sys.path:  # loaded by file path (tests): keep the sibling import working
+    sys.path.insert(0, HERE)
+from drawio_cli import resolve_drawio
 
 
 def parse_page(path):
@@ -264,7 +268,8 @@ def main():
 
     if not os.path.isfile(args.file):
         sys.exit(f"error: {args.file} not found")
-    if not shutil.which("drawio"):
+    drawio = resolve_drawio()
+    if not drawio:
         sys.exit("error: draw.io CLI not found on PATH (is the draw.io CLI installed?)")
 
     tree, cells = parse_page(args.file)
@@ -301,7 +306,7 @@ def main():
             src = os.path.join(tmp, f"step{k:03d}.drawio")
             frame_tree.write(src, encoding="utf-8", xml_declaration=False)
             png_path = os.path.join(tmp, f"step{k:03d}.png")
-            r = subprocess.run(["drawio", "-x", "-f", "png", "--page-index", "1",
+            r = subprocess.run([drawio, "-x", "-f", "png", "--page-index", "1",
                                 "--width", "2000", "-o", png_path, src], capture_output=True)
             if r.returncode != 0 or not os.path.exists(png_path):
                 sys.stderr.write(f"warning: step {k + 1}/{n_total} export failed — skipped\n")

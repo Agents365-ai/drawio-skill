@@ -19,12 +19,14 @@ Usage: python3 prdiff.py --base <ref> [--head <ref>] [--repo <dir>] [--out-dir <
 """
 import argparse
 import os
-import shutil
 import subprocess
 import sys
 import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+if HERE not in sys.path:  # loaded by file path (tests): keep the sibling import working
+    sys.path.insert(0, HERE)
+from drawio_cli import resolve_drawio
 
 
 def changed_drawios(base, head, repo):
@@ -64,7 +66,10 @@ def git_show_file(repo, ref, path, dest):
 
 def export_png(src_drawio, out_png):
     """CLI-export page 1 of src_drawio to out_png. True on success."""
-    r = subprocess.run(["drawio", "-x", "-f", "png", "--page-index", "1", "-o", out_png, src_drawio],
+    drawio = resolve_drawio()
+    if not drawio:
+        return False
+    r = subprocess.run([drawio, "-x", "-f", "png", "--page-index", "1", "-o", out_png, src_drawio],
                        capture_output=True)
     return r.returncode == 0 and os.path.exists(out_png)
 
@@ -169,7 +174,7 @@ def main():
     if not changed:
         sys.stderr.write("no .drawio files changed\n")
 
-    drawio_available = shutil.which("drawio") is not None
+    drawio_available = resolve_drawio() is not None
     if not drawio_available and changed:
         sys.stderr.write("warning: draw.io CLI not found - image export skipped, "
                          "Markdown will list files only (is the draw.io CLI installed?)\n")

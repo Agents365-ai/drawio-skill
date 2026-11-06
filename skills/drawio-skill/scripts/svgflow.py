@@ -27,6 +27,11 @@ import subprocess
 import sys
 import tempfile
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+if HERE not in sys.path:  # loaded by file path (tests): keep the sibling import working
+    sys.path.insert(0, HERE)
+from drawio_cli import resolve_drawio
+
 EDGE_PATH = re.compile(r'(<path )((?:(?!/?>)[^>])*pointer-events="stroke"(?:(?!/?>)[^>])*/?>)')
 
 
@@ -35,9 +40,12 @@ def to_svg(path):
     if path.lower().endswith(".svg"):
         with open(path, encoding="utf-8") as f:
             return f.read()
+    drawio = resolve_drawio()
+    if not drawio:
+        sys.exit("error: draw.io CLI not found on PATH (is the draw.io CLI installed?)")
     with tempfile.TemporaryDirectory() as tmp:
         out = os.path.join(tmp, "d.svg")
-        r = subprocess.run(["drawio", "-x", "-f", "svg", "--embed-svg-images", "-o", out, path],
+        r = subprocess.run([drawio, "-x", "-f", "svg", "--embed-svg-images", "-o", out, path],
                            capture_output=True)
         if r.returncode != 0 or not os.path.exists(out):
             sys.exit("error: draw.io SVG export failed (is the draw.io CLI installed?)")

@@ -36,6 +36,7 @@ from diagram_ir import (
 from diagram_ir import (
     query as query_ir,
 )
+from drawio_cli import resolve_drawio
 
 HERE = Path(__file__).resolve().parent
 IMPORTERS = {
@@ -214,9 +215,7 @@ def source_ir(source, source_type="auto", group=False):
 
 
 def cmd_doctor(args):
-    drawio = shutil.which("drawio") or shutil.which("draw.io")
-    if not drawio and Path("/Applications/draw.io.app/Contents/MacOS/draw.io").exists():
-        drawio = "/Applications/draw.io.app/Contents/MacOS/draw.io"
+    drawio = resolve_drawio()
     checks = {
         "python": {
             "status": "ok",
