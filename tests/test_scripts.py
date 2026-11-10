@@ -1443,6 +1443,38 @@ class TestImportersCli(unittest.TestCase):
                 self.assertEqual((e["source"], e["target"]), ("orders", "users"))
                 self.assertIn("ERmany", e["style"])  # crow's foot at the FK side
 
+    def test_sqlerd_string_literals_do_not_move_foreign_keys(self):
+        # "--" or ")" inside a quoted default must not eat the next column or
+        # attach that column's REFERENCES to the defaulted column. Real
+        # comments still must not create an edge.
+        sql = """
+        CREATE TABLE customers (id INTEGER PRIMARY KEY);
+        CREATE TABLE orders (
+          note TEXT DEFAULT 'it''s -- fine',
+          customer_id INTEGER REFERENCES customers(id)
+        );
+        CREATE TABLE tickets (
+          note VARCHAR(20) DEFAULT 'vip)',
+          customer_id INTEGER REFERENCES customers(id)
+        );
+        CREATE TABLE commented (
+          id INT PRIMARY KEY -- REFERENCES customers(id)
+          /* REFERENCES customers(id) */
+        );
+        """
+        tables = load("sqlerd").parse_tables(sql)
+        self.assertEqual(
+            tables["orders"]["columns"], [("note", "TEXT"), ("customer_id", "INTEGER")]
+        )
+        self.assertEqual(tables["orders"]["fks"], [("customer_id", "customers")])
+        self.assertEqual(
+            tables["tickets"]["columns"],
+            [("note", "VARCHAR(20)"), ("customer_id", "INTEGER")],
+        )
+        self.assertEqual(tables["tickets"]["fks"], [("customer_id", "customers")])
+        self.assertEqual(tables["commented"]["fks"], [])
+        self.assertIn("id", tables["commented"]["pks"])
+
     def test_seqlayout_geometry(self):
         spec = {
             "participants": [

@@ -13,7 +13,9 @@ Understood per table: column name + type, inline ``PRIMARY KEY`` /
 ``REFERENCES tab(col)``, table-level ``PRIMARY KEY (...)`` and
 ``[CONSTRAINT x] FOREIGN KEY (col) REFERENCES tab(col)``. Quoted identifiers
 ("t", `t`, [t]) and ``schema.table`` prefixes are normalized; edges land only
-on tables defined in the scanned files. Dialect-specific clauses beyond that
+on tables defined in the scanned files. Single-quoted strings are not scanned,
+so a ``--`` or parenthesis inside a default cannot drop the next column or
+attach its foreign key to the wrong one. Dialect-specific clauses beyond that
 (partitioning, generated columns, …) are simply ignored — worst case a column
 line is skipped, never a wrong edge.
 
@@ -35,7 +37,6 @@ ER_EDGE = ("edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;"
            "labelBackgroundColor=#ffffff;"
            "startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;")
 
-_COMMENT = re.compile(r"/\*.*?\*/|--[^\n]*", re.S)
 _CREATE = re.compile(r"\bCREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([\w.\"`\[\]]+)\s*\(",
                      re.I)
 _FK = re.compile(r"FOREIGN\s+KEY\s*\(([^)]+)\)\s*REFERENCES\s+([\w.\"`\[\]]+)\s*(?:\(([^)]+)\))?",
@@ -44,6 +45,68 @@ _PK = re.compile(r"PRIMARY\s+KEY\s*\(([^)]+)\)", re.I)
 _INLINE_REF = re.compile(r"\bREFERENCES\s+([\w.\"`\[\]]+)", re.I)
 _SKIP = re.compile(r"^\s*(CONSTRAINT|UNIQUE|CHECK|KEY|INDEX|FULLTEXT|SPATIAL|EXCLUDE|LIKE)\b",
                    re.I)
+
+
+def _blank_sql_literals(text):
+    """Blank comments and single-quoted string contents; keep identifier text.
+
+    The structure scan is regex plus parenthesis matching. A ``--`` or ``)``
+    inside ``DEFAULT '-- keep'`` / ``DEFAULT 'vip)'`` used to eat the rest of
+    the line or close the ``CREATE TABLE`` early, so the next column vanished
+    and its ``REFERENCES`` was recorded on the wrong column.
+    """
+    out = list(text)
+    i, n = 0, len(text)
+
+    def blank(start, end):
+        for k in range(start, min(end, n)):
+            if out[k] != "\n":
+                out[k] = " "
+
+    while i < n:
+        ch = text[i]
+        if ch == "'":
+            j, closed = i + 1, False
+            while j < n:
+                if text[j] == "'" and j + 1 < n and text[j + 1] == "'":
+                    j += 2
+                    continue
+                if text[j] == "'":
+                    closed = True
+                    j += 1
+                    break
+                j += 1
+            blank(i + 1, j - 1 if closed else j)
+            i = j
+        elif ch == '"':
+            j = i + 1
+            while j < n:
+                if text[j] == '"' and j + 1 < n and text[j + 1] == '"':
+                    j += 2
+                    continue
+                if text[j] == '"':
+                    j += 1
+                    break
+                j += 1
+            i = j
+        elif ch == "`":
+            j = text.find("`", i + 1)
+            i = n if j == -1 else j + 1
+        elif ch == "[":
+            j = text.find("]", i + 1)
+            i = n if j == -1 else j + 1
+        elif text.startswith("--", i):
+            j = text.find("\n", i)
+            blank(i, n if j == -1 else j)
+            i = n if j == -1 else j
+        elif text.startswith("/*", i):
+            j = text.find("*/", i + 2)
+            end = n if j == -1 else j + 2
+            blank(i, end)
+            i = end
+        else:
+            i += 1
+    return "".join(out)
 
 
 def ident(raw):
@@ -72,7 +135,7 @@ def split_columns(body):
 
 def parse_tables(text):
     """{table: {"schema", "columns": [(name, type)], "pks": set, "fks": [(col, table)]}}"""
-    text = _COMMENT.sub("", text)
+    text = _blank_sql_literals(text)
     tables = {}
     for m in _CREATE.finditer(text):
         raw_name = m.group(1)
