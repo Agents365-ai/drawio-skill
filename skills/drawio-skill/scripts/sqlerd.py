@@ -43,6 +43,8 @@ _FK = re.compile(r"FOREIGN\s+KEY\s*\(([^)]+)\)\s*REFERENCES\s+([\w.\"`\[\]]+)\s*
                  re.I)
 _PK = re.compile(r"PRIMARY\s+KEY\s*\(([^)]+)\)", re.I)
 _INLINE_REF = re.compile(r"\bREFERENCES\s+([\w.\"`\[\]]+)", re.I)
+# Column name (a quoted name may hold spaces) and the type word after it.
+_COLUMN_HEAD = re.compile(r'("(?:[^"]|"")*"|`(?:[^`]|``)*`|\[[^\]]*\]|[^\s"`\[]\S*(?=\s))\s*(\S+)')
 _SKIP = re.compile(r"^\s*(CONSTRAINT|UNIQUE|CHECK|KEY|INDEX|FULLTEXT|SPATIAL|EXCLUDE|LIKE)\b",
                    re.I)
 
@@ -163,14 +165,15 @@ def parse_tables(text):
                 continue
             if _SKIP.match(item):
                 continue
-            toks = item.split()
-            if len(toks) < 2:
+            head = _COLUMN_HEAD.match(item)
+            if head is None:
                 continue
-            col, ctype = ident(toks[0]), toks[1].rstrip(",")
+            col, ctype = ident(head.group(1)), head.group(2).rstrip(",")
             cols.append((col, ctype))
-            if re.search(r"\bPRIMARY\s+KEY\b", item, re.I):
+            rest = item[head.end(1):]  # a quoted name can hold "Primary Key"
+            if re.search(r"\bPRIMARY\s+KEY\b", rest, re.I):
                 pks.add(col)
-            ref = _INLINE_REF.search(item)
+            ref = _INLINE_REF.search(rest)
             if ref:
                 fks.append((col, ident(ref.group(1))))
         tables[name] = {"schema": schema, "columns": cols, "pks": pks, "fks": fks}
