@@ -602,6 +602,79 @@ class TestValidateGeometry(unittest.TestCase):
         self.assertEqual(r.returncode, 0)
 
 
+class TestValidateSwimlaneWaypoints(unittest.TestCase):
+    """Waypoints of container-parented edges are parent-relative, not absolute.
+
+    draw.io renders an edge waypoint at waypoint+parent-origin, so a
+    swimlane-parented edge whose points are used as absolute page coordinates
+    produces phantom W-EDGE-THROUGH-VERTEX / W-EDGE-CROSS warnings (and misses
+    real ones). Geometry below is in S-local coords: S at (100,100),
+    A(20,60) B(20,260) C(20,160), all 120x40.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.m = load("validate")
+
+    @staticmethod
+    def _ids(xml):
+        import xml.etree.ElementTree as ET
+
+        root = ET.fromstring(xml)
+        return {c.get("id"): c for c in root.iter("mxCell")}
+
+    SWIM = (
+        '<mxfile><diagram name="P1"><mxGraphModel><root>'
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        '<mxCell id="S" value="S" style="swimlane;" vertex="1" parent="1">'
+        '<mxGeometry x="100" y="100" width="300" height="400" as="geometry"/></mxCell>'
+        '<mxCell id="A" value="A" vertex="1" parent="S"><mxGeometry x="20" y="60" width="120" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="C" value="C" vertex="1" parent="S"><mxGeometry x="20" y="160" width="120" height="40" as="geometry"/></mxCell>'
+        '<mxCell id="B" value="B" vertex="1" parent="S"><mxGeometry x="20" y="260" width="120" height="40" as="geometry"/></mxCell>'
+        # e1 hugs S's right side (S-local x=200 -> abs 300): clear of C.
+        '<mxCell id="e1" value="around" edge="1" parent="S" source="A" target="B">'
+        '<mxGeometry relative="1" as="geometry"><Array as="points">'
+        '<mxPoint x="200" y="80"/><mxPoint x="200" y="280"/></Array></mxGeometry></mxCell>'
+        # e2 runs down the middle (S-local x=80 -> abs 180 = mid-C): hits C.
+        '<mxCell id="e2" value="through" edge="1" parent="S" source="A" target="B">'
+        '<mxGeometry relative="1" as="geometry"><Array as="points">'
+        '<mxPoint x="80" y="80"/><mxPoint x="80" y="280"/></Array></mxGeometry></mxCell>'
+        "</root></mxGraphModel></diagram></mxfile>"
+    )
+
+    def _check(self, xml):
+        with tempfile.NamedTemporaryFile("w", suffix=".drawio", delete=False) as f:
+            f.write(xml)
+            path = f.name
+        try:
+            return run("validate.py", path)
+        finally:
+            os.unlink(path)
+
+    def test_edge_route_shifts_waypoints_by_parent_origin(self):
+        # (200,80)/(200,280) are S-relative; abs = +S origin (100,100).
+        ids = self._ids(self.SWIM)
+        route = self.m.edge_route(ids["e1"], ids)
+        self.assertIn((300.0, 180.0), route)
+        self.assertIn((300.0, 380.0), route)
+
+    def test_origin_zero_for_layer_parented_edge(self):
+        # Flat-diagram edges (parent="1") keep waypoints as-is: no regression.
+        ids = self._ids(self.SWIM)
+        self.assertEqual(self.m.origin(ids["1"], ids), (0.0, 0.0))
+
+    def test_swimlane_routed_around_vertex_clean(self):
+        # Phantom: e1's S-relative waypoints misread as absolute used to cross C.
+        r = self._check(self.SWIM)
+        self.assertNotIn("edge 'e1' routes through", r.stdout)
+        self.assertEqual(r.returncode, 0, r.stdout)
+
+    def test_swimlane_through_vertex_still_warns(self):
+        # True positive must survive the fix: e2 really cuts C in half.
+        r = self._check(self.SWIM)
+        self.assertIn("edge 'e2' routes through vertex 'C'", r.stdout)
+
+
 class TestImportersCli(unittest.TestCase):
     @staticmethod
     def _write(path, text):
