@@ -85,6 +85,12 @@ def is_edge_label(cell):
     return g is not None and g.get("relative") == "1"
 
 
+def is_decision(cell):
+    """True for rhombus-shaped vertices (flowchart decision diamonds)."""
+    st = cell.get("style") or ""
+    return st.startswith("rhombus") or "shape=rhombus" in st
+
+
 def overlap(a, b):
     ax, ay, aw, ah = a
     bx, by, bw, bh = b
@@ -370,6 +376,34 @@ def check_page(diagram):
                     "W-OVERLAP", "warning", f"{ia},{ib}",
                     f"vertices {ia!r} and {ib!r} overlap",
                     "move the siblings apart or nest one inside the other"))
+    # ElementTree's as_ keyword trap: SubElement(..., {"as_": "geometry"})
+    # silently emits an attribute literally named as_ instead of as, which
+    # draw.io ignores — the cell then renders without its geometry. Fail fast
+    # on any leaked as_ attribute instead of shipping a broken file.
+    for el in diagram.iter():
+        if "as_" in el.attrib:
+            errors.append(diag(
+                "E-AS-LEAK", "error", el.get("id") or el.tag,
+                f"attribute as_= on <{el.tag}> (ElementTree as_ keyword trap)",
+                'write the real as= attribute with .set("as", "geometry")'))
+
+    # Decision completeness: a rhombus with fewer than 2 distinct exits is a
+    # dead branch ("decision with no way out") — easy to miss visually on
+    # dense swimlane diagrams.
+    out_edges = {}
+    for c in cells:
+        if c.get("edge") == "1" and c.get("source"):
+            out_edges.setdefault(c.get("source"), set()).add(c.get("target"))
+    for c in cells:
+        if c.get("vertex") == "1" and is_decision(c):
+            n = len(out_edges.get(c.get("id"), ()))
+            if n < 2:
+                warns.append(diag(
+                    "W-DECISION-EXIT", "warning", c.get("id"),
+                    f"decision {c.get('id')!r} has {n} distinct exit(s)",
+                    "a decision needs one branch per outcome — add the "
+                    "missing outgoing edge(s)"))
+
     warns += geometry_warnings(cells, ids, parents)
     return errors, warns
 

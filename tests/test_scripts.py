@@ -675,6 +675,68 @@ class TestValidateSwimlaneWaypoints(unittest.TestCase):
         self.assertIn("edge 'e2' routes through vertex 'C'", r.stdout)
 
 
+class TestValidateFlowchartChecks(unittest.TestCase):
+    """Decision-exit completeness and the ElementTree as_ keyword trap."""
+
+    def _check(self, xml):
+        with tempfile.NamedTemporaryFile("w", suffix=".drawio", delete=False) as f:
+            f.write(xml)
+            path = f.name
+        try:
+            return run("validate.py", path)
+        finally:
+            os.unlink(path)
+
+    def _decision_page(self, n_exits):
+        cells = [
+            '<mxCell id="d" value="ok?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">'
+            '<mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>',
+            '<mxCell id="n1" value="Y" vertex="1" parent="1">'
+            '<mxGeometry x="200" y="0" width="80" height="40" as="geometry"/></mxCell>',
+            '<mxCell id="d1" edge="1" parent="1" source="d" target="n1">'
+            '<mxGeometry relative="1" as="geometry"/></mxCell>',
+        ]
+        if n_exits >= 2:
+            cells += [
+                '<mxCell id="n2" value="N" vertex="1" parent="1">'
+                '<mxGeometry x="200" y="120" width="80" height="40" as="geometry"/></mxCell>',
+                '<mxCell id="d2" edge="1" parent="1" source="d" target="n2">'
+                '<mxGeometry relative="1" as="geometry"/></mxCell>',
+            ]
+        return (
+            '<mxfile><diagram name="P1"><mxGraphModel><root>'
+            '<mxCell id="0"/><mxCell id="1" parent="0"/>' + "".join(cells) +
+            "</root></mxGraphModel></diagram></mxfile>"
+        )
+
+    def test_decision_with_single_exit_warns(self):
+        # Dead branch: a decision diamond with no second outcome path.
+        r = self._check(self._decision_page(1))
+        self.assertIn("W-DECISION-EXIT", r.stdout)
+        self.assertIn("decision 'd' has 1 distinct exit(s)", r.stdout)
+
+    def test_decision_with_two_exits_clean(self):
+        r = self._check(self._decision_page(2))
+        self.assertNotIn("W-DECISION-EXIT", r.stdout)
+        self.assertEqual(r.returncode, 0, r.stdout)
+
+    AS_LEAK = (
+        '<mxfile><diagram name="P1"><mxGraphModel><root>'
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        '<mxCell id="n" vertex="1" parent="1">'
+        '<mxGeometry x="0" y="0" width="80" height="40" as_="geometry"/></mxCell>'
+        "</root></mxGraphModel></diagram></mxfile>"
+    )
+
+    def test_as_underscore_attribute_fails(self):
+        # ElementTree turns an as_ kwarg into a literal as_= attribute which
+        # draw.io ignores — must be an error, not silent breakage.
+        r = self._check(self.AS_LEAK)
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("error: [E-AS-LEAK]", r.stdout)
+        self.assertIn("(fix:", r.stdout)
+
+
 class TestImportersCli(unittest.TestCase):
     @staticmethod
     def _write(path, text):
