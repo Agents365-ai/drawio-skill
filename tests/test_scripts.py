@@ -720,6 +720,19 @@ class TestValidateFlowchartChecks(unittest.TestCase):
         self.assertNotIn("W-DECISION-EXIT", r.stdout)
         self.assertEqual(r.returncode, 0, r.stdout)
 
+    def test_decision_targetless_edge_is_not_an_exit(self):
+        # A second edge with source but no target must not count as an exit,
+        # else the dead branch hides behind a dangling stub.
+        xml = self._decision_page(1)[:-len("</root></mxGraphModel></diagram></mxfile>")]
+        xml += (
+            '<mxCell id="d2" edge="1" parent="1" source="d">'
+            '<mxGeometry relative="1" as="geometry"/></mxCell>'
+            "</root></mxGraphModel></diagram></mxfile>"
+        )
+        r = self._check(xml)
+        self.assertIn("W-DECISION-EXIT", r.stdout)
+        self.assertIn("decision 'd' has 1 distinct exit(s)", r.stdout)
+
     AS_LEAK = (
         '<mxfile><diagram name="P1"><mxGraphModel><root>'
         '<mxCell id="0"/><mxCell id="1" parent="0"/>'

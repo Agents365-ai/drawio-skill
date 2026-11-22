@@ -392,7 +392,9 @@ def check_page(diagram):
     # dense swimlane diagrams.
     out_edges = {}
     for c in cells:
-        if c.get("edge") == "1" and c.get("source"):
+        # An edge with no target attribute is not an exit: the branch goes
+        # nowhere, and E-DANGLING-END only flags nonexistent target ids.
+        if c.get("edge") == "1" and c.get("source") and c.get("target"):
             out_edges.setdefault(c.get("source"), set()).add(c.get("target"))
     for c in cells:
         if c.get("vertex") == "1" and is_decision(c):
