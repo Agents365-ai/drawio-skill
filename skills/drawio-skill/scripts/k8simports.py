@@ -81,7 +81,11 @@ def load_manifests(paths):
             docs = [json.loads(sys.stdin.read())]
         elif path.endswith(".json"):
             with open(path, encoding="utf-8") as f:
-                docs = [json.loads(f.read())]
+                try:
+                    docs = [json.loads(f.read())]
+                except json.JSONDecodeError as e:     # e.g. a tsconfig.json with comments
+                    sys.stderr.write(f"warning: skipping {path}: {e}\n")
+                    continue
         else:
             with open(path, encoding="utf-8") as f:
                 text = f.read()
@@ -90,7 +94,11 @@ def load_manifests(paths):
             except ImportError:
                 sys.exit(f"error: {path} is YAML but PyYAML is not installed "
                          "(pip install pyyaml) — or feed JSON from `kubectl get ... -o json`")
-            docs = list(yaml.safe_load_all(text))
+            try:
+                docs = list(yaml.safe_load_all(text))
+            except yaml.YAMLError as e:               # e.g. a Helm template
+                sys.stderr.write(f"warning: skipping {path}: {e}\n")
+                continue
         for doc in docs:
             if not isinstance(doc, dict):
                 continue

@@ -922,6 +922,53 @@ class TestImportersCli(unittest.TestCase):
             graph = json.loads(run("k8simports.py", d, "--group").stdout)
             self.assertTrue(all(n["group"] == "shop" for n in graph["nodes"]))
 
+    def test_k8simports_skips_json_it_cannot_parse(self):
+        # A directory scan also finds JSON that is not a manifest, such as a
+        # tsconfig.json with comments: skip it with a warning, not a traceback.
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "all.json"), json.dumps(self.K8S_LIST))
+            bad = os.path.join(d, "web", "tsconfig.json")
+            os.makedirs(os.path.dirname(bad))
+            self._write(bad, '{\n  // build options\n  "compilerOptions": {}\n}\n')
+            r = run("k8simports.py", d)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            ids = {n["id"] for n in json.loads(r.stdout)["nodes"]}
+            self.assertEqual(
+                ids, {"shop/Service/web", "shop/Deployment/web", "shop/ConfigMap/cfg"}
+            )
+            self.assertIn(f"warning: skipping {bad}", r.stderr)
+            self.assertNotIn("Traceback", r.stderr)
+
+    def test_k8simports_skips_yaml_it_cannot_parse(self):
+        try:
+            import yaml  # noqa: F401
+        except ImportError:
+            self.skipTest("PyYAML not installed")
+        # A Helm chart's templates are not YAML until they are rendered.
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "all.json"), json.dumps(self.K8S_LIST))
+            tpl = os.path.join(d, "chart", "templates", "deployment.yaml")
+            os.makedirs(os.path.dirname(tpl))
+            self._write(
+                tpl,
+                "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n"
+                '  name: {{ include "app.fullname" . }}\n  labels:\n'
+                '    {{- include "app.labels" . | nindent 4 }}\n',
+            )
+            r = run("k8simports.py", d)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertEqual(len(json.loads(r.stdout)["nodes"]), 3)
+            self.assertIn(f"warning: skipping {tpl}", r.stderr)
+            self.assertNotIn("Traceback", r.stderr)
+
+    def test_k8simports_fails_when_every_file_is_skipped(self):
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "tsconfig.json"), "{ // nope\n}")
+            r = run("k8simports.py", d)
+            self.assertEqual(r.returncode, 1)
+            self.assertIn("no Kubernetes objects found", r.stderr)
+            self.assertNotIn("Traceback", r.stderr)
+
     def test_composeimports_edges(self):
         try:
             import yaml  # noqa: F401
