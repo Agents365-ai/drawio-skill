@@ -14,6 +14,21 @@ semantic-ish versioning (the `metadata.version` field in
   column line. The type word, the `PRIMARY KEY` marker, and the `REFERENCES`
   clause are read only after the name, so a column named `"Primary Key"` is no
   longer marked as a key (#148).
+- **Validator: swimlane-parented edge waypoints**: waypoints live in the edge
+  parent's coordinate system; `validate.py` now shifts them through the parent
+  origin before geometry checks, removing phantom `W-EDGE-THROUGH-VERTEX` /
+  `W-EDGE-CROSS` warnings on swimlane diagrams. Flat, root-layered diagrams
+  are unchanged (#149).
+
+### Added
+
+- **Validator: decision-exit completeness**: `W-DECISION-EXIT` warns when a
+  rhombus decision has fewer than two distinct exits. A target-less edge does
+  not count as an exit (#149).
+- **Validator: `E-AS-LEAK`**: a literal `as_` attribute (the ElementTree
+  keyword trap that emits `as_=` instead of `as=`) now fails validation
+  instead of silently shipping a file that draw.io renders without geometry
+  (#149).
 
 ## [3.4.4] - 2026-11-06
 
