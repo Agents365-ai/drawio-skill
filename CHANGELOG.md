@@ -5,6 +5,16 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning (the `metadata.version` field in
 `skills/drawio-skill/SKILL.md`).
 
+## [Unreleased]
+
+### Fixed
+
+- **SQL ER importer: quoted column names with spaces**: `sqlerd.py` now keeps
+  `"Order Id"`, `` `Unit Price` ``, and `[Product Id]` whole when parsing a
+  column line. The type word, the `PRIMARY KEY` marker, and the `REFERENCES`
+  clause are read only after the name, so a column named `"Primary Key"` is no
+  longer marked as a key (#148).
+
 ## [3.4.4] - 2026-11-06
 
 ### Changed
