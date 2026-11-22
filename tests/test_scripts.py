@@ -1475,6 +1475,42 @@ class TestImportersCli(unittest.TestCase):
         self.assertEqual(tables["commented"]["fks"], [])
         self.assertIn("id", tables["commented"]["pks"])
 
+    def test_sqlerd_quoted_column_names_with_spaces(self):
+        sql = """
+        CREATE TABLE products (id INT PRIMARY KEY);
+        CREATE TABLE orders (
+          "Order Id" INTEGER NOT NULL,
+          `Unit Price` DECIMAL(10,2),
+          [Product Id] INT REFERENCES products(id),
+          PRIMARY KEY ("Order Id")
+        );
+        """
+        orders = load("sqlerd").parse_tables(sql)["orders"]
+        self.assertEqual(
+            orders["columns"],
+            [("order id", "INTEGER"), ("unit price", "DECIMAL(10,2)"), ("product id", "INT")],
+        )
+        self.assertEqual(orders["pks"], {"order id"})
+        self.assertEqual(orders["fks"], [("product id", "products")])
+
+    def test_sqlerd_quoted_column_name_is_not_a_keyword(self):
+        sql = """
+        CREATE TABLE notes (
+          "Primary Key" TEXT,
+          "references x" TEXT,
+          "Due Date"DATE,
+          id INT PRIMARY KEY
+        );
+        """
+        notes = load("sqlerd").parse_tables(sql)["notes"]
+        self.assertEqual(
+            notes["columns"],
+            [("primary key", "TEXT"), ("references x", "TEXT"), ("due date", "DATE"),
+             ("id", "INT")],
+        )
+        self.assertEqual(notes["pks"], {"id"})
+        self.assertEqual(notes["fks"], [])
+
     def test_seqlayout_geometry(self):
         spec = {
             "participants": [
