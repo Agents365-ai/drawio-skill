@@ -860,6 +860,78 @@ class TestImportersCli(unittest.TestCase):
             self.assertEqual(graph["nodes"][0]["label"], "logs\naws_s3_bucket")
             self.assertNotIn("style", graph["nodes"][0])
 
+    def test_tfimports_comment_markers_inside_strings(self):
+        # "//" in a URL, "/*" in an S3 ARN glob and "#" in a tag are string
+        # content: the reference in the URL stays an edge, and the "/*" no
+        # longer swallows every block up to the later "*/" comment.
+        with tempfile.TemporaryDirectory() as d:
+            self._write(
+                os.path.join(d, "main.tf"),
+                'resource "aws_lb" "main" {}\n'
+                'resource "aws_route53_health_check" "web" {\n'
+                '  resource_path = "https://${aws_lb.main.dns_name}/health"\n'
+                "}\n"
+                'resource "aws_s3_bucket" "logs" {}\n'
+                'resource "aws_iam_policy" "read" {\n'
+                '  policy = jsonencode({ Resource = "${aws_s3_bucket.logs.arn}/*" })\n'
+                "}\n"
+                'resource "aws_sqs_queue" "jobs" {\n'
+                '  tags = { Name = "jobs#1" }\n'
+                "}\n"
+                'resource "aws_lambda_function" "worker" {\n'
+                "  role = aws_iam_policy.read.arn\n"
+                "  /* the queue it reads */\n"
+                "  environment { variables = { Q = aws_sqs_queue.jobs.url } }\n"
+                "}\n",
+            )
+            r = run("tfimports.py", d, "--no-icons", "--no-reduce")
+            graph = json.loads(r.stdout)
+            self.assertEqual(
+                [n["id"] for n in graph["nodes"]],
+                [
+                    "aws_lb.main",
+                    "aws_route53_health_check.web",
+                    "aws_s3_bucket.logs",
+                    "aws_iam_policy.read",
+                    "aws_sqs_queue.jobs",
+                    "aws_lambda_function.worker",
+                ],
+            )
+            self.assertEqual(
+                [(e["source"], e["target"]) for e in graph["edges"]],
+                [
+                    ("aws_iam_policy.read", "aws_s3_bucket.logs"),
+                    ("aws_lambda_function.worker", "aws_iam_policy.read"),
+                    ("aws_lambda_function.worker", "aws_sqs_queue.jobs"),
+                    ("aws_route53_health_check.web", "aws_lb.main"),
+                ],
+            )
+
+    def test_tfimports_strip_comments(self):
+        strip = load("tfimports").strip_comments
+        cases = [
+            ("a = 1 # note\nb = 2 // note\n", "a = 1 \nb = 2 \n"),
+            ("a /* one\ntwo */ = 1", "a  = 1"),
+            ('u = "http://x#y" # note', 'u = "http://x#y" '),
+            # a string inside ${...} keeps its own "//"; braces nest inside ${...}
+            (
+                'u = "${replace(var.u, "https://", "")}" // note',
+                'u = "${replace(var.u, "https://", "")}" ',
+            ),
+            (
+                'm = "${merge({ a = 1 }, { b = "#c" })}" # note',
+                'm = "${merge({ a = 1 }, { b = "#c" })}" ',
+            ),
+            # an escaped quote does not end the string; $${ is a literal, not ${
+            ('s = "say \\"#hi\\"" # note', 's = "say \\"#hi\\"" '),
+            ('s = "$${ // y" # note', 's = "$${ // y" '),
+            # an unclosed string ends at its line, so later comments still go
+            ('s = "open\nb = 1 # note', 's = "open\nb = 1 '),
+        ]
+        for text, want in cases:
+            with self.subTest(text=text):
+                self.assertEqual(strip(text), want)
+
     K8S_LIST = {
         "kind": "List",
         "items": [

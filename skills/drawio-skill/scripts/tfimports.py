@@ -93,14 +93,63 @@ QUERY_OVERRIDES = {
     "google_storage_bucket": "gcp cloud storage",
 }
 
-_COMMENT = re.compile(r"/\*.*?\*/|(?:#|//)[^\n]*", re.S)
 _BLOCK = re.compile(r'^[ \t]*(resource|module)[ \t]+"([\w.-]+)"(?:[ \t]+"([\w.-]+)")?[ \t]*\{', re.M)
 _REF = re.compile(r"\b([a-z][a-z0-9_]*\.[A-Za-z_][A-Za-z0-9_-]*)")
 
 
+def strip_comments(text):
+    """Drop ``#``, ``//`` and ``/* */`` comments, keeping quoted strings whole.
+
+    ``"https://${aws_lb.main.dns_name}"``, ``"${aws_s3_bucket.b.arn}/*"`` and
+    ``"web#1"`` hold comment markers that are not comments; a plain regex cut
+    the reference out of the URL, or ate every block up to the next ``*/``.
+    A ``${...}`` / ``%{...}`` inside a string may hold strings of its own. A
+    string still open at the end of a line is closed there (HCL strings do
+    not span lines), so one stray quote cannot hide the rest of the file.
+    """
+    out, i, n = [], 0, len(text)
+    stack = []  # "s": inside a quoted string, "t": inside a string's ${...}
+    while i < n:
+        c = text[i]
+        if stack and stack[-1] == "s":
+            if c == "\\":
+                step = 2                          # escaped character
+            elif text.startswith(("$${", "%%{"), i):
+                step = 3                          # a literal ${ / %{
+            elif text.startswith(("${", "%{"), i):
+                stack.append("t")
+                step = 2
+            else:
+                if c == '"':
+                    stack.pop()
+                elif c == "\n":
+                    stack.clear()
+                step = 1
+            out.append(text[i:i + step])
+            i += step
+            continue
+        if c == '"':
+            stack.append("s")
+        elif stack and c == "{":
+            stack.append("t")
+        elif stack and c == "}":
+            stack.pop()
+        elif not stack and (c == "#" or text.startswith("//", i)):
+            end = text.find("\n", i)
+            i = n if end < 0 else end
+            continue
+        elif not stack and text.startswith("/*", i):
+            end = text.find("*/", i + 2)
+            i = n if end < 0 else end + 2
+            continue
+        out.append(c)
+        i += 1
+    return "".join(out)
+
+
 def parse_blocks(text):
     """Yield (kind, label1, label2, body) for resource/module blocks."""
-    text = _COMMENT.sub("", text)
+    text = strip_comments(text)
     for m in _BLOCK.finditer(text):
         depth, i = 1, m.end()
         while i < len(text) and depth:
