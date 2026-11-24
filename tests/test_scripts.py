@@ -790,6 +790,63 @@ class TestImportersCli(unittest.TestCase):
             # No hard-coded colour anymore (coloured by group in autolayout).
             self.assertNotIn("style", graph["nodes"][0])
 
+    @staticmethod
+    def _write_bytes(path, data):
+        with open(path, "wb") as f:
+            f.write(data)
+
+    def test_pyimports_reads_bom_and_coding_line(self):
+        # A UTF-8 BOM (common from Windows editors) and a PEP 263 `# coding:`
+        # line are valid Python; their modules' imports must still be edges.
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "b.py"), "x = 1\n")
+            self._write_bytes(os.path.join(d, "a.py"), b"\xef\xbb\xbfimport b\n")
+            self._write_bytes(
+                os.path.join(d, "c.py"),
+                b'# -*- coding: latin-1 -*-\nimport b\nNAME = "caf\xe9"\n',
+            )
+            r = run("pyimports.py", d, "--no-reduce")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            graph = json.loads(r.stdout)
+            self.assertEqual(
+                [(e["source"], e["target"], e["provenance"]["line"]) for e in graph["edges"]],
+                [("a", "b", 1), ("c", "b", 2)],
+            )
+
+    def test_pyimports_skips_an_undecodable_module(self):
+        # Bytes that are not UTF-8 and no coding line: Python would refuse the
+        # file, so it is skipped like a syntax error instead of ending the run.
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "a.py"), "import b\n")
+            self._write(os.path.join(d, "b.py"), "x = 1\n")
+            self._write_bytes(os.path.join(d, "c.py"), b'import b\nNAME = "caf\xe9"\n')
+            self._write_bytes(os.path.join(d, "d.py"), b"import b\x00\n")
+            r = run("pyimports.py", d, "--no-reduce")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            graph = json.loads(r.stdout)
+            self.assertEqual({n["id"] for n in graph["nodes"]}, {"a", "b", "c", "d"})
+            self.assertEqual(
+                [(e["source"], e["target"]) for e in graph["edges"]], [("a", "b")]
+            )
+
+    def test_pyclasses_reads_bom_and_coding_line(self):
+        with tempfile.TemporaryDirectory() as d:
+            self._write_bytes(
+                os.path.join(d, "m.py"), b"\xef\xbb\xbfclass A: pass\nclass B(A): pass\n"
+            )
+            self._write_bytes(
+                os.path.join(d, "n.py"),
+                b'# coding: latin-1\nclass C: pass\nclass D(C): """caf\xe9"""\n',
+            )
+            self._write_bytes(os.path.join(d, "o.py"), b"class E: pass\n\x00\n")
+            r = run("pyclasses.py", d)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            graph = json.loads(r.stdout)
+            self.assertEqual(
+                sorted((e["source"], e["target"]) for e in graph["edges"]),
+                [("m.B", "m.A"), ("n.D", "n.C")],
+            )
+
     def test_jsimports_edge(self):
         # Node ids are the module basename without extension: a, b.
         with tempfile.TemporaryDirectory() as d:
