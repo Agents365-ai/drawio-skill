@@ -59,7 +59,8 @@ def base_name(node):
 def classes_in(module, path):
     """Top-level classes of a module: list of (qualified_id, simple_name, [base names])."""
     try:
-        with open(path, encoding="utf-8") as f:
+        # Bytes, so ast decodes the file the way Python does (BOM, `# coding:`).
+        with open(path, "rb") as f:
             tree = ast.parse(f.read(), filename=path)
     except SyntaxError:
         return []

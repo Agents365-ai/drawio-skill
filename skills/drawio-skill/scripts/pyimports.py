@@ -73,7 +73,9 @@ def edges_of(name, path, modules):
     )
     found = {}
     try:
-        with open(path, encoding="utf-8") as f:
+        # Bytes, so ast decodes the file the way Python does: a UTF-8 BOM or a
+        # `# coding:` line is honoured, and an undecodable file is a SyntaxError.
+        with open(path, "rb") as f:
             tree = ast.parse(f.read(), filename=path)
     except SyntaxError:
         return found
