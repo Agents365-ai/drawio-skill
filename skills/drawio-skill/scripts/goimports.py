@@ -42,6 +42,46 @@ def module_path(root):
     return m.group(1) if m else None
 
 
+def strip_comments(src):
+    """Drop ``//`` and ``/* */`` comments, keeping string and rune literals whole.
+
+    A comment inside an import block, like ``"fmt" // printing (stdlib)``,
+    ended BLOCK at its ``)`` so the specs after it were lost, and a
+    commented-out ``// "mod/old"`` or ``/* import "mod/old" */`` was read as
+    a real import. A ``//`` inside ``"..."``, ``'...'`` or a raw `` `...` ``
+    string is not a comment. ``"..."`` and ``'...'`` end at a newline (Go
+    does not let them span lines), so one stray quote cannot hide the rest of
+    the file.
+    """
+    out, i, n = [], 0, len(src)
+    while i < n:
+        c = src[i]
+        if c in "\"'":
+            j = i + 1
+            while j < n and src[j] not in (c, "\n"):
+                j += 2 if src[j] == "\\" else 1
+            if j < n and src[j] == c:
+                j += 1
+            out.append(src[i:j])
+            i = j
+        elif c == "`":
+            end = src.find("`", i + 1)
+            j = n if end < 0 else end + 1
+            out.append(src[i:j])
+            i = j
+        elif src.startswith("//", i):
+            end = src.find("\n", i)
+            i = n if end < 0 else end
+        elif src.startswith("/*", i):
+            end = src.find("*/", i + 2)
+            i = n if end < 0 else end + 2
+            out.append(" ")
+        else:
+            out.append(c)
+            i += 1
+    return "".join(out)
+
+
 def discover(root, modpath):
     """Map package import path -> list of .go files (one entry per directory)."""
     root = os.path.abspath(root)
@@ -69,7 +109,7 @@ def imports_of(files, modpath, pkgs):
     for path in files:
         try:
             with open(path, encoding="utf-8", errors="ignore") as f:
-                src = f.read()
+                src = strip_comments(f.read())
         except OSError:
             continue
         specs = []
