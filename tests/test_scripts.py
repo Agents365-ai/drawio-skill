@@ -882,6 +882,59 @@ class TestImportersCli(unittest.TestCase):
                 {"source": "example.com/m/a", "target": "example.com/m/b"},
             )
 
+    def test_goimports_ignores_comments(self):
+        # A ")" in a comment inside the import block must not end the block,
+        # and a commented-out import is not an edge.
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "go.mod"), "module example.com/m\n\ngo 1.21\n")
+            for pkg in ("a", "b", "c", "old"):
+                os.mkdir(os.path.join(d, pkg))
+            self._write(
+                os.path.join(d, "a", "a.go"),
+                "package a\n\n"
+                "import (\n"
+                '\t"fmt" // printing (stdlib)\n'
+                '\t_ "example.com/m/b"\n'
+                '\t// "example.com/m/old"\n'
+                '\t"example.com/m/c"\n'
+                ")\n\n"
+                "/* Previously:\n"
+                'import "example.com/m/old"\n'
+                "*/\n\n"
+                'func F() { fmt.Println("hi") }\n',
+            )
+            for pkg in ("b", "c", "old"):
+                self._write(os.path.join(d, pkg, pkg + ".go"), f"package {pkg}\n")
+            r = run("goimports.py", d, "--no-reduce")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            graph = json.loads(r.stdout)
+            self.assertEqual(
+                sorted((e["source"], e["target"]) for e in graph["edges"]),
+                [
+                    ("example.com/m/a", "example.com/m/b"),
+                    ("example.com/m/a", "example.com/m/c"),
+                ],
+            )
+
+    def test_goimports_strip_comments(self):
+        strip = load("goimports").strip_comments
+        cases = [
+            ('import "a" // note\nx := 1', 'import "a" \nx := 1'),
+            ('import/* note */"a"', 'import "a"'),
+            ('import (\n\t"a" /* one\ntwo */\n)', 'import (\n\t"a"  \n)'),
+            # comment markers inside string, rune and raw literals stay
+            ('u := "http://x/*y*/" // note', 'u := "http://x/*y*/" '),
+            ("r := '\"' // note", "r := '\"' "),
+            ("r := `a // b\n/* c */` // note", "r := `a // b\n/* c */` "),
+            # an escaped quote does not end the string
+            ('s := "say \\"//hi\\"" // note', 's := "say \\"//hi\\"" '),
+            # an unclosed string ends at its line, so later comments still go
+            ('s := "open\nb := 1 // note', 's := "open\nb := 1 '),
+        ]
+        for text, want in cases:
+            with self.subTest(text=text):
+                self.assertEqual(strip(text), want)
+
     def test_tfimports_edge_and_icons(self):
         # Node ids are type.name; the lambda resolves to an official aws4 icon
         # and the referenced role becomes an edge.
