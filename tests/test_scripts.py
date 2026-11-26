@@ -1981,6 +1981,58 @@ class TestImportersCli(unittest.TestCase):
             self.assertEqual(len(graph["edges"]), 1)
             self.assertEqual(graph["edges"][0], {"source": "a", "target": "b"})
 
+    def test_rustimports_ignores_comments_and_strings(self):
+        # A ";" in a comment inside a brace group must not end the use, and a
+        # commented-out use or one inside a string is not an edge.
+        with tempfile.TemporaryDirectory() as d:
+            self._write(os.path.join(d, "Cargo.toml"), '[package]\nname = "m"\n')
+            os.mkdir(os.path.join(d, "src"))
+            self._write(
+                os.path.join(d, "src", "a.rs"),
+                "use crate::{\n"
+                "    b, // the parser; see docs\n"
+                "    c,\n"
+                "};\n"
+                "// use crate::old;\n"
+                "/* Previously:\n"
+                "use crate::old;\n"
+                "*/\n"
+                'pub fn f() -> &\'static str { "use crate::old;" }\n',
+            )
+            for m in ("b", "c", "old"):
+                self._write(os.path.join(d, "src", m + ".rs"), "pub fn f() {}\n")
+            r = run("rustimports.py", d, "--no-reduce")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            graph = json.loads(r.stdout)
+            self.assertEqual(
+                sorted((e["source"], e["target"]) for e in graph["edges"]),
+                [("a", "b"), ("a", "c")],
+            )
+
+    def test_rustimports_strip_comments(self):
+        strip = load("rustimports").strip_comments
+        cases = [
+            ("use crate::a; // note\nx", "use crate::a; \nx"),
+            ("use/* note */crate::a;", "use crate::a;"),
+            ("/// use crate::a;\n//! use crate::b;\nx", "\n\nx"),
+            # block comments nest
+            ("a /* x /* y */ use crate::b; */ c", "a   c"),
+            # literals are emptied, so their markers and uses are not seen
+            ('let u = "http://x/*y*/"; // note', 'let u = ""; '),
+            ('let s = "say \\"//hi\\""; // note', 'let s = ""; '),
+            ('let s = "a\nuse crate::b;\n"; c', 'let s = ""; c'),
+            ('let s = r#"a "// b" c"#; // note', 'let s = ""; '),
+            ('let s = br"a // b"; x', 'let s = b""; x'),
+            ("let q = '\"'; // note", 'let q = ""; '),
+            ("let q = '\\''; // note", 'let q = ""; '),
+            # a lifetime is not a char literal; r in a name is not a raw string
+            ("fn f<'a>(x: &'a str) // note", "fn f<'a>(x: &'a str) "),
+            ('let r = bar("x"); // note', 'let r = bar(""); '),
+        ]
+        for text, want in cases:
+            with self.subTest(text=text):
+                self.assertEqual(strip(text), want)
+
     def test_openapiimports_operations_and_schemas(self):
         spec = {
             "openapi": "3.0.0",
