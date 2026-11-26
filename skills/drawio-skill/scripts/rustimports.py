@@ -33,6 +33,59 @@ import subprocess
 import sys
 
 USE = re.compile(r"\buse\s+([^;]+);")
+RAW = re.compile(r'r(#*)"')
+
+
+def strip_comments(src):
+    """Drop ``//`` and ``/* */`` comments and empty string and char literals.
+
+    A ``;`` in a comment inside a brace group, like ``b, // the parser; see
+    docs``, ended USE there so the whole group was lost, and a commented-out
+    ``// use crate::old;``, one inside ``/* */`` or one in a string was read
+    as a real use. A ``use`` path never holds a literal, so each literal
+    becomes ``""`` and its ``//``, ``;`` or ``use`` is not seen. ``/* */``
+    nests as in Rust, ``"..."`` may span lines, a raw string (``r"..."``,
+    ``r#"..."#``, ``br"..."``) ends only at its own closing quote, and a
+    lifetime like ``'a`` is not a char literal.
+    """
+    out, i, n = [], 0, len(src)
+    while i < n:
+        c = src[i]
+        raw = RAW.match(src, i) if c == "r" else None
+        if raw:
+            end = src.find('"' + raw.group(1), raw.end())
+            i = n if end < 0 else end + 1 + len(raw.group(1))
+            out.append('""')
+        elif c == '"':
+            j = i + 1
+            while j < n and src[j] != '"':
+                j += 2 if src[j] == "\\" else 1
+            i = min(j + 1, n)
+            out.append('""')
+        elif c == "'" and src.startswith("\\", i + 1):  # '\n', '\'', '\u{..}'
+            end = src.find("'", i + 3)
+            i = n if end < 0 else end + 1
+            out.append('""')
+        elif c == "'" and src.startswith("'", i + 2):  # 'x', '"'
+            i += 3
+            out.append('""')
+        elif src.startswith("//", i):
+            end = src.find("\n", i)
+            i = n if end < 0 else end
+        elif src.startswith("/*", i):
+            depth, i = 1, i + 2
+            while i < n and depth:
+                if src.startswith("/*", i):
+                    depth, i = depth + 1, i + 2
+                elif src.startswith("*/", i):
+                    depth, i = depth - 1, i + 2
+                else:
+                    i += 1
+            out.append(" ")
+        else:
+            out.append(c)
+            i += 1
+    return "".join(out)
 
 
 def crate_name(root):
@@ -122,7 +175,7 @@ def edges_of(current, path, modules):
     found = set()
     try:
         with open(path, encoding="utf-8", errors="ignore") as f:
-            src = f.read()
+            src = strip_comments(f.read())
     except OSError:
         return found
     for stmt in USE.findall(src):
