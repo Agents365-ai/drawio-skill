@@ -860,6 +860,56 @@ class TestImportersCli(unittest.TestCase):
             self.assertEqual(len(graph["edges"]), 1)
             self.assertEqual(graph["edges"][0], {"source": "a", "target": "b"})
 
+    def test_jsimports_ignores_comments(self):
+        # A ";" in a comment inside a multi-line import must not stop the
+        # match before "from", and a commented-out import is not an edge.
+        with tempfile.TemporaryDirectory() as d:
+            self._write(
+                os.path.join(d, "a.ts"),
+                "import { b } from './b';\n"
+                "// import { old } from './old';\n"
+                "/* Previously:\n"
+                "import { old } from './old';\n"
+                "*/\n"
+                "import {\n"
+                "  c, // the parser; see docs\n"
+                "} from './c';\n"
+                "const url = /https?:\\/\\//; import { d } from './d';\n",
+            )
+            for m in ("b", "c", "d", "old"):
+                self._write(os.path.join(d, m + ".ts"), "export const x = 1;\n")
+            r = run("jsimports.py", d, "--no-reduce")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            graph = json.loads(r.stdout)
+            self.assertEqual(
+                sorted((e["source"], e["target"]) for e in graph["edges"]),
+                [("a", "b"), ("a", "c"), ("a", "d")],
+            )
+
+    def test_jsimports_strip_comments(self):
+        strip = load("jsimports").strip_comments
+        cases = [
+            ("import a from './a' // note\nx = 1", "import a from './a' \nx = 1"),
+            ("import/* note */'./a'", "import './a'"),
+            (
+                "import {\n  a, /* one\ntwo */\n} from './a'",
+                "import {\n  a,  \n} from './a'",
+            ),
+            # comment markers inside string and template literals stay
+            ('u = "http://x/*y*/" // note', 'u = "http://x/*y*/" '),
+            ("q = '\"' // note", "q = '\"' "),
+            ("t = `a // b\n/* c */` // note", "t = `a // b\n/* c */` "),
+            # an escaped quote does not end the string
+            ('s = "say \\"//hi\\"" // note', 's = "say \\"//hi\\"" '),
+            # an escaped slash in a regex literal is not a comment
+            ("r = /https?:\\/\\//; // note", "r = /https?:\\/\\//; "),
+            # an unclosed string ends at its line, so later comments still go
+            ("s = 'open\nb = 1 // note", "s = 'open\nb = 1 "),
+        ]
+        for text, want in cases:
+            with self.subTest(text=text):
+                self.assertEqual(strip(text), want)
+
     def test_goimports_edge(self):
         # Node ids are full import paths: example.com/m/<pkg>.
         with tempfile.TemporaryDirectory() as d:

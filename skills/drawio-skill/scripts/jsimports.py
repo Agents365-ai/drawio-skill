@@ -13,8 +13,9 @@ root), and applies transitive reduction so the diagram stays readable.
 Resolution is path-based: relative specifiers are resolved against the
 importing file's directory, trying the .ts/.tsx/.js/.jsx/.mjs/.cjs extensions
 and directory index files. Bare specifiers (node_modules packages such as
-"react") are ignored. Scanning is regex-based rather than a full parser, so a
-specifier inside a comment or string literal is counted in rare cases.
+"react") are ignored. Comments are dropped before scanning; the scan itself is
+regex-based rather than a full parser, so a specifier inside a string literal
+is counted in rare cases.
 
 Usage: python3 jsimports.py <src_dir> [-o graph.json] [--direction TB|LR]
                                        [--group] [--no-reduce]
@@ -34,6 +35,43 @@ SPEC = re.compile(
     r"|require\s*\(\s*['\"]([^'\"]+)['\"]\s*\)"  # require("x")
     r"|import\s*\(\s*['\"]([^'\"]+)['\"]\s*\)"  # import("x") dynamic
 )
+
+
+def strip_comments(src):
+    """Drop ``//`` and ``/* */`` comments, keeping string and template literals whole.
+
+    A ``;`` in a comment inside a multi-line ``import { ... } from`` stopped
+    SPEC before ``from``, so that import was lost, and a commented-out
+    ``// import x from './old'`` was read as a real import. A ``//`` inside
+    ``'...'``, ``"..."`` or a template `` `...` `` is not a comment, nor is an
+    escaped ``\\/`` in a regex literal. ``'...'`` and ``"..."`` end at a newline,
+    so one stray quote cannot hide the rest of the file.
+    """
+    out, i, n = [], 0, len(src)
+    while i < n:
+        c = src[i]
+        if c in "\"'`":
+            j = i + 1
+            while j < n and src[j] != c and (c == "`" or src[j] != "\n"):
+                j += 2 if src[j] == "\\" else 1
+            if j < n and src[j] == c:
+                j += 1
+            out.append(src[i:j])
+            i = j
+        elif c == "\\":
+            out.append(src[i : i + 2])
+            i += 2
+        elif src.startswith("//", i):
+            end = src.find("\n", i)
+            i = n if end < 0 else end
+        elif src.startswith("/*", i):
+            end = src.find("*/", i + 2)
+            i = n if end < 0 else end + 2
+            out.append(" ")
+        else:
+            out.append(c)
+            i += 1
+    return "".join(out)
 
 
 def modid(path, root):
@@ -84,7 +122,7 @@ def edges_of(mid, path, root, modules):
             src = f.read()
     except OSError:
         return found
-    for m in SPEC.finditer(src):
+    for m in SPEC.finditer(strip_comments(src)):
         spec = m.group(1) or m.group(2) or m.group(3) or m.group(4)
         target = resolve(spec, path, root, modules)
         if target and target != mid:
