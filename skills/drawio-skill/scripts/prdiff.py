@@ -34,7 +34,11 @@ def changed_drawios(base, head, repo):
 
     status is "added", "removed", or "modified" (renames/copies count as
     modified, keyed on the new path). Shells to `git diff --name-status`.
+    A ref starting with "-" would be read by git as an option, so it is refused.
     """
+    for flag, ref in (("--base", base), ("--head", head)):
+        if ref.startswith("-"):
+            sys.exit(f"error: {flag} {ref!r} is not a git ref (refs can't start with '-')")
     try:
         r = subprocess.run(
             ["git", "-C", repo, "diff", "--name-status", f"{base}..{head}", "--", "*.drawio"],
@@ -55,7 +59,12 @@ def changed_drawios(base, head, repo):
 
 
 def git_show_file(repo, ref, path, dest):
-    """Write the blob at ref:path (in repo) to dest. False if it doesn't exist there."""
+    """Write the blob at ref:path (in repo) to dest. False if it doesn't exist there.
+
+    False for a ref starting with "-" too: git would read `-x:path` as an option.
+    """
+    if ref.startswith("-"):
+        return False
     r = subprocess.run(["git", "-C", repo, "show", f"{ref}:{path}"], capture_output=True)
     if r.returncode != 0:
         return False

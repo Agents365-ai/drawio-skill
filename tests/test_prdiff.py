@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.join(ROOT, "skills", "drawio-skill", "scripts")
@@ -96,6 +97,56 @@ class TestChangedDrawios(unittest.TestCase):
             write_commit(tmp, "a.drawio", V1, "v1")
             write_commit(tmp, "notes.txt", "hello", "add notes")
             self.assertEqual(self.m.changed_drawios("HEAD~1", "HEAD", tmp), [])
+
+    def test_ref_starting_with_dash_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = os.path.join(tmp, "repo")
+            os.makedirs(repo)
+            make_repo(repo)
+            write_commit(repo, "a.drawio", V1, "v1")
+            write_commit(repo, "a.drawio", V2, "v2")
+            target = os.path.join(tmp, "x")
+            for base, head in ((f"--output={target}", "HEAD"), ("HEAD~1", f"--output={target}"),
+                               ("-x", "HEAD")):
+                with self.assertRaises(SystemExit) as cm:
+                    self.m.changed_drawios(base, head, repo)
+                self.assertIn("refs can't start with '-'", str(cm.exception.code))
+            self.assertEqual(os.listdir(tmp), ["repo"])
+
+    def test_ref_with_inner_dash_still_works(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            make_repo(tmp)
+            write_commit(tmp, "a.drawio", V1, "v1")
+            subprocess.run(["git", "-C", tmp, "branch", "my-base"], check=True)
+            write_commit(tmp, "a.drawio", V2, "v2")
+            self.assertEqual(self.m.changed_drawios("my-base", "HEAD", tmp), [("a.drawio", "modified")])
+
+
+class TestGitShowFile(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.m = load("prdiff")
+
+    def test_writes_blob(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = os.path.join(tmp, "repo")
+            os.makedirs(repo)
+            make_repo(repo)
+            write_commit(repo, "a.drawio", V1, "v1")
+            dest = os.path.join(tmp, "a.drawio")
+            self.assertTrue(self.m.git_show_file(repo, "HEAD", "a.drawio", dest))
+            with open(dest, encoding="utf-8") as f:
+                self.assertEqual(f.read(), V1)
+
+    def test_ref_starting_with_dash_is_refused(self):
+        # git would read `--output=x:a.drawio` as an option and write the file
+        # (Windows refuses the ":" in the name, so assert git is never called).
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = os.path.join(tmp, "out.drawio")
+            with mock.patch.object(self.m.subprocess, "run") as run:
+                self.assertFalse(self.m.git_show_file(tmp, f"--output={tmp}/x", "a.drawio", dest))
+            run.assert_not_called()
+            self.assertEqual(os.listdir(tmp), [])
 
 
 class TestRenderMarkdown(unittest.TestCase):
