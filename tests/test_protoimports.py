@@ -142,6 +142,47 @@ class TestProtoImports(unittest.TestCase):
         self.assertIn(("shop.Cart", "shop.Cart.State"), pairs)
         self.assertIn(("shop.Cart", "shop.Cart.Item"), pairs)
 
+    def test_nested_name_only_shadows_inside_its_parent(self):
+        # A nested Cart.Item used to win every lookup of the short name `Item`,
+        # so Order and the service pointed at Cart.Item, not the top-level Item.
+        proto = """
+        syntax = "proto3";
+        package shop;
+
+        message Item { string sku = 1; }
+        enum Status { STATUS_OPEN = 0; }
+
+        message Cart {
+          message Item { int32 qty = 1; }
+          enum Status { STATUS_ACTIVE = 0; }
+          message Line { Item item = 1; }
+          repeated Item lines = 1;
+        }
+
+        message Order {
+          Item item = 1;
+          Cart.Item cart_item = 2;
+          Status status = 3;
+        }
+
+        service OrderService {
+          rpc Get (Item) returns (Order);
+        }
+        """
+        parsed = self.importer.parse_proto(proto, "shop.proto")
+        graph = self.importer.build([parsed])
+        targets = {}
+        for edge in graph["edges"]:
+            targets.setdefault((edge["source"], edge["label"]), set()).add(edge["target"])
+
+        self.assertEqual({"shop.Item"}, targets[("shop.Order", "item")])
+        self.assertEqual({"shop.Cart.Item"}, targets[("shop.Order", "cart_item")])
+        self.assertEqual({"shop.Status"}, targets[("shop.Order", "status")])
+        self.assertEqual({"shop.Item", "shop.Order"}, targets[("shop.OrderService", "Get")])
+        # Inside Cart (and messages nested in it) the nested Item still wins.
+        self.assertEqual({"shop.Cart.Item"}, targets[("shop.Cart", "lines")])
+        self.assertEqual({"shop.Cart.Item"}, targets[("shop.Cart.Line", "item")])
+
     def test_comments_do_not_swallow_string_literals(self):
         # A "//" inside a string used to be stripped as a comment, which also
         # removed the brace that closed the message and dropped the rest of the
