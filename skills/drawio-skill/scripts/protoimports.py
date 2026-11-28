@@ -368,6 +368,9 @@ def build(proto_data_list, group=False, direction="TB"):
     # Also index by package
     all_symbols = {}
     package_symbols = {}
+    # Package -> package-relative full name (Cart.Item) -> node_id, for
+    # scoped lookups. Short names alone collide across parent messages.
+    full_symbols = {}
 
     # Assign IDs
     # If package exists, prefix with package to ensure uniqueness across packages
@@ -388,6 +391,7 @@ def build(proto_data_list, group=False, direction="TB"):
             all_symbols[m["name"]] = nid
             package_symbols.setdefault(pkg, {})[m["full_name"]] = nid
             package_symbols.setdefault(pkg, {})[m["name"]] = nid
+            full_symbols.setdefault(pkg, {})[m["full_name"]] = nid
 
         for e in data["enums"]:
             nid = f"{pkg}.{e['full_name']}" if pkg else e["full_name"]
@@ -397,10 +401,19 @@ def build(proto_data_list, group=False, direction="TB"):
             all_symbols[e["name"]] = nid
             package_symbols.setdefault(pkg, {})[e["full_name"]] = nid
             package_symbols.setdefault(pkg, {})[e["name"]] = nid
+            full_symbols.setdefault(pkg, {})[e["full_name"]] = nid
 
-    def resolve(type_name, current_pkg=""):
+    def resolve(type_name, current_pkg="", scope=""):
         if type_name in SCALAR_TYPES:
             return None
+        # Search the enclosing message scopes innermost first, as protoc does,
+        # so a nested `Item` only shadows a top-level `Item` inside its parent.
+        full_map = full_symbols.get(current_pkg, {})
+        parts = scope.split(".") if scope else []
+        for i in range(len(parts), -1, -1):
+            candidate = ".".join(parts[:i] + [type_name])
+            if candidate in full_map:
+                return full_map[candidate]
         # Check current package first
         pkg_map = package_symbols.get(current_pkg, {})
         if type_name in pkg_map:
@@ -480,7 +493,7 @@ def build(proto_data_list, group=False, direction="TB"):
 
             for f in m["fields"]:
                 ref_type = f.get("val_type") or f["type"]
-                target = resolve(ref_type, pkg)
+                target = resolve(ref_type, pkg, m["full_name"])
                 if target:
                     add_edge(m["id"], target, REF_EDGE, f["name"], f["line"], m["file"])
 
